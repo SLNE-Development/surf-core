@@ -11,6 +11,7 @@ data class SurfPlayer(
     val nameHistory: NameHistory
 ) {
     var currentServer: String? = null
+    val currentName get() = nameHistory.currentName
 
     fun isOnline() = surfCoreApi.getOnlinePlayers().any { it.uuid == uuid }
 }

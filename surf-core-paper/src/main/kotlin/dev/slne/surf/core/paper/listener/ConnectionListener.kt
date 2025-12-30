@@ -6,6 +6,7 @@ import dev.slne.surf.core.api.common.event.SurfPlayerDisconnectEvent
 import dev.slne.surf.core.core.common.event.surfEventBus
 import dev.slne.surf.core.core.common.player.surfPlayerService
 import dev.slne.surf.core.paper.plugin
+import dev.slne.surf.core.paper.surfServerConfig
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
@@ -21,7 +22,9 @@ object ConnectionListener : Listener {
                 if (firstSeen == null) {
                     firstSeen = System.currentTimeMillis()
                 }
+                lastSeen = System.currentTimeMillis()
                 lastKnownName = event.player.name
+                currentServer = surfServerConfig.serverName
             }
 
 

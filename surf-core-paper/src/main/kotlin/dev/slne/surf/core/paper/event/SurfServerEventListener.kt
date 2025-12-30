@@ -53,7 +53,7 @@ object SurfServerEventListener {
     }
 
     private fun SurfComponentBuilder.appendOnlinePrefix() = append {
-        text("»", Colors.GREEN)
+        success("»")
         darkSpacer(" |")
         appendSpace()
     }

@@ -1,7 +1,9 @@
 package dev.slne.surf.core.api.common.event
 
 import dev.slne.surf.core.api.common.player.SurfPlayer
+import kotlinx.serialization.Serializable
 
-interface CancellableSurfPlayerEvent : CancellableSurfEvent {
+@Serializable
+sealed interface CancellableSurfPlayerEvent : CancellableSurfEvent {
     val player: SurfPlayer
 }

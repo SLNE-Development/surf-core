@@ -7,11 +7,13 @@ import dev.jorel.commandapi.kotlindsl.getValue
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.paper.command.argument.surfOfflinePlayerArgument
 import dev.slne.surf.core.core.common.util.formatDateMillis
+import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.core.paper.plugin
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 import kotlinx.coroutines.Deferred
 
-fun lastSeenCommand() = commandTree("lastseen") {//TODO: Permission
+fun lastSeenCommand() = commandTree("lastseen") {
+    withPermission(PermissionRegistry.COMMAND_LAST_SEEN)
     surfOfflinePlayerArgument("player") {
         anyExecutor { executor, args ->
             val player: Deferred<SurfPlayer?> by args
@@ -45,7 +47,7 @@ fun lastSeenCommand() = commandTree("lastseen") {//TODO: Permission
                 executor.sendText {
                     appendPrefix()
                     info("Der Spieler ")
-                    variableValue(surfPlayer.currentName ?: surfPlayer.uuid.toString())
+                    variableValue(surfPlayer.lastKnownName ?: surfPlayer.uuid.toString())
                     info(" wurde zuletzt am ")
                     variableValue(lastSeen.formatDateMillis())
                     info(" um ")

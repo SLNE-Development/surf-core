@@ -2,7 +2,6 @@ package dev.slne.surf.core.fallback.service
 
 import com.google.auto.service.AutoService
 import dev.slne.surf.core.api.common.player.SurfPlayer
-import dev.slne.surf.core.api.common.player.name.NameHistory
 import dev.slne.surf.core.core.common.player.SurfPlayerService
 import dev.slne.surf.core.fallback.repository.surfPlayerRepository
 import dev.slne.surf.surfapi.core.api.util.mutableObjectSetOf
@@ -14,7 +13,7 @@ class SurfPlayerServiceImpl : SurfPlayerService, Services.Fallback {
     override val players = mutableObjectSetOf<SurfPlayer>()
 
     override fun findPlayerByName(name: String) =
-        players.firstOrNull { it.nameHistory.currentName.equals(name, ignoreCase = true) }
+        players.firstOrNull { it.lastKnownName.equals(name, ignoreCase = true) }
 
     override fun findPlayerByUuid(uuid: UUID) = players.firstOrNull { it.uuid == uuid }
     override suspend fun loadPlayerByName(name: String) =
@@ -30,9 +29,9 @@ class SurfPlayerServiceImpl : SurfPlayerService, Services.Fallback {
     override suspend fun getOrLoadOrCreatePlayerByUuid(uuid: UUID) = getOrLoadPlayerByUuid(uuid)
         ?: SurfPlayer(
             uuid = uuid,
+            lastKnownName = null,
             firstSeen = null,
-            lastSeen = null,
-            nameHistory = NameHistory(mutableListOf())
+            lastSeen = null
         )
 
     override suspend fun savePlayer(player: SurfPlayer) = surfPlayerRepository.savePlayer(player)

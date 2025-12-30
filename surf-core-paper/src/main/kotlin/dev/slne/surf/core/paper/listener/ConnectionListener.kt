@@ -1,6 +1,9 @@
 package dev.slne.surf.core.paper.listener
 
 import com.github.shynixn.mccoroutine.folia.launch
+import dev.slne.surf.core.api.common.event.SurfPlayerConnectEvent
+import dev.slne.surf.core.api.common.event.SurfPlayerDisconnectEvent
+import dev.slne.surf.core.core.common.event.surfEventBus
 import dev.slne.surf.core.core.common.player.surfPlayerService
 import dev.slne.surf.core.paper.plugin
 import org.bukkit.event.EventHandler
@@ -12,18 +15,40 @@ object ConnectionListener : Listener {
     @EventHandler
     fun onJoin(event: PlayerJoinEvent) {
         plugin.launch {
-            surfPlayerService.cachePlayer(surfPlayerService.getOrLoadOrCreatePlayerByUuid(event.player.uniqueId))
+            val player = surfPlayerService.getOrLoadOrCreatePlayerByUuid(
+                event.player.uniqueId
+            ).apply {
+                if (firstSeen == null) {
+                    firstSeen = System.currentTimeMillis()
+                }
+                lastKnownName = event.player.name
+            }
+
+
+            surfEventBus.fire(
+                SurfPlayerConnectEvent(
+                    player
+                )
+            )
+
+            surfPlayerService.savePlayer(player)
         }
     }
 
     @EventHandler
     fun onQuit(event: PlayerQuitEvent) {
-        plugin.launch {
-            surfPlayerService.findPlayerByUuid(event.player.uniqueId)?.let {
-                surfPlayerService.savePlayer(it)
-            }
+        val player = surfPlayerService.findPlayerByUuid(event.player.uniqueId) ?: return
 
-            surfPlayerService.invalidatePlayer(event.player.uniqueId)
+        surfEventBus.fire(
+            SurfPlayerDisconnectEvent(
+                player
+            )
+        )
+
+        plugin.launch {
+            surfPlayerService.savePlayer(player.apply {
+                lastSeen = System.currentTimeMillis()
+            })
         }
     }
 }

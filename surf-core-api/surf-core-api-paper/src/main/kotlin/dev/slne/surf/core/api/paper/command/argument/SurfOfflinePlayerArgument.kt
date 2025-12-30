@@ -22,7 +22,7 @@ class SurfOfflinePlayerArgument(nodeName: String) :
     init {
         this.replaceSuggestions(
             ArgumentSuggestions.stringCollection {
-                surfCoreApi.getOnlinePlayers().mapNotNull { it.nameHistory.currentName }
+                surfCoreApi.getOnlinePlayers().mapNotNull { it.lastKnownName }
             }
         )
     }

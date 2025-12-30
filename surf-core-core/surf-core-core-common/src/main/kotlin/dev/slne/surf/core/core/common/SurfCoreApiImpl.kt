@@ -15,4 +15,7 @@ abstract class SurfCoreApiImpl : SurfCoreApi {
 
     override suspend fun getOfflinePlayer(name: String) =
         surfPlayerService.getOrLoadPlayerByName(name)
+
+    override suspend fun getOfflinePlayer(uuid: UUID) =
+        surfPlayerService.getOrLoadPlayerByUuid(uuid)
 }

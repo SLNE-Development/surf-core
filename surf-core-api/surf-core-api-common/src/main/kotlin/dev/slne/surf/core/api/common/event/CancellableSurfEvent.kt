@@ -1,6 +1,4 @@
-package dev.slne.surf.core.api.common.event.cancellable
-
-import dev.slne.surf.core.api.common.event.SurfEvent
+package dev.slne.surf.core.api.common.event
 
 interface CancellableSurfEvent : SurfEvent {
     var isCancelled: Boolean

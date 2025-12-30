@@ -1,6 +1,6 @@
 package dev.slne.surf.core.paper
 
-import dev.slne.surf.core.api.common.event.server.SurfServerStartEvent
+import dev.slne.surf.core.api.common.event.SurfServerStartEvent
 import dev.slne.surf.core.core.common.event.surfEventBus
 import dev.slne.surf.core.core.common.redis.redisLoader
 import dev.slne.surf.core.paper.config.SurfServerConfigHolder
@@ -13,9 +13,14 @@ class PaperBootstrap : PluginBootstrap {
         redisLoader.load(context.dataDirectory)
         redisLoader.connect()
 
+        surfServerConfigHolder = SurfServerConfigHolder(context.dataDirectory)
+
         surfEventBus.fire(SurfServerStartEvent(surfServerConfig.serverName))
+    }
+
+    companion object {
+        lateinit var surfServerConfigHolder: SurfServerConfigHolder
     }
 }
 
-val surfServerConfigHolder = SurfServerConfigHolder()
-val surfServerConfig get() = surfServerConfigHolder.config
+val surfServerConfig get() = PaperBootstrap.surfServerConfigHolder.config

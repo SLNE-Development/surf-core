@@ -1,6 +1,5 @@
-package dev.slne.surf.core.api.common.event.server
+package dev.slne.surf.core.api.common.event
 
-import dev.slne.surf.core.api.common.event.SurfEvent
 import kotlinx.serialization.Serializable
 
 @Serializable

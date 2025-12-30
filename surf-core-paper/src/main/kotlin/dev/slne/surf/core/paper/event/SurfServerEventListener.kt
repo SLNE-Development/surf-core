@@ -1,10 +1,12 @@
 package dev.slne.surf.core.paper.event
 
 import dev.slne.surf.core.api.common.event.SurfEventHandler
-import dev.slne.surf.core.api.common.event.server.SurfServerOnlineEvent
-import dev.slne.surf.core.api.common.event.server.SurfServerStartEvent
-import dev.slne.surf.core.api.common.event.server.SurfServerStoppingEvent
+import dev.slne.surf.core.api.common.event.SurfServerOnlineEvent
+import dev.slne.surf.core.api.common.event.SurfServerStartEvent
+import dev.slne.surf.core.api.common.event.SurfServerStoppingEvent
+import dev.slne.surf.surfapi.core.api.messages.Colors
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
+import dev.slne.surf.surfapi.core.api.messages.builder.SurfComponentBuilder
 import org.bukkit.Bukkit
 
 object SurfServerEventListener {
@@ -12,10 +14,10 @@ object SurfServerEventListener {
     fun onServerStart(event: SurfServerStartEvent) {
         Bukkit.getOnlinePlayers().filter { it.hasPermission("surf.core.servernotify") }.forEach {
             it.sendText {
-                appendPrefix()
+                appendStartingPrefix()
                 info("Der Server ")
                 variableValue(event.serverName)
-                success(" startet nun...")
+                info(" startet nun...")
             }
         }
     }
@@ -24,10 +26,10 @@ object SurfServerEventListener {
     fun onServerOnline(event: SurfServerOnlineEvent) {
         Bukkit.getOnlinePlayers().filter { it.hasPermission("surf.core.servernotify") }.forEach {
             it.sendText {
-                appendPrefix()
+                appendOnlinePrefix()
                 info("Der Server ")
                 variableValue(event.serverName)
-                success(" ist nun online")
+                info(" ist nun online.")
             }
         }
     }
@@ -36,11 +38,29 @@ object SurfServerEventListener {
     fun onServerStop(event: SurfServerStoppingEvent) {
         Bukkit.getOnlinePlayers().filter { it.hasPermission("surf.core.servernotify") }.forEach {
             it.sendText {
-                appendPrefix()
+                appendStoppingPrefix()
                 info("Der Server ")
                 variableValue(event.serverName)
-                error(" stoppt nun...")
+                info(" stoppt nun...")
             }
         }
+    }
+
+    private fun SurfComponentBuilder.appendStartingPrefix() = append {
+        text("»", Colors.YELLOW)
+        darkSpacer(" |")
+        appendSpace()
+    }
+
+    private fun SurfComponentBuilder.appendOnlinePrefix() = append {
+        text("»", Colors.GREEN)
+        darkSpacer(" |")
+        appendSpace()
+    }
+
+    private fun SurfComponentBuilder.appendStoppingPrefix() = append {
+        error("»")
+        darkSpacer(" |")
+        appendSpace()
     }
 }

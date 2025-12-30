@@ -21,7 +21,7 @@ class TeleportManager {
 
         if (player.surfPlayer.currentServer != targetServer) {
             surfBukkitApi.sendPlayerToServer(player, targetServer)
-            delay(2.seconds)
+            delay(1.seconds)
             redisApi.publishEvent(SurfPlayerTeleportRequestRedisEvent(surfPlayer, target))
             return
         }

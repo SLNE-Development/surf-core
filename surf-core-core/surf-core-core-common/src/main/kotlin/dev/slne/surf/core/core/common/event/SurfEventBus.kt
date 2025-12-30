@@ -2,7 +2,7 @@ package dev.slne.surf.core.core.common.event
 
 import dev.slne.surf.core.api.common.event.SurfEvent
 import dev.slne.surf.core.api.common.event.SurfEventHandler
-import dev.slne.surf.core.core.common.redis.SurfEventFireRedisEvent
+import dev.slne.surf.core.core.common.redis.event.SurfEventFireRedisEvent
 import dev.slne.surf.core.core.common.redis.redisApi
 import kotlin.reflect.KClass
 import kotlin.reflect.full.declaredFunctions

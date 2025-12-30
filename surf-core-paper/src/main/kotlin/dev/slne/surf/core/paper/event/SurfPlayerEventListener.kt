@@ -11,7 +11,7 @@ object SurfPlayerEventListener {
     @SurfEventHandler
     fun onPlayerConnect(event: SurfPlayerConnectEvent) {
         plugin.launch {
-            surfPlayerService.cachePlayer(surfPlayerService.getOrLoadOrCreatePlayerByUuid(event.player.uuid))
+            surfPlayerService.cachePlayer(event.player)
         }
     }
 

@@ -31,7 +31,9 @@ fun lastSeenCommand() = commandTree("lastseen") {
                 if (surfPlayer.isOnline()) {
                     executor.sendText {
                         appendPrefix()
-                        success("Der Spieler ist aktuell online.")
+                        success("Der Spieler ")
+                        variableValue(surfPlayer.lastKnownName ?: surfPlayer.uuid.toString())
+                        success(" ist aktuell online.")
                     }
                     return@launch
                 }

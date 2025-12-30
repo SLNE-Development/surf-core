@@ -2,8 +2,10 @@ package dev.slne.surf.core.paper
 
 import dev.slne.surf.core.api.common.event.SurfServerStartEvent
 import dev.slne.surf.core.core.common.event.surfEventBus
+import dev.slne.surf.core.core.common.redis.redisApi
 import dev.slne.surf.core.core.common.redis.redisLoader
 import dev.slne.surf.core.paper.config.SurfServerConfigHolder
+import dev.slne.surf.core.paper.teleport.TeleportRedisListener
 import io.papermc.paper.plugin.bootstrap.BootstrapContext
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap
 
@@ -11,10 +13,10 @@ import io.papermc.paper.plugin.bootstrap.PluginBootstrap
 class PaperBootstrap : PluginBootstrap {
     override fun bootstrap(context: BootstrapContext) {
         redisLoader.load(context.dataDirectory)
+        redisApi.subscribeToEvents(TeleportRedisListener)
         redisLoader.connect()
 
         surfServerConfigHolder = SurfServerConfigHolder(context.dataDirectory)
-
         surfEventBus.fire(SurfServerStartEvent(surfServerConfig.serverName))
     }
 

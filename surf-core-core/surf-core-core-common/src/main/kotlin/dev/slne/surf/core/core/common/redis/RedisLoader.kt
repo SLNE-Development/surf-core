@@ -1,5 +1,6 @@
 package dev.slne.surf.core.core.common.redis
 
+import dev.slne.surf.core.core.common.event.LocalSurfEventBusListener
 import dev.slne.surf.redis.RedisApi
 import java.nio.file.Path
 
@@ -14,6 +15,7 @@ class RedisLoader {
     }
 
     fun connect() {
+        redisApi.subscribeToEvents(LocalSurfEventBusListener)
         redisApi.freezeAndConnect()
     }
 

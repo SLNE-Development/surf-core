@@ -14,7 +14,7 @@ val surfEventBus = SurfEventBus()
 class SurfEventBus {
     private val listeners = mutableMapOf<KClass<out SurfEvent>, MutableList<(SurfEvent) -> Unit>>()
 
-    fun register(listener: Any) {
+    fun registerListener(listener: Any) {
         val clazz = listener::class
 
         clazz.declaredFunctions.forEach { function ->
@@ -46,6 +46,10 @@ class SurfEventBus {
                 listeners.computeIfAbsent(eventClass) { mutableListOf() }.add(executor)
             }
         }
+    }
+
+    fun subscribe(eventClass: KClass<out SurfEvent>, handler: (SurfEvent) -> Unit) {
+        listeners.computeIfAbsent(eventClass) { mutableListOf() }.add(handler)
     }
 
     fun fireLocal(event: SurfEvent) {

@@ -6,11 +6,10 @@ import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.jorel.commandapi.kotlindsl.getValue
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.paper.command.argument.surfOfflinePlayerArgument
+import dev.slne.surf.core.core.common.util.formatDateMillis
 import dev.slne.surf.core.paper.plugin
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 import kotlinx.coroutines.Deferred
-import java.time.Instant
-import java.time.ZoneId
 
 fun lastSeenCommand() = commandTree("lastseen") {//TODO: Permission
     surfOfflinePlayerArgument("player") {
@@ -42,11 +41,17 @@ fun lastSeenCommand() = commandTree("lastseen") {//TODO: Permission
                     return@launch
                 }
 
-                val lastSeenTime = Instant.ofEpochMilli(lastSeen)
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDateTime()
 
-
+                executor.sendText {
+                    appendPrefix()
+                    info("Der Spieler ")
+                    variableValue(surfPlayer.currentName ?: surfPlayer.uuid.toString())
+                    info(" wurde zuletzt am ")
+                    variableValue(lastSeen.formatDateMillis())
+                    info(" um ")
+                    variableValue(lastSeen.formatDateMillis())
+                    info(" gesehen.")
+                }
             }
         }
     }

@@ -12,4 +12,5 @@ surfPaperPluginApi {
 
 dependencies {
     api(project(":surf-core-core:surf-core-core-paper"))
+    runtimeOnly(project(":surf-core-backend"))
 }

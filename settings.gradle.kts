@@ -10,3 +10,5 @@ include("surf-core-core:surf-core-core-velocity")
 
 include("surf-core-paper")
 include("surf-core-velocity")
+
+include("surf-core-backend")

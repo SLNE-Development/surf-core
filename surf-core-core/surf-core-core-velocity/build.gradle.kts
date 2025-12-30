@@ -4,5 +4,5 @@ plugins {
 
 dependencies {
     api(project(":surf-core-core:surf-core-core-common"))
-    api(project(":surf-core-core:surf-core-api-velocity"))
+    api(project(":surf-core-api:surf-core-api-velocity"))
 }

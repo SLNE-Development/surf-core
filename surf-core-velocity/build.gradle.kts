@@ -9,4 +9,5 @@ velocityPluginFile {
 
 dependencies {
     api(project(":surf-core-core:surf-core-core-velocity"))
+    runtimeOnly(project(":surf-core-backend"))
 }

@@ -3,5 +3,5 @@ plugins {
 }
 
 dependencies {
-    api(project(":surf-core-core:surf-core-api-common"))
+    api(project(":surf-core-api:surf-core-api-common"))
 }

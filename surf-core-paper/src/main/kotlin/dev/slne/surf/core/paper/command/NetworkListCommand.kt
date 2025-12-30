@@ -21,9 +21,9 @@ fun networkListCommand() = commandTree("nlist") {
 
         executor.sendText {
             appendPrefix()
-            info("Aktuell sind ")
+            info("Derzeit sind ")
             variableValue(players.size)
-            info(" Spieler im Netzwerk online: ")
+            info(" Spieler auf dem Netzwerk online: ")
             variableValue(players.joinToString(", ") { it.lastKnownName ?: it.uuid.toString() })
         }
     }

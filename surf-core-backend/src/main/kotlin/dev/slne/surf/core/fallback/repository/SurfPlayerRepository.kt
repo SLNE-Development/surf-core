@@ -55,25 +55,12 @@ class SurfPlayerRepository {
         Unit
     }
 
-    private fun createPlayerByRowAndHistory(row: ResultRow, history: NameHistory) = row.let {
-        SurfPlayer(
-            row[SurfPlayerTable.uuid],
-            row[SurfPlayerTable.firstSeen],
-            row[SurfPlayerTable.lastSeen],
-            history
-        )
-    }
-
-    private fun createNameHistory(rows: List<ResultRow>) = rows.let {
-        NameHistory(
-            it.map { row ->
-                NameHistoryEntry(
-                    row[SurfPlayerNameHistoryTable.name],
-                    row[SurfPlayerNameHistoryTable.changedAt]
-                )
-            }
-        )
-    }
+    private fun createPlayerByRowAndHistory(row: ResultRow, history: NameHistory) = SurfPlayer(
+        row[SurfPlayerTable.uuid],
+        row[SurfPlayerTable.firstSeen],
+        row[SurfPlayerTable.lastSeen],
+        history
+    )
 
     private fun createNameHistoryEntry(row: ResultRow) = row.let {
         NameHistoryEntry(

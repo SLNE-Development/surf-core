@@ -1,4 +1,4 @@
-package dev.slne.surf.core.paper.config
+package dev.slne.surf.core.core.common.config
 
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 

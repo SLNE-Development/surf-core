@@ -9,7 +9,7 @@ import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 fun networkListCommand() = commandTree("nlist") {
     withPermission(PermissionRegistry.COMMAND_NETWORK_LIST)
     anyExecutor { executor, _ ->
-        val players = surfPlayerService.players.sortedByDescending { it.lastKnownName }
+        val players = surfPlayerService.players.sortedBy { it.lastKnownName }
 
         if (players.isEmpty()) {
             executor.sendText {

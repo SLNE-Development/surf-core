@@ -27,6 +27,7 @@ object ConnectionListener : Listener {
                 currentServer = surfServerConfig.serverName
             }
 
+            surfPlayerService.cachePlayer(player)
 
             surfEventBus.fire(
                 SurfPlayerConnectEvent(
@@ -47,6 +48,8 @@ object ConnectionListener : Listener {
                 player
             )
         )
+
+        surfPlayerService.invalidatePlayer(player.uuid)
 
         plugin.launch {
             surfPlayerService.savePlayer(player.apply {

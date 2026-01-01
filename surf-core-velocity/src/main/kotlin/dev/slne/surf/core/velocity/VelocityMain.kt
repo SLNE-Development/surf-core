@@ -15,9 +15,8 @@ import dev.slne.surf.core.api.common.event.SurfServerStartEvent
 import dev.slne.surf.core.api.common.event.SurfServerStoppingEvent
 import dev.slne.surf.core.core.common.config.SurfServerConfigHolder
 import dev.slne.surf.core.core.common.event.surfEventBus
-import dev.slne.surf.core.core.common.redis.redisApi
+import dev.slne.surf.core.core.common.player.surfPlayerService
 import dev.slne.surf.core.core.common.redis.redisLoader
-import dev.slne.surf.core.velocity.listener.SurfPlayerEventListener
 import java.nio.file.Path
 
 class VelocityMain @Inject constructor(
@@ -31,7 +30,7 @@ class VelocityMain @Inject constructor(
     init {
         suspendingPluginContainer.initialize(this)
         redisLoader.load(dataPath)
-        redisApi.subscribeToEvents(SurfPlayerEventListener)
+        surfPlayerService.init()
         redisLoader.connect()
 
         instance = this

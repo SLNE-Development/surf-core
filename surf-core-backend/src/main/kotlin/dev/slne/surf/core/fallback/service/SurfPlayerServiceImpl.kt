@@ -42,6 +42,10 @@ class SurfPlayerServiceImpl : SurfPlayerService, Services.Fallback {
 
     override suspend fun savePlayer(player: SurfPlayer) = surfPlayerRepository.savePlayer(player)
     override fun cachePlayer(player: SurfPlayer) {
+        if (players.any { it.uuid == player.uuid }) {
+            return
+        }
+
         globalPlayers.add(player)
     }
 

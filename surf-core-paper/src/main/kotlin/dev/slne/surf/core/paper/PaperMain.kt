@@ -5,10 +5,12 @@ import dev.slne.surf.core.api.common.event.SurfServerOnlineEvent
 import dev.slne.surf.core.api.common.event.SurfServerStoppingEvent
 import dev.slne.surf.core.core.common.database.databaseLoader
 import dev.slne.surf.core.core.common.event.surfEventBus
+import dev.slne.surf.core.core.common.player.surfPlayerService
 import dev.slne.surf.core.core.common.redis.redisApi
 import dev.slne.surf.core.paper.command.lastSeenCommand
 import dev.slne.surf.core.paper.command.networkListCommand
 import dev.slne.surf.core.paper.command.networkTeleportCommand
+import dev.slne.surf.core.paper.command.surfCoreCommand
 import dev.slne.surf.core.paper.event.SurfServerEventListener
 import dev.slne.surf.core.paper.listener.ConnectionListener
 import dev.slne.surf.surfapi.bukkit.api.event.register
@@ -33,10 +35,13 @@ class PaperMain : SuspendingJavaPlugin() {
         lastSeenCommand()
         networkListCommand()
         networkTeleportCommand()
+        surfCoreCommand()
     }
 
     override fun onDisable() {
         surfEventBus.fire(SurfServerStoppingEvent(surfServerConfig.serverName))
+
+        surfPlayerService.invalidateServerPlayers(surfServerConfig.serverName)
 
         databaseLoader.disconnect()
         redisApi.disconnect()

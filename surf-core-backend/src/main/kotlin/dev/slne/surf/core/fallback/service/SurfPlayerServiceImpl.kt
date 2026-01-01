@@ -41,6 +41,10 @@ class SurfPlayerServiceImpl : SurfPlayerService, Services.Fallback {
         )
 
     override suspend fun savePlayer(player: SurfPlayer) = surfPlayerRepository.savePlayer(player)
+    override fun clearPlayers() {
+        globalPlayers.clear()
+    }
+
     override fun cachePlayer(player: SurfPlayer) {
         if (players.any { it.uuid == player.uuid }) {
             return
@@ -51,5 +55,9 @@ class SurfPlayerServiceImpl : SurfPlayerService, Services.Fallback {
 
     override fun invalidatePlayer(uuid: UUID) {
         globalPlayers.removeIf { it.uuid == uuid }
+    }
+
+    override fun invalidateServerPlayers(server: String) {
+        globalPlayers.removeIf { it.currentServer == server }
     }
 }

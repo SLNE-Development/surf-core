@@ -14,4 +14,17 @@ data class SurfPlayer(
 ) {
     var currentServer: String? = null
     fun isOnline() = surfCoreApi.getOnlinePlayers().any { it.uuid == uuid }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is SurfPlayer) return false
+
+        if (uuid != other.uuid) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return uuid.hashCode()
+    }
 }

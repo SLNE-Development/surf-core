@@ -9,4 +9,5 @@ import net.kyori.adventure.util.Services
 @AutoService(SurfCoreApi::class)
 class SurfCoreApiVelocityImpl : SurfCoreApiImpl(), Services.Fallback {
     override fun getCurrentServerName() = surfServerConfig.serverName
+    override fun getCurrentServerCategory() = surfServerConfig.serverCategory
 }

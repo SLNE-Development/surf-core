@@ -13,6 +13,7 @@ interface SurfCoreApi {
     fun getPlayer(uuid: UUID): SurfPlayer?
 
     fun getCurrentServerName(): String
+    fun getCurrentServerCategory(): String
 
     suspend fun getOfflinePlayer(name: String): SurfPlayer?
     suspend fun getOfflinePlayer(uuid: UUID): SurfPlayer?

@@ -9,12 +9,6 @@ surfVelocityApi {
 velocityPluginFile {
     main = "dev.slne.surf.core.velocity.VelocityMain"
     authors = listOf("red")
-
-    pluginDependencies {
-        register("surf-redis-velocity") {
-            optional = false
-        }
-    }
 }
 
 dependencies {

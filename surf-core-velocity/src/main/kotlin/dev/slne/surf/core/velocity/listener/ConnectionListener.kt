@@ -3,7 +3,7 @@ package dev.slne.surf.core.velocity.listener
 import com.github.shynixn.mccoroutine.velocity.launch
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.connection.DisconnectEvent
-import com.velocitypowered.api.event.player.ServerConnectedEvent
+import com.velocitypowered.api.event.player.ServerPostConnectEvent
 import dev.slne.surf.core.api.common.event.SurfPlayerConnectEvent
 import dev.slne.surf.core.api.common.event.SurfPlayerDisconnectEvent
 import dev.slne.surf.core.core.common.event.surfEventBus
@@ -13,13 +13,14 @@ import kotlin.jvm.optionals.getOrNull
 
 object ConnectionListener {
     @Subscribe
-    fun onConnected(event: ServerConnectedEvent) {
-        val previousServer = event.previousServer.getOrNull()
+    fun onConnected(event: ServerPostConnectEvent) {
+        val previousServer = event.previousServer
+        val newServer = event.player.currentServer.getOrNull()?.serverInfo?.name
 
         if (previousServer != null) {
             val player =
                 surfPlayerService.players.find { it.uuid == event.player.uniqueId } ?: return
-            player.currentServer = event.server.serverInfo.name
+            player.currentServer = newServer
 
             surfPlayerService.cachePlayer(player)
             return
@@ -34,7 +35,7 @@ object ConnectionListener {
                 }
                 lastSeen = System.currentTimeMillis()
                 lastKnownName = event.player.username
-                currentServer = event.server.serverInfo.name
+                currentServer = newServer
             }
 
             surfPlayerService.cachePlayer(player)

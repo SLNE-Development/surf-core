@@ -57,6 +57,7 @@ class VelocityMain @Inject constructor(
         surfEventBus.fire(SurfServerStoppingEvent(surfServerConfig.serverName))
 
         redisLoader.disconnect()
+        databaseLoader.disconnect()
     }
 
     companion object {

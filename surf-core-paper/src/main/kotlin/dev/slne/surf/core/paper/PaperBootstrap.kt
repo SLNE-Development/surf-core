@@ -13,7 +13,7 @@ import io.papermc.paper.plugin.bootstrap.PluginBootstrap
 @Suppress("UnstableApiUsage")
 class PaperBootstrap : PluginBootstrap {
     override fun bootstrap(context: BootstrapContext) {
-        redisLoader.load(context.dataDirectory)
+        redisLoader.load()
         redisApi.subscribeToEvents(TeleportRedisListener)
         surfPlayerService.init()
         redisLoader.connect()

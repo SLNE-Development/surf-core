@@ -8,6 +8,8 @@ surfPaperPluginApi {
     generateLibraryLoader(false)
     foliaSupported(true)
 
+    withSurfRedis()
+
     authors.add("red")
 }
 

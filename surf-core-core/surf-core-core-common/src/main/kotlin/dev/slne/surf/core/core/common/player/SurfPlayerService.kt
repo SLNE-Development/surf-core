@@ -28,5 +28,4 @@ interface SurfPlayerService {
     fun clearPlayers()
     fun cachePlayer(player: SurfPlayer)
     fun invalidatePlayer(uuid: UUID)
-    fun invalidateServerPlayers(server: String)
 }

@@ -5,21 +5,24 @@ import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.core.common.player.SurfPlayerService
 import dev.slne.surf.core.core.common.redis.redisApi
 import dev.slne.surf.core.fallback.repository.surfPlayerRepository
-import dev.slne.surf.redis.sync.set.SyncSet
+import dev.slne.surf.redis.sync.map.SyncMap
+import dev.slne.surf.surfapi.core.api.util.toObjectSet
 import net.kyori.adventure.util.Services
 import java.util.*
 
+typealias UuidString = String
+
 @AutoService(SurfPlayerService::class)
 class SurfPlayerServiceImpl : SurfPlayerService, Services.Fallback {
-    lateinit var globalPlayers: SyncSet<SurfPlayer>
-    override val players get() = globalPlayers.snapshot()
+    lateinit var globalPlayers: SyncMap<UuidString, SurfPlayer>
+    override val players get() = globalPlayers.snapshot().values.toObjectSet()
 
     override fun findPlayerByName(name: String) =
         players.firstOrNull { it.lastKnownName.equals(name, ignoreCase = true) }
 
     override fun findPlayerByUuid(uuid: UUID) = players.firstOrNull { it.uuid == uuid }
     override fun init() {
-        globalPlayers = redisApi.createSyncSet("surf-core:players")
+        globalPlayers = redisApi.createSyncMap("surf-core:players")
     }
 
     override suspend fun loadPlayerByName(name: String) =
@@ -46,18 +49,10 @@ class SurfPlayerServiceImpl : SurfPlayerService, Services.Fallback {
     }
 
     override fun cachePlayer(player: SurfPlayer) {
-        if (players.any { it.uuid == player.uuid }) {
-            return
-        }
-
-        globalPlayers.add(player)
+        globalPlayers.put(player.uuid.toString(), player)
     }
 
     override fun invalidatePlayer(uuid: UUID) {
-        globalPlayers.removeIf { it.uuid == uuid }
-    }
-
-    override fun invalidateServerPlayers(server: String) {
-        globalPlayers.removeIf { it.currentServer == server }
+        globalPlayers.remove(uuid.toString())
     }
 }

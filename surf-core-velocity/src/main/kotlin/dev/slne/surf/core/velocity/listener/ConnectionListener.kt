@@ -16,7 +16,7 @@ import kotlin.jvm.optionals.getOrNull
 object ConnectionListener {
     @Subscribe(priority = Short.MIN_VALUE)
     fun onLogin(event: PlayerChooseInitialServerEvent) {
-        val newServer = event.initialServer.getOrNull()?.serverInfo?.name
+        val newServer = event.initialServer.getOrNull()?.serverInfo?.name ?: return
         println("[connection: new] ${event.player.username} (${event.player.remoteAddress}) connected to '$newServer'")
 
         plugin.pluginContainer.launch {

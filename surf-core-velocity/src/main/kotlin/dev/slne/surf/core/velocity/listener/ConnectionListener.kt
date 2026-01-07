@@ -3,7 +3,6 @@ package dev.slne.surf.core.velocity.listener
 import com.github.shynixn.mccoroutine.velocity.launch
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.connection.DisconnectEvent
-import com.velocitypowered.api.event.player.KickedFromServerEvent
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent
 import com.velocitypowered.api.event.player.ServerPostConnectEvent
 import dev.slne.surf.core.api.common.event.SurfPlayerConnectEvent
@@ -16,7 +15,8 @@ import kotlin.jvm.optionals.getOrNull
 object ConnectionListener {
     @Subscribe(priority = Short.MIN_VALUE)
     fun onLogin(event: PlayerChooseInitialServerEvent) {
-        val newServer = event.initialServer.getOrNull()?.serverInfo?.name ?: return
+        val newServer = event.initialServer.getOrNull()?.serverInfo?.name
+            ?: error("Player has no initial server")
         println("[connection: new] ${event.player.username} (${event.player.remoteAddress}) connected to '$newServer'")
 
         plugin.pluginContainer.launch {
@@ -45,49 +45,22 @@ object ConnectionListener {
 
     @Subscribe
     fun onConnected(event: ServerPostConnectEvent) {
-        val previousServer = event.previousServer
-        val newServer = event.player.currentServer.getOrNull()?.serverInfo?.name
+        val previousServer = event.previousServer ?: return
+        val newServer = event.player.currentServer.getOrNull()?.serverInfo?.name ?: return
 
-        if (previousServer != null) {
-            val player =
-                surfPlayerService.players.find { it.uuid == event.player.uniqueId } ?: return
-            player.currentServer = newServer
+        println("[connection: update] ${event.player.username} was redirected from '${previousServer.serverInfo.name}' to '$newServer'")
 
-            println("[connection: update] ${event.player.username} was redirected from '${previousServer.serverInfo.name}' to '$newServer'")
+        val player =
+            surfPlayerService.players.find { it.uuid == event.player.uniqueId } ?: return
+        player.currentServer = newServer
 
-            surfPlayerService.cachePlayer(player)
-        }
-    }
-
-    @Subscribe
-    fun onKick(event: KickedFromServerEvent) {
-        when (event.result) {
-            is KickedFromServerEvent.DisconnectPlayer -> {
-                val player = surfPlayerService.findPlayerByUuid(event.player.uniqueId) ?: return
-
-                surfEventBus.fire(
-                    SurfPlayerDisconnectEvent(
-                        player
-                    )
-                )
-
-                surfPlayerService.invalidatePlayer(player.uuid)
-
-                println("[connection: closed] ${event.player.username} disconnected")
-
-                plugin.pluginContainer.launch {
-                    surfPlayerService.savePlayer(player.apply {
-                        lastSeen = System.currentTimeMillis()
-                    })
-                }
-            }
-
-            else -> {}
-        }
+        surfPlayerService.cachePlayer(player)
     }
 
     @Subscribe
     fun onDisconnect(event: DisconnectEvent) {
+        println("[connection: closed] ${event.player.username} disconnected")
+
         val player = surfPlayerService.findPlayerByUuid(event.player.uniqueId) ?: return
 
         surfEventBus.fire(
@@ -97,8 +70,6 @@ object ConnectionListener {
         )
 
         surfPlayerService.invalidatePlayer(player.uuid)
-
-        println("[connection: closed] ${event.player.username} disconnected")
 
         plugin.pluginContainer.launch {
             surfPlayerService.savePlayer(player.apply {

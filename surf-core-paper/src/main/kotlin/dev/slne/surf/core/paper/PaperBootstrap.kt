@@ -3,7 +3,6 @@ package dev.slne.surf.core.paper
 import dev.slne.surf.core.api.common.event.SurfServerStartEvent
 import dev.slne.surf.core.core.common.config.SurfServerConfigHolder
 import dev.slne.surf.core.core.common.event.surfEventBus
-import dev.slne.surf.core.core.common.player.surfPlayerService
 import dev.slne.surf.core.core.common.redis.redisApi
 import dev.slne.surf.core.core.common.redis.redisLoader
 import dev.slne.surf.core.paper.teleport.TeleportRedisListener
@@ -15,7 +14,6 @@ class PaperBootstrap : PluginBootstrap {
     override fun bootstrap(context: BootstrapContext) {
         redisLoader.load()
         redisApi.subscribeToEvents(TeleportRedisListener)
-        surfPlayerService.init()
         redisLoader.connect()
 
         surfServerConfigHolder = SurfServerConfigHolder(context.dataDirectory)

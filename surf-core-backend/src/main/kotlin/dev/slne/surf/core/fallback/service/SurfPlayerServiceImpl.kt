@@ -5,22 +5,20 @@ import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.core.common.player.SurfPlayerService
 import dev.slne.surf.core.core.common.redis.redisApi
 import dev.slne.surf.core.fallback.repository.surfPlayerRepository
-import dev.slne.surf.redis.sync.set.SyncSet
 import dev.slne.surf.surfapi.core.api.util.toObjectSet
 import net.kyori.adventure.util.Services
 import java.util.*
 
 @AutoService(SurfPlayerService::class)
 class SurfPlayerServiceImpl : SurfPlayerService, Services.Fallback {
-    lateinit var globalPlayers: SyncSet<SurfPlayer>
-    override val players get() = globalPlayers.snapshot().toObjectSet()
+    val globalPlayers = redisApi.createSyncMap<UUID, SurfPlayer>("surf-core:players-new")
+    override val players get() = globalPlayers.snapshot().values.toObjectSet()
 
     override fun findPlayerByName(name: String) =
         players.firstOrNull { it.lastKnownName.equals(name, ignoreCase = true) }
 
-    override fun findPlayerByUuid(uuid: UUID) = players.firstOrNull { it.uuid == uuid }
+    override fun findPlayerByUuid(uuid: UUID) = globalPlayers.get(uuid)
     override fun init() {
-        globalPlayers = redisApi.createSyncSet("surf-core:players-new")
     }
 
     override suspend fun loadPlayerByName(name: String) =
@@ -47,19 +45,19 @@ class SurfPlayerServiceImpl : SurfPlayerService, Services.Fallback {
     }
 
     override fun cachePlayer(player: SurfPlayer) {
-        globalPlayers.add(player)
+        globalPlayers.put(player.uuid, player)
         println(
             "Cached player: ${player.uuid}, now: ${
-                globalPlayers.snapshot().map { it.lastKnownName }
+                players.map { it.lastKnownName }
             }"
         )
     }
 
     override fun invalidatePlayer(uuid: UUID) {
-        globalPlayers.removeIf { it.uuid == uuid }
+        globalPlayers.remove(uuid)
         println(
             "Invalidated player: $uuid, now: ${
-                globalPlayers.snapshot().map { it.lastKnownName }
+                players.map { it.lastKnownName }
             }"
         )
     }

@@ -7,10 +7,9 @@ val redisLoader = RedisLoader()
 val redisApi get() = redisLoader.redisApi
 
 class RedisLoader {
-    lateinit var redisApi: RedisApi
+    val redisApi = RedisApi.create()
 
     fun load() {
-        redisApi = RedisApi.create()
     }
 
     fun connect() {

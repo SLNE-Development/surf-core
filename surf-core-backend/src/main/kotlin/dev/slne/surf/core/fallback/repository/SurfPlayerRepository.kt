@@ -20,9 +20,10 @@ class SurfPlayerRepository {
     }
 
     suspend fun loadPlayerByUuid(uuid: UUID): SurfPlayer? = suspendTransaction {
-        SurfPlayerTable.selectAll().where(SurfPlayerTable.uuid eq uuid).firstOrNull()?.let {
-            createPlayerByRow(it)
-        }
+        SurfPlayerTable.selectAll()
+            .where(SurfPlayerTable.uuid eq uuid)
+            .firstOrNull()
+            ?.let(::createPlayerByRow)
     }
 
     suspend fun savePlayer(player: SurfPlayer) = suspendTransaction {

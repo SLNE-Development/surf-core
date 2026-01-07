@@ -28,16 +28,18 @@ class SurfPlayerServiceImpl : SurfPlayerService, Services.Fallback {
     override suspend fun getOrLoadPlayerByName(name: String) =
         findPlayerByName(name) ?: loadPlayerByName(name)
 
-    override suspend fun getOrLoadPlayerByUuid(uuid: UUID) =
-        findPlayerByUuid(uuid) ?: loadPlayerByUuid(uuid)
+    override suspend fun getOrLoadPlayerByUuid(uuid: UUID): SurfPlayer? {
+        return findPlayerByUuid(uuid) ?: loadPlayerByUuid(uuid)
+    }
 
-    override suspend fun getOrLoadOrCreatePlayerByUuid(uuid: UUID) = getOrLoadPlayerByUuid(uuid)
-        ?: SurfPlayer(
+    override suspend fun getOrLoadOrCreatePlayerByUuid(uuid: UUID): SurfPlayer {
+        return getOrLoadPlayerByUuid(uuid) ?: SurfPlayer(
             uuid = uuid,
             lastKnownName = null,
             firstSeen = null,
             lastSeen = null
         )
+    }
 
     override suspend fun savePlayer(player: SurfPlayer) = surfPlayerRepository.savePlayer(player)
     override fun clearPlayers() {

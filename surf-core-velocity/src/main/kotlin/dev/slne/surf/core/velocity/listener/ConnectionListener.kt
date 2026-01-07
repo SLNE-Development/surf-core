@@ -10,9 +10,12 @@ import dev.slne.surf.core.api.common.event.SurfPlayerDisconnectEvent
 import dev.slne.surf.core.core.common.event.surfEventBus
 import dev.slne.surf.core.core.common.player.surfPlayerService
 import dev.slne.surf.core.velocity.plugin
+import dev.slne.surf.surfapi.core.api.util.logger
 import kotlin.jvm.optionals.getOrNull
 
 object ConnectionListener {
+    private val log = logger()
+
     @Subscribe(priority = Short.MIN_VALUE)
     fun onLogin(event: PlayerChooseInitialServerEvent) {
         val newServer = event.initialServer.getOrNull()?.serverInfo?.name
@@ -20,26 +23,33 @@ object ConnectionListener {
         println("[connection: new] ${event.player.username} (${event.player.remoteAddress}) connected to '$newServer'")
 
         plugin.pluginContainer.launch {
-            val player = surfPlayerService.getOrLoadOrCreatePlayerByUuid(
-                event.player.uniqueId
-            ).apply {
-                if (firstSeen == null) {
-                    firstSeen = System.currentTimeMillis()
+
+            try {
+                val player = surfPlayerService.getOrLoadOrCreatePlayerByUuid(
+                    event.player.uniqueId
+                ).apply {
+                    if (firstSeen == null) {
+                        firstSeen = System.currentTimeMillis()
+                    }
+                    lastSeen = System.currentTimeMillis()
+                    lastKnownName = event.player.username
+                    currentServer = newServer
                 }
-                lastSeen = System.currentTimeMillis()
-                lastKnownName = event.player.username
-                currentServer = newServer
-            }
 
-            surfPlayerService.cachePlayer(player)
+                surfPlayerService.cachePlayer(player)
 
-            surfEventBus.fire(
-                SurfPlayerConnectEvent(
-                    player
+                surfEventBus.fire(
+                    SurfPlayerConnectEvent(
+                        player
+                    )
                 )
-            )
 
-            surfPlayerService.savePlayer(player)
+                surfPlayerService.savePlayer(player)
+            } catch (e: Throwable) {
+                log.atSevere().withCause(e).log("Failed to save player")
+
+                throw e;
+            }
         }
     }
 

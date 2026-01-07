@@ -18,6 +18,8 @@ class SurfPlayerServiceImpl : SurfPlayerService, Services.Fallback {
         players.firstOrNull { it.lastKnownName.equals(name, ignoreCase = true) }
 
     override fun findPlayerByUuid(uuid: UUID) = globalPlayers.get(uuid)
+    override fun init() {
+    }
 
     override suspend fun loadPlayerByName(name: String) =
         surfPlayerRepository.loadPlayerByName(name)

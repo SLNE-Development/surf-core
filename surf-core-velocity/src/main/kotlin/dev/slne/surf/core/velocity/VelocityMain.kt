@@ -16,6 +16,7 @@ import dev.slne.surf.core.api.common.event.SurfServerStoppingEvent
 import dev.slne.surf.core.core.common.config.SurfServerConfigHolder
 import dev.slne.surf.core.core.common.database.databaseLoader
 import dev.slne.surf.core.core.common.event.surfEventBus
+import dev.slne.surf.core.core.common.player.surfPlayerService
 import dev.slne.surf.core.core.common.redis.redisLoader
 import dev.slne.surf.core.velocity.listener.ConnectionListener
 import kotlinx.coroutines.runBlocking
@@ -35,6 +36,7 @@ class VelocityMain @Inject constructor(
         instance = this
         surfServerConfigHolder = SurfServerConfigHolder(dataPath)
         redisLoader.load()
+        surfPlayerService.init()
         redisLoader.connect()
 
         surfEventBus.fire(SurfServerStartEvent(surfServerConfig.serverName))

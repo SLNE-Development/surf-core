@@ -13,6 +13,8 @@ interface SurfPlayerService {
     fun findPlayerByName(name: String): SurfPlayer?
     fun findPlayerByUuid(uuid: UUID): SurfPlayer?
 
+    fun init()
+
     suspend fun loadPlayerByName(name: String): SurfPlayer?
     suspend fun loadPlayerByUuid(uuid: UUID): SurfPlayer?
 

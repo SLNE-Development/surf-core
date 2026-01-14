@@ -10,6 +10,7 @@ import dev.slne.surf.core.api.common.event.SurfPlayerDisconnectEvent
 import dev.slne.surf.core.core.common.event.surfEventBus
 import dev.slne.surf.core.core.common.player.surfPlayerService
 import dev.slne.surf.core.velocity.plugin
+import dev.slne.surf.core.velocity.surfServerConfig
 import kotlin.jvm.optionals.getOrNull
 
 object ConnectionListener {
@@ -28,6 +29,7 @@ object ConnectionListener {
             lastSeen = System.currentTimeMillis()
             lastKnownName = event.player.username
             currentServer = newServer
+            currentProxy = surfServerConfig.serverName
         }
 
         surfPlayerService.cachePlayer(player)

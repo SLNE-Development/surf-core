@@ -10,9 +10,10 @@ data class SurfPlayer(
     val uuid: @Contextual UUID,
     var lastKnownName: String?,
     var firstSeen: Long?,
-    var lastSeen: Long?
+    var lastSeen: Long?,
+    var currentServer: String? = null,
+    var currentProxy: String? = null
 ) {
-    var currentServer: String? = null
     fun isOnline() = surfCoreApi.getOnlinePlayers().any { it.uuid == uuid }
 
     override fun equals(other: Any?): Boolean {

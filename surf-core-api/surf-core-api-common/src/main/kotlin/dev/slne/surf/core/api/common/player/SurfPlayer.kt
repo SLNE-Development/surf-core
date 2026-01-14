@@ -12,7 +12,8 @@ data class SurfPlayer(
     var firstSeen: Long?,
     var lastSeen: Long?,
     var currentServer: String? = null,
-    var currentProxy: String? = null
+    var currentProxy: String? = null,
+    val lastKnownIpAddress: String? = null
 ) {
     fun isOnline() = surfCoreApi.getOnlinePlayers().any { it.uuid == uuid }
 

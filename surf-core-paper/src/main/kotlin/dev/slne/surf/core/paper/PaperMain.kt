@@ -6,10 +6,7 @@ import dev.slne.surf.core.api.common.event.SurfServerStoppingEvent
 import dev.slne.surf.core.core.common.database.databaseLoader
 import dev.slne.surf.core.core.common.event.surfEventBus
 import dev.slne.surf.core.core.common.redis.redisLoader
-import dev.slne.surf.core.paper.command.lastSeenCommand
-import dev.slne.surf.core.paper.command.networkListCommand
-import dev.slne.surf.core.paper.command.networkTeleportCommand
-import dev.slne.surf.core.paper.command.surfCoreCommand
+import dev.slne.surf.core.paper.command.*
 import dev.slne.surf.core.paper.event.SurfServerEventListener
 import kotlinx.coroutines.runBlocking
 import org.bukkit.plugin.java.JavaPlugin
@@ -28,6 +25,7 @@ class PaperMain : SuspendingJavaPlugin() {
         networkListCommand()
         networkTeleportCommand()
         surfCoreCommand()
+        whereAmICommand()
 
         runBlocking {
             databaseLoader.connect(plugin.dataPath)

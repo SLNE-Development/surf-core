@@ -9,6 +9,7 @@ object PermissionRegistry : PermissionRegistry() {
     val COMMAND_LAST_SEEN = create("$BASE_COMMAND.lastseen")
     val COMMAND_NETWORK_LIST = create("$BASE_COMMAND.networklist")
     val COMMAND_NETWORK_TELEPORT = create("$BASE_COMMAND.networkteleport")
+    val COMMAND_WHERE_AM_I = create("$BASE_COMMAND.whereami")
 
     val COMMAND_CORE = create("$BASE_COMMAND.core")
 }

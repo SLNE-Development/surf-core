@@ -1,4 +1,4 @@
-package dev.slne.surf.core.api.common.player.history.entry
+package dev.slne.surf.core.api.common.player.history.ip
 
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable

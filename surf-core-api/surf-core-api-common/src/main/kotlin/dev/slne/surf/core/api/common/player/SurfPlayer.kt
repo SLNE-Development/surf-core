@@ -3,6 +3,7 @@ package dev.slne.surf.core.api.common.player
 import dev.slne.surf.core.api.common.surfCoreApi
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import java.net.InetAddress
 import java.util.*
 
 @Serializable
@@ -13,7 +14,7 @@ data class SurfPlayer(
     var lastSeen: Long?,
     var currentServer: String? = null,
     var currentProxy: String? = null,
-    val lastKnownIpAddress: String? = null
+    var lastKnownIpAddress: @Contextual InetAddress? = null
 ) {
     fun isOnline() = surfCoreApi.getOnlinePlayers().any { it.uuid == uuid }
 

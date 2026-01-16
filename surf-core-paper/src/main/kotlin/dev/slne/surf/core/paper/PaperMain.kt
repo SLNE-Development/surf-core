@@ -8,6 +8,8 @@ import dev.slne.surf.core.core.common.event.surfEventBus
 import dev.slne.surf.core.core.common.redis.redisLoader
 import dev.slne.surf.core.paper.command.*
 import dev.slne.surf.core.paper.event.SurfServerEventListener
+import dev.slne.surf.core.paper.listener.PlayerClientLoadedListener
+import dev.slne.surf.surfapi.bukkit.api.event.register
 import kotlinx.coroutines.runBlocking
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -26,6 +28,9 @@ class PaperMain : SuspendingJavaPlugin() {
         networkTeleportCommand()
         surfCoreCommand()
         whereAmICommand()
+        networkInformationCommand()
+
+        PlayerClientLoadedListener.register()
 
         runBlocking {
             databaseLoader.connect(plugin.dataPath)

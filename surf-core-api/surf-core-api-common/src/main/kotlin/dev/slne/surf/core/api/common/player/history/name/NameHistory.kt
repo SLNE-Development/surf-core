@@ -1,6 +1,5 @@
-package dev.slne.surf.core.api.common.player.history
+package dev.slne.surf.core.api.common.player.history.name
 
-import dev.slne.surf.core.api.common.player.history.entry.NameHistoryEntry
 import kotlinx.serialization.Serializable
 
 @Serializable

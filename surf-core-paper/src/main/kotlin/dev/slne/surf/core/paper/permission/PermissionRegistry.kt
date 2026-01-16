@@ -11,5 +11,11 @@ object PermissionRegistry : PermissionRegistry() {
     val COMMAND_NETWORK_TELEPORT = create("$BASE_COMMAND.networkteleport")
     val COMMAND_WHERE_AM_I = create("$BASE_COMMAND.whereami")
 
+    val COMMAND_INFO = create("$BASE_COMMAND.info")
+    val COMMAND_INFO_PLAYER = create("$BASE_COMMAND.info.player")
+    val COMMAND_INFO_SERVER = create("$BASE_COMMAND.info.server")
+
     val COMMAND_CORE = create("$BASE_COMMAND.core")
+
+    val JOIN_WHERE_AM_I = create("$BASE.whereamijoin")
 }

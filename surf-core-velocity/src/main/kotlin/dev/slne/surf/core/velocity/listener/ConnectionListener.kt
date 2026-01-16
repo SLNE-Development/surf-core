@@ -8,28 +8,69 @@ import com.velocitypowered.api.event.player.ServerPostConnectEvent
 import dev.slne.surf.core.api.common.event.SurfPlayerConnectEvent
 import dev.slne.surf.core.api.common.event.SurfPlayerDisconnectEvent
 import dev.slne.surf.core.core.common.event.surfEventBus
+import dev.slne.surf.core.core.common.player.history.surfPlayerIpAddressHistoryService
+import dev.slne.surf.core.core.common.player.history.surfPlayerNameHistoryService
 import dev.slne.surf.core.core.common.player.surfPlayerService
 import dev.slne.surf.core.velocity.plugin
 import dev.slne.surf.core.velocity.surfServerConfig
+import java.net.InetAddress
+import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
 object ConnectionListener {
     @Subscribe(priority = Short.MIN_VALUE)
-    suspend fun onLogin(event: PlayerChooseInitialServerEvent) {
+    fun onLogin(event: PlayerChooseInitialServerEvent) {
         val newServer = event.initialServer.getOrNull()?.serverInfo?.name
             ?: error("Player has no initial server")
-        println("[connection: new] ${event.player.username} (${event.player.remoteAddress}) connected to '$newServer'")
+        val player = event.player
+
+        plugin.pluginContainer.launch {
+            handleConnect(
+                player.uniqueId,
+                player.username,
+                player.remoteAddress.toString(),
+                player.remoteAddress.address,
+                newServer
+            )
+        }
+    }
+
+    @Subscribe
+    fun onConnected(event: ServerPostConnectEvent) {
+        handleSwitch(
+            event.player.uniqueId,
+            event.player.username,
+            event.previousServer?.serverInfo?.name ?: return,
+            event.player.currentServer.getOrNull()?.serverInfo?.name ?: return
+        )
+    }
+
+    @Subscribe
+    fun onDisconnect(event: DisconnectEvent) {
+        handleDisconnect(event.player.uniqueId, event.player.username)
+    }
+
+    private suspend fun handleConnect(
+        playerUuid: UUID,
+        playerName: String,
+        remoteAddress: String,
+        inetAddress: InetAddress,
+        initialServer: String
+    ) {
+        println("[new connection] $playerName ($remoteAddress) connected to '$initialServer'")
 
         val player = surfPlayerService.getOrLoadOrCreatePlayerByUuid(
-            event.player.uniqueId
+            playerUuid
         ).apply {
             if (firstSeen == null) {
                 firstSeen = System.currentTimeMillis()
             }
+
             lastSeen = System.currentTimeMillis()
-            lastKnownName = event.player.username
-            currentServer = newServer
+            lastKnownName = playerName
+            currentServer = initialServer
             currentProxy = surfServerConfig.serverName
+            lastKnownIpAddress = inetAddress
         }
 
         surfPlayerService.cachePlayer(player)
@@ -41,27 +82,30 @@ object ConnectionListener {
         )
 
         surfPlayerService.savePlayer(player)
+
+        surfPlayerIpAddressHistoryService.handleNewIpAddress(player)
+        surfPlayerNameHistoryService.handleNewName(player)
     }
 
-    @Subscribe
-    fun onConnected(event: ServerPostConnectEvent) {
-        val previousServer = event.previousServer ?: return
-        val newServer = event.player.currentServer.getOrNull()?.serverInfo?.name ?: return
-
-        println("[connection: update] ${event.player.username} was redirected from '${previousServer.serverInfo.name}' to '$newServer'")
+    private fun handleSwitch(
+        playerUuid: UUID,
+        playerName: String,
+        fromServer: String,
+        toServer: String
+    ) {
+        println("[connection update] $playerName was redirected from '$fromServer' to '$toServer'")
 
         val player =
-            surfPlayerService.players.find { it.uuid == event.player.uniqueId } ?: return
-        player.currentServer = newServer
+            surfPlayerService.players.find { it.uuid == playerUuid } ?: return
+        player.currentServer = toServer
 
         surfPlayerService.cachePlayer(player)
     }
 
-    @Subscribe
-    fun onDisconnect(event: DisconnectEvent) {
-        println("[connection: closed] ${event.player.username} disconnected")
+    private fun handleDisconnect(playerUuid: UUID, playerName: String) {
+        println("[connection closed] $playerName disconnected")
 
-        val player = surfPlayerService.findPlayerByUuid(event.player.uniqueId) ?: return
+        val player = surfPlayerService.findPlayerByUuid(playerUuid) ?: return
 
         surfEventBus.fire(
             SurfPlayerDisconnectEvent(

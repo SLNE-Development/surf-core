@@ -1,7 +1,7 @@
 package dev.slne.surf.core.fallback.repository
 
-import dev.slne.surf.core.api.common.player.history.IpAddressHistory
-import dev.slne.surf.core.api.common.player.history.entry.IpAddressHistoryEntry
+import dev.slne.surf.core.api.common.player.history.ip.IpAddressHistory
+import dev.slne.surf.core.api.common.player.history.ip.IpAddressHistoryEntry
 import dev.slne.surf.core.fallback.table.SurfPlayerIpAddressHistoryTable
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.eq
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.insert
@@ -26,11 +26,11 @@ class SurfPlayerIpAddressHistoryRepository {
     suspend fun getIpAddressHistory(uuid: UUID): IpAddressHistory = suspendTransaction {
         val entries = SurfPlayerIpAddressHistoryTable.selectAll()
             .where(SurfPlayerIpAddressHistoryTable.playerUuid eq uuid).map {
-            IpAddressHistoryEntry(
-                address = it[SurfPlayerIpAddressHistoryTable.ipAddress],
-                lastSeen = it[SurfPlayerIpAddressHistoryTable.lastSeen]
-            )
-        }.toList()
+                IpAddressHistoryEntry(
+                    address = it[SurfPlayerIpAddressHistoryTable.ipAddress],
+                    lastSeen = it[SurfPlayerIpAddressHistoryTable.lastSeen]
+                )
+            }.toList()
         IpAddressHistory(entries)
     }
 }

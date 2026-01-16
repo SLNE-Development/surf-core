@@ -1,6 +1,5 @@
-package dev.slne.surf.core.api.common.player.history
+package dev.slne.surf.core.api.common.player.history.ip
 
-import dev.slne.surf.core.api.common.player.history.entry.IpAddressHistoryEntry
 import kotlinx.serialization.Serializable
 import java.net.InetAddress
 

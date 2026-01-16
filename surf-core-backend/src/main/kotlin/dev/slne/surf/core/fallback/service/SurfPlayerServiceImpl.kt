@@ -46,19 +46,9 @@ class SurfPlayerServiceImpl : SurfPlayerService, Services.Fallback {
 
     override fun cachePlayer(player: SurfPlayer) {
         globalPlayers.put(player.uuid, player)
-        println(
-            "Cached player: ${player.uuid}, now: ${
-                players.map { it.lastKnownName }
-            }"
-        )
     }
 
     override fun invalidatePlayer(uuid: UUID) {
         globalPlayers.remove(uuid)
-        println(
-            "Invalidated player: $uuid, now: ${
-                players.map { it.lastKnownName }
-            }"
-        )
     }
 }

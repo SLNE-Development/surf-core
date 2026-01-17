@@ -4,7 +4,7 @@ import com.github.shynixn.mccoroutine.velocity.launch
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.connection.DisconnectEvent
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent
-import com.velocitypowered.api.event.player.ServerPreConnectEvent
+import com.velocitypowered.api.event.player.ServerConnectedEvent
 import dev.slne.surf.core.api.common.event.SurfPlayerConnectEvent
 import dev.slne.surf.core.api.common.event.SurfPlayerDisconnectEvent
 import dev.slne.surf.core.api.common.server.SurfServer
@@ -37,12 +37,12 @@ object ConnectionListener {
     }
 
     @Subscribe
-    fun onConnected(event: ServerPreConnectEvent) {
+    fun onConnected(event: ServerConnectedEvent) {
         handleSwitch(
             event.player.uniqueId,
             event.player.username,
-            event.previousServer?.serverInfo?.name ?: return,
-            event.player.currentServer.getOrNull()?.serverInfo?.name ?: return
+            event.previousServer.getOrNull()?.serverInfo?.name ?: return,
+            event.server.serverInfo?.name ?: return
         )
     }
 
@@ -101,7 +101,10 @@ object ConnectionListener {
                 ?: error("Player $playerName is not cached")
         player.currentServer = SurfServer[toServer]
 
+        println("currently cached: ${surfPlayerService.players.map { it.toString() }}")
         surfPlayerService.cachePlayer(player)
+        println("Cached Player: $player")
+        println("after cached: ${surfPlayerService.players.map { it.toString() }}")
     }
 
     private fun handleDisconnect(playerUuid: UUID, playerName: String) {

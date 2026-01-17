@@ -23,6 +23,7 @@ import dev.slne.surf.core.core.common.player.surfPlayerService
 import dev.slne.surf.core.core.common.redis.redisLoader
 import dev.slne.surf.core.core.common.server.surfServerService
 import dev.slne.surf.core.velocity.listener.ConnectionListener
+import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 import kotlinx.coroutines.runBlocking
 import java.nio.file.Path
 
@@ -73,6 +74,18 @@ class VelocityMain @Inject constructor(
 
         surfServerService.changeState(SurfServer.current(), SurfServerState.STOPPING)
         surfServerService.removeServer(SurfServer.current())
+
+        proxy.allPlayers.forEach {
+            it.disconnect(buildText {
+                appendKickDisconnectMessage(
+                    {
+                        variableValue("Der Proxy wird heruntergefahren...")
+                    }, {
+                        spacer("Bitte verbinde dich später erneut.")
+                    }
+                )
+            })
+        }
 
         redisLoader.disconnect()
         databaseLoader.disconnect()

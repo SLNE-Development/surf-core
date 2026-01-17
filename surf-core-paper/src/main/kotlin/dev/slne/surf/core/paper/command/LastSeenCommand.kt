@@ -6,8 +6,7 @@ import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.jorel.commandapi.kotlindsl.getValue
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.paper.command.argument.surfOfflinePlayerArgument
-import dev.slne.surf.core.core.common.util.formatDateMillis
-import dev.slne.surf.core.core.common.util.formatTimeMillis
+import dev.slne.surf.core.core.common.util.formatDateTime
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.core.paper.plugin
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
@@ -52,9 +51,9 @@ fun lastSeenCommand() = commandTree("lastseen") {
                     info("Der Spieler ")
                     variableValue(surfPlayer.lastKnownName ?: surfPlayer.uuid.toString())
                     info(" wurde zuletzt am ")
-                    variableValue(lastSeen.formatDateMillis())
+                    variableValue(lastSeen.formatDateTime())
                     info(" um ")
-                    variableValue(lastSeen.formatTimeMillis())
+                    variableValue(lastSeen.formatDateTime())
                     info(" gesehen.")
                 }
             }

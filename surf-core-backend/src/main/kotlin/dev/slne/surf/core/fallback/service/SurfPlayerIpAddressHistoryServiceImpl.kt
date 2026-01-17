@@ -7,6 +7,7 @@ import dev.slne.surf.core.api.common.player.history.ip.IpAddressHistoryEntry
 import dev.slne.surf.core.core.common.player.history.SurfPlayerIpAddressHistoryService
 import dev.slne.surf.core.fallback.repository.surfPlayerIpAddressHistoryRepository
 import net.kyori.adventure.util.Services
+import java.time.OffsetDateTime
 import java.util.*
 
 @AutoService(SurfPlayerIpAddressHistoryService::class)
@@ -23,7 +24,7 @@ class SurfPlayerIpAddressHistoryServiceImpl : SurfPlayerIpAddressHistoryService,
             surfPlayer.uuid,
             IpAddressHistoryEntry(
                 address = currentIp,
-                lastSeen = System.currentTimeMillis()
+                lastSeen = OffsetDateTime.now()
             )
         )
     }

@@ -3,6 +3,7 @@ package dev.slne.surf.core.api.common.player.serializer
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.common.surfCoreApi
+import dev.slne.surf.surfapi.core.api.serializer.java.datetime.datetime.offset.OffsetDateTimeSerializer
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.serializer
@@ -12,6 +13,7 @@ import kotlinx.serialization.encoding.CompositeDecoder
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import java.net.InetAddress
+import java.time.OffsetDateTime
 import java.util.*
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -39,13 +41,13 @@ object SurfPlayerSerializer : KSerializer<SurfPlayer> {
         composite.encodeNullableSerializableElement(
             descriptor,
             2,
-            Long.serializer(),
+            OffsetDateTimeSerializer,
             value.firstSeen
         )
         composite.encodeNullableSerializableElement(
             descriptor,
             3,
-            Long.serializer(),
+            OffsetDateTimeSerializer,
             value.lastSeen
         )
         composite.encodeNullableSerializableElement(
@@ -75,8 +77,8 @@ object SurfPlayerSerializer : KSerializer<SurfPlayer> {
 
         var uuid: UUID? = null
         var lastKnownName: String? = null
-        var firstSeen: Long? = null
-        var lastSeen: Long? = null
+        var firstSeen: OffsetDateTime? = null
+        var lastSeen: OffsetDateTime? = null
         var currentServer: SurfServer? = null
         var currentProxy: SurfServer? = null
         var lastKnownIpAddress: InetAddress? = null
@@ -88,10 +90,10 @@ object SurfPlayerSerializer : KSerializer<SurfPlayer> {
                     dec.decodeNullableSerializableElement(descriptor, 1, String.serializer())
 
                 2 -> firstSeen =
-                    dec.decodeNullableSerializableElement(descriptor, 2, Long.serializer())
+                    dec.decodeNullableSerializableElement(descriptor, 2, OffsetDateTimeSerializer)
 
                 3 -> lastSeen =
-                    dec.decodeNullableSerializableElement(descriptor, 3, Long.serializer())
+                    dec.decodeNullableSerializableElement(descriptor, 3, OffsetDateTimeSerializer)
 
                 4 -> currentServer =
                     dec.decodeNullableSerializableElement(descriptor, 4, String.serializer())

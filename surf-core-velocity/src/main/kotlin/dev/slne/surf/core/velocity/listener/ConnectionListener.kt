@@ -15,6 +15,7 @@ import dev.slne.surf.core.core.common.player.surfPlayerService
 import dev.slne.surf.core.core.common.server.surfServerService
 import dev.slne.surf.core.velocity.plugin
 import java.net.InetAddress
+import java.time.OffsetDateTime
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
@@ -64,10 +65,10 @@ object ConnectionListener {
             playerUuid
         ).apply {
             if (firstSeen == null) {
-                firstSeen = System.currentTimeMillis()
+                firstSeen = OffsetDateTime.now()
             }
 
-            lastSeen = System.currentTimeMillis()
+            lastSeen = OffsetDateTime.now()
             lastKnownName = playerName
             currentServer = surfServerService.getServerByName(initialServer)
             currentProxy = SurfServer.current()
@@ -119,7 +120,7 @@ object ConnectionListener {
 
         plugin.pluginContainer.launch {
             surfPlayerService.savePlayer(player.apply {
-                lastSeen = System.currentTimeMillis()
+                lastSeen = OffsetDateTime.now()
             })
         }
     }

@@ -6,14 +6,15 @@ import dev.slne.surf.core.api.common.surfCoreApi
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import java.net.InetAddress
+import java.time.OffsetDateTime
 import java.util.*
 
 @Serializable(with = SurfPlayerSerializer::class)
 data class SurfPlayer(
     val uuid: @Contextual UUID,
     var lastKnownName: String?,
-    var firstSeen: Long?,
-    var lastSeen: Long?,
+    var firstSeen: @Contextual OffsetDateTime?,
+    var lastSeen: @Contextual OffsetDateTime?,
     var currentServer: SurfServer? = null,
     var currentProxy: SurfServer? = null,
     var lastKnownIpAddress: @Contextual InetAddress? = null

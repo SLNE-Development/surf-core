@@ -7,6 +7,7 @@ import dev.slne.surf.core.api.common.player.history.name.NameHistoryEntry
 import dev.slne.surf.core.core.common.player.history.SurfPlayerNameHistoryService
 import dev.slne.surf.core.fallback.repository.surfPlayerNameHistoryRepository
 import net.kyori.adventure.util.Services
+import java.time.OffsetDateTime
 import java.util.*
 
 @AutoService(SurfPlayerNameHistoryService::class)
@@ -22,7 +23,7 @@ class SurfPlayerNameHistoryServiceImpl : SurfPlayerNameHistoryService, Services.
         surfPlayerNameHistoryRepository.addNameToHistory(
             surfPlayer.uuid, NameHistoryEntry(
                 name = currentName,
-                lastSeen = System.currentTimeMillis()
+                lastSeen = OffsetDateTime.now()
             )
         )
     }

@@ -1,6 +1,7 @@
 package dev.slne.surf.core.core.common.util
 
 import java.time.Instant
+import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -24,3 +25,8 @@ fun Long.formatTimeMillis(): String =
     Instant.ofEpochMilli(this)
         .atZone(zone)
         .format(timeFormatter)
+
+
+fun OffsetDateTime.formatDateTime(
+    formatter: DateTimeFormatter = dateTimeFormatter
+): String = this.format(formatter)

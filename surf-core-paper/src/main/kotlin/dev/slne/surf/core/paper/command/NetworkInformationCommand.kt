@@ -10,7 +10,7 @@ import dev.slne.surf.core.api.paper.command.argument.surfPlayerArgument
 import dev.slne.surf.core.api.paper.command.argument.surfServerArgument
 import dev.slne.surf.core.core.common.player.surfPlayerService
 import dev.slne.surf.core.core.common.server.surfServerService
-import dev.slne.surf.core.core.common.util.formatMillis
+import dev.slne.surf.core.core.common.util.formatDateTime
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 
@@ -47,7 +47,7 @@ fun networkInformationCommand() = commandTree("ninfo") {
                     variableKey("Erstes mal gesehen:")
                     appendNewline()
                     darkSpacer("» | ")
-                    variableValue(target.firstSeen?.formatMillis() ?: "/")
+                    variableValue(target.firstSeen?.formatDateTime() ?: "/")
 
                     appendNewline()
                     darkSpacer("» | ")

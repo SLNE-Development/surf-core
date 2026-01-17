@@ -97,14 +97,11 @@ object ConnectionListener {
         println("[connection update] $playerName was redirected from '$fromServer' to '$toServer'")
 
         val player =
-            surfPlayerService.players.find { it.uuid == playerUuid }
+            surfPlayerService.players.firstOrNull { it.uuid == playerUuid }
+                ?.copy(currentServer = SurfServer[toServer])
                 ?: error("Player $playerName is not cached")
-        player.currentServer = SurfServer[toServer]
 
-        println("currently cached: ${surfPlayerService.players.map { it.toString() }}")
         surfPlayerService.cachePlayer(player)
-        println("Cached Player: $player")
-        println("after cached: ${surfPlayerService.players.map { it.toString() }}")
     }
 
     private fun handleDisconnect(playerUuid: UUID, playerName: String) {

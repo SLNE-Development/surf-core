@@ -13,11 +13,15 @@ import com.velocitypowered.api.proxy.ProxyServer
 import dev.slne.surf.core.api.common.event.SurfServerOnlineEvent
 import dev.slne.surf.core.api.common.event.SurfServerStartEvent
 import dev.slne.surf.core.api.common.event.SurfServerStoppingEvent
+import dev.slne.surf.core.api.common.server.SurfServer
+import dev.slne.surf.core.api.common.server.state.SurfServerState
+import dev.slne.surf.core.api.common.server.type.SurfServerType
 import dev.slne.surf.core.core.common.config.SurfServerConfigHolder
 import dev.slne.surf.core.core.common.database.databaseLoader
 import dev.slne.surf.core.core.common.event.surfEventBus
 import dev.slne.surf.core.core.common.player.surfPlayerService
 import dev.slne.surf.core.core.common.redis.redisLoader
+import dev.slne.surf.core.core.common.server.surfServerService
 import dev.slne.surf.core.velocity.listener.ConnectionListener
 import kotlinx.coroutines.runBlocking
 import java.nio.file.Path
@@ -37,9 +41,18 @@ class VelocityMain @Inject constructor(
         surfServerConfigHolder = SurfServerConfigHolder(dataPath)
         redisLoader.load()
         surfPlayerService.init()
+        surfServerService.init()
         redisLoader.connect()
 
+        val server = SurfServer(
+            name = surfServerConfig.serverName,
+            category = surfServerConfig.serverCategory,
+            state = SurfServerState.STARTING,
+            type = SurfServerType.PROXY
+        )
+
         surfEventBus.fire(SurfServerStartEvent(surfServerConfig.serverName))
+        surfServerService.addServer(server)
     }
 
     @Subscribe
@@ -50,11 +63,16 @@ class VelocityMain @Inject constructor(
 
         surfEventBus.fire(SurfServerOnlineEvent(surfServerConfig.serverName))
         eventManager.register(this, ConnectionListener)
+
+        surfServerService.changeState(SurfServer.current(), SurfServerState.RUNNING)
     }
 
     @Subscribe
     fun onProxyShutdown(event: ProxyShutdownEvent) {
         surfEventBus.fire(SurfServerStoppingEvent(surfServerConfig.serverName))
+
+        surfServerService.changeState(SurfServer.current(), SurfServerState.STOPPING)
+        surfServerService.removeServer(SurfServer.current())
 
         redisLoader.disconnect()
         databaseLoader.disconnect()

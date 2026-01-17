@@ -31,8 +31,8 @@ class SurfPlayerRepository {
             it[name] = player.lastKnownName
             it[firstSeen] = player.firstSeen
             it[lastSeen] = player.lastSeen
-            it[latestServer] = player.currentServer
-            it[latestProxy] = player.currentProxy
+            it[latestServer] = player.currentServer?.name
+            it[latestProxy] = player.currentProxy?.name
         }
         Unit
     }
@@ -42,7 +42,7 @@ class SurfPlayerRepository {
         lastKnownName = row[SurfPlayerTable.name],
         firstSeen = row[SurfPlayerTable.firstSeen],
         lastSeen = row[SurfPlayerTable.lastSeen],
-        currentServer = row[SurfPlayerTable.latestServer],
-        currentProxy = row[SurfPlayerTable.latestProxy]
+        currentServer = null,
+        currentProxy = null
     )
 }

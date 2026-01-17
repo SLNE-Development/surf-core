@@ -5,8 +5,11 @@ import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.jorel.commandapi.kotlindsl.getValue
 import dev.jorel.commandapi.kotlindsl.literalArgument
 import dev.slne.surf.core.api.common.player.SurfPlayer
+import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.paper.command.argument.surfPlayerArgument
+import dev.slne.surf.core.api.paper.command.argument.surfServerArgument
 import dev.slne.surf.core.core.common.player.surfPlayerService
+import dev.slne.surf.core.core.common.server.surfServerService
 import dev.slne.surf.core.core.common.util.formatMillis
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
@@ -20,7 +23,7 @@ fun networkInformationCommand() = commandTree("ninfo") {
             info("Derzeit sind ")
             variableValue(surfPlayerService.players.size)
             info(" Spieler verteilt auf ")
-            variableValue("???")
+            variableValue(surfServerService.servers.size)
             info(" Server online.")
         }
     }
@@ -54,7 +57,7 @@ fun networkInformationCommand() = commandTree("ninfo") {
                     variableKey("Aktueller Server:")
                     appendNewline()
                     darkSpacer("» | ")
-                    variableValue(target.currentServer ?: "Unbekannt")
+                    variableValue(target.currentServer?.name ?: "Unbekannt")
 
                     appendNewline()
                     darkSpacer("» | ")
@@ -64,7 +67,7 @@ fun networkInformationCommand() = commandTree("ninfo") {
                     variableKey("Aktueller Proxy:")
                     appendNewline()
                     darkSpacer("» | ")
-                    variableValue(target.currentProxy ?: "Unbekannt")
+                    variableValue(target.currentProxy?.name ?: "Unbekannt")
 
                     appendNewline()
                     darkSpacer("» | ")
@@ -82,10 +85,45 @@ fun networkInformationCommand() = commandTree("ninfo") {
 
     literalArgument("server") {
         withPermission(PermissionRegistry.COMMAND_INFO_SERVER)
-        anyExecutor { sender, _ ->
-            sender.sendText {
-                appendPrefix()
-                error("Die Server Api ist nocht nicht fertig... lg red ~ 16.01.26")
+        surfServerArgument("surfServer") {
+            anyExecutor { executor, args ->
+                val surfServer: SurfServer by args
+
+                executor.sendText {
+                    appendNewline()
+                    darkSpacer("» | ")
+                    variableValue(surfServer.name)
+
+                    appendNewline()
+                    darkSpacer("» | ")
+
+                    appendNewline()
+                    darkSpacer("» | ")
+                    variableKey("Kategorie:")
+                    appendNewline()
+                    darkSpacer("» | ")
+                    variableValue(surfServer.category)
+
+                    appendNewline()
+                    darkSpacer("» | ")
+
+                    appendNewline()
+                    darkSpacer("» | ")
+                    variableKey("Status:")
+                    appendNewline()
+                    darkSpacer("» | ")
+                    variableValue(surfServer.state.toString())
+
+                    appendNewline()
+                    darkSpacer("» | ")
+
+                    appendNewline()
+                    darkSpacer("» | ")
+                    variableKey("Spieler:")
+                    appendNewline()
+                    darkSpacer("» | ")
+                    variableValue(surfServer.getPlayerCount())
+                }
             }
         }
     }

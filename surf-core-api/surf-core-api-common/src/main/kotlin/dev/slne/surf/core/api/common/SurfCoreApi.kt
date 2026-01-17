@@ -1,6 +1,7 @@
 package dev.slne.surf.core.api.common
 
 import dev.slne.surf.core.api.common.player.SurfPlayer
+import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.surfapi.core.api.util.requiredService
 import it.unimi.dsi.fastutil.objects.ObjectSet
 import java.util.*
@@ -14,6 +15,11 @@ interface SurfCoreApi {
 
     fun getCurrentServerName(): String
     fun getCurrentServerCategory(): String
+    fun getCurrentServer(): SurfServer
+
+    fun getServerByName(name: String): SurfServer?
+    fun getServerByCategory(category: String): ObjectSet<SurfServer>
+    fun getServers(): ObjectSet<SurfServer>
 
     suspend fun getOfflinePlayer(name: String): SurfPlayer?
     suspend fun getOfflinePlayer(uuid: UUID): SurfPlayer?

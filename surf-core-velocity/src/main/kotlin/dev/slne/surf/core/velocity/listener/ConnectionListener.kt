@@ -7,12 +7,13 @@ import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent
 import com.velocitypowered.api.event.player.ServerPostConnectEvent
 import dev.slne.surf.core.api.common.event.SurfPlayerConnectEvent
 import dev.slne.surf.core.api.common.event.SurfPlayerDisconnectEvent
+import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.core.common.event.surfEventBus
 import dev.slne.surf.core.core.common.player.history.surfPlayerIpAddressHistoryService
 import dev.slne.surf.core.core.common.player.history.surfPlayerNameHistoryService
 import dev.slne.surf.core.core.common.player.surfPlayerService
+import dev.slne.surf.core.core.common.server.surfServerService
 import dev.slne.surf.core.velocity.plugin
-import dev.slne.surf.core.velocity.surfServerConfig
 import java.net.InetAddress
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
@@ -68,8 +69,8 @@ object ConnectionListener {
 
             lastSeen = System.currentTimeMillis()
             lastKnownName = playerName
-            currentServer = initialServer
-            currentProxy = surfServerConfig.serverName
+            currentServer = surfServerService.getServerByName(initialServer)
+            currentProxy = SurfServer.current()
             lastKnownIpAddress = inetAddress
         }
 
@@ -97,7 +98,7 @@ object ConnectionListener {
 
         val player =
             surfPlayerService.players.find { it.uuid == playerUuid } ?: return
-        player.currentServer = toServer
+        player.currentServer = SurfServer[toServer]
 
         surfPlayerService.cachePlayer(player)
     }

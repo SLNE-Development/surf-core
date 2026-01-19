@@ -4,8 +4,11 @@ import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.core.common.player.surfPlayerService
+import dev.slne.surf.core.core.common.redis.event.SurfPlayerMessageRedisEvent
+import dev.slne.surf.core.core.common.redis.redisApi
 import dev.slne.surf.core.core.common.server.surfServerService
 import it.unimi.dsi.fastutil.objects.ObjectSet
+import net.kyori.adventure.text.Component
 import java.util.*
 
 abstract class SurfCoreApiImpl : SurfCoreApi {
@@ -36,5 +39,9 @@ abstract class SurfCoreApiImpl : SurfCoreApi {
 
     override fun getServers(): ObjectSet<SurfServer> {
         return surfServerService.servers
+    }
+
+    override fun sendText(player: SurfPlayer, text: Component) {
+        redisApi.publishEvent(SurfPlayerMessageRedisEvent(player.uuid, text))
     }
 }

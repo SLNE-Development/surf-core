@@ -4,6 +4,6 @@ import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.surfapi.core.api.messages.builder.SurfComponentBuilder
 
-fun SurfPlayer.sendText(text: SurfComponentBuilder.() -> Unit) {
+inline fun SurfPlayer.sendText(text: SurfComponentBuilder.() -> Unit) {
     surfCoreApi.sendText(this, SurfComponentBuilder().apply(text).build())
 }

@@ -4,6 +4,7 @@ import dev.slne.surf.redis.event.RedisEvent
 import net.kyori.adventure.text.Component
 import java.util.*
 
+@Serializable
 data class SurfPlayerMessageRedisEvent(
     val uuid: UUID,
     val message: Component

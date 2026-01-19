@@ -1,11 +1,13 @@
 package dev.slne.surf.core.core.common.redis.event
 
 import dev.slne.surf.redis.event.RedisEvent
-import net.kyori.adventure.text.Component
+import dev.slne.surf.surfapi.core.api.serializer.adventure.component.SerializableComponent
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
 import java.util.*
 
 @Serializable
 data class SurfPlayerMessageRedisEvent(
-    val uuid: UUID,
-    val message: Component
+    val uuid: @Contextual UUID,
+    val message: SerializableComponent
 ) : RedisEvent()

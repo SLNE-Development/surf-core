@@ -23,6 +23,7 @@ import dev.slne.surf.core.core.common.player.surfPlayerService
 import dev.slne.surf.core.core.common.redis.redisLoader
 import dev.slne.surf.core.core.common.server.surfServerService
 import dev.slne.surf.core.velocity.listener.ConnectionListener
+import dev.slne.surf.core.velocity.redis.listener.VelocitySurfPlayerRedisListener
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 import kotlinx.coroutines.runBlocking
 import java.nio.file.Path
@@ -43,7 +44,7 @@ class VelocityMain @Inject constructor(
         redisLoader.load()
         surfPlayerService.init()
         surfServerService.init()
-        redisLoader.connect()
+        redisLoader.connect(VelocitySurfPlayerRedisListener)
 
         val server = SurfServer(
             name = surfServerConfig.serverName,

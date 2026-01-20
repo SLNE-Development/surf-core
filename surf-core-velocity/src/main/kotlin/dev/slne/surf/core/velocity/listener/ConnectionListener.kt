@@ -4,7 +4,7 @@ import com.github.shynixn.mccoroutine.velocity.launch
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.connection.DisconnectEvent
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent
-import com.velocitypowered.api.event.player.ServerConnectedEvent
+import com.velocitypowered.api.event.player.ServerPreConnectEvent
 import dev.slne.surf.core.api.common.event.SurfPlayerConnectEvent
 import dev.slne.surf.core.api.common.event.SurfPlayerDisconnectEvent
 import dev.slne.surf.core.api.common.server.SurfServer
@@ -37,13 +37,13 @@ object ConnectionListener {
         }
     }
 
-    @Subscribe
-    fun onConnected(event: ServerConnectedEvent) {
+    @Subscribe(priority = Short.MIN_VALUE)
+    fun onConnected(event: ServerPreConnectEvent) {
         handleSwitch(
             event.player.uniqueId,
             event.player.username,
-            event.previousServer.getOrNull()?.serverInfo?.name ?: return,
-            event.server.serverInfo?.name ?: return
+            event.previousServer?.serverInfo?.name ?: return,
+            event.result.server.getOrNull()?.serverInfo?.name ?: return
         )
     }
 
@@ -97,9 +97,11 @@ object ConnectionListener {
     ) {
         println("[connection update] $playerName was redirected from '$fromServer' to '$toServer'")
 
+
+        val server = SurfServer[toServer] ?: error("SurfServer '$toServer' not found")
         val player =
             surfPlayerService.players.firstOrNull { it.uuid == playerUuid }
-                ?.copy(currentServer = SurfServer[toServer])
+                ?.copy(currentServer = server)
                 ?: error("Player $playerName is not cached")
 
         surfPlayerService.cachePlayer(player)

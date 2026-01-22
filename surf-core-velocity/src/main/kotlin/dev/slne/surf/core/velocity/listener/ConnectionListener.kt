@@ -5,12 +5,14 @@ import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.connection.DisconnectEvent
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent
 import com.velocitypowered.api.event.player.ServerPreConnectEvent
+import com.velocitypowered.api.util.GameProfile
 import dev.slne.surf.core.api.common.event.SurfPlayerConnectEvent
 import dev.slne.surf.core.api.common.event.SurfPlayerDisconnectEvent
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.core.common.event.surfEventBus
 import dev.slne.surf.core.core.common.player.history.surfPlayerIpAddressHistoryService
 import dev.slne.surf.core.core.common.player.history.surfPlayerNameHistoryService
+import dev.slne.surf.core.core.common.player.history.surfPlayerTextureHistoryService
 import dev.slne.surf.core.core.common.player.surfPlayerService
 import dev.slne.surf.core.core.common.server.surfServerService
 import dev.slne.surf.core.velocity.plugin
@@ -32,7 +34,9 @@ object ConnectionListener {
                 player.username,
                 player.remoteAddress.toString(),
                 player.remoteAddress.address,
-                newServer
+                newServer,
+                event.player.gameProfile
+
             )
         }
     }
@@ -57,7 +61,8 @@ object ConnectionListener {
         playerName: String,
         remoteAddress: String,
         inetAddress: InetAddress,
-        initialServer: String
+        initialServer: String,
+        gameProfile: GameProfile
     ) {
         println("[new connection] $playerName ($remoteAddress) connected to '$initialServer'")
 
@@ -83,10 +88,22 @@ object ConnectionListener {
             )
         )
 
+        val playerTexture = gameProfile.properties.find { it.name == "textures" }?.value
+        val playerSignature = gameProfile.properties.find { it.name == "textures" }?.signature
+
         surfPlayerService.savePlayer(player)
 
         surfPlayerIpAddressHistoryService.handleNewIpAddress(player)
         surfPlayerNameHistoryService.handleNewName(player)
+
+
+        if (playerTexture != null && playerSignature != null) {
+            surfPlayerTextureHistoryService.handleNewTexture(
+                player,
+                playerTexture,
+                playerSignature
+            )
+        }
     }
 
     private fun handleSwitch(

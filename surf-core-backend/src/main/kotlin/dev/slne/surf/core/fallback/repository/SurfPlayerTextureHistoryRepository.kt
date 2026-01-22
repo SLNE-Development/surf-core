@@ -18,6 +18,7 @@ class SurfPlayerTextureHistoryRepository {
         suspendTransaction {
             SurfPlayerTexturesHistoryTable.insert {
                 it[playerUuid] = uuid
+                it[textureHash] = historyEntry.hash
                 it[textureValue] = historyEntry.texture
                 it[textureSignature] = historyEntry.signature
                 it[lastSeen] = historyEntry.lastSeen
@@ -28,6 +29,7 @@ class SurfPlayerTextureHistoryRepository {
         val entries = SurfPlayerTexturesHistoryTable.selectAll()
             .where(SurfPlayerTexturesHistoryTable.playerUuid eq uuid).map {
                 TextureHistoryEntry(
+                    hash = it[SurfPlayerTexturesHistoryTable.textureHash],
                     texture = it[SurfPlayerTexturesHistoryTable.textureValue],
                     signature = it[SurfPlayerTexturesHistoryTable.textureSignature],
                     lastSeen = it[SurfPlayerTexturesHistoryTable.lastSeen]

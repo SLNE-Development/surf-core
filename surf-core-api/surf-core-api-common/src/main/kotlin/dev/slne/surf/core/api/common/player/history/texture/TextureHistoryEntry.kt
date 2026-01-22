@@ -6,6 +6,7 @@ import java.time.OffsetDateTime
 
 @Serializable
 data class TextureHistoryEntry(
+    val hash: String,
     val texture: String,
     val signature: String,
     val lastSeen: @Contextual OffsetDateTime

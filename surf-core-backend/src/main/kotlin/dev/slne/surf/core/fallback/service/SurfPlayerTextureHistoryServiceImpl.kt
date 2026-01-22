@@ -1,6 +1,7 @@
 package dev.slne.surf.core.fallback.service
 
 import com.google.auto.service.AutoService
+import com.google.gson.JsonParser
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.player.history.texture.TextureHistory
 import dev.slne.surf.core.api.common.player.history.texture.TextureHistoryEntry
@@ -17,9 +18,10 @@ class SurfPlayerTextureHistoryServiceImpl : SurfPlayerTextureHistoryService, Ser
         texture: String,
         signature: String
     ) {
+        val skinHash = extractSkinHash(texture)
         val latestLogged = getTextureHistory(surfPlayer.uuid).getCurrentTexture()
 
-        if (latestLogged != null && latestLogged.texture == texture && latestLogged.signature == signature) {
+        if (latestLogged != null && latestLogged.hash == skinHash) {
             return
         }
 
@@ -27,10 +29,22 @@ class SurfPlayerTextureHistoryServiceImpl : SurfPlayerTextureHistoryService, Ser
             surfPlayer.uuid, TextureHistoryEntry(
                 texture = texture,
                 signature = signature,
-                lastSeen = OffsetDateTime.now()
+                lastSeen = OffsetDateTime.now(),
+                hash = skinHash
             )
         )
     }
+
+    fun extractSkinHash(base64: String): String {
+        val json = String(Base64.getDecoder().decode(base64))
+        val obj = JsonParser.parseString(json).asJsonObject
+        val url = obj["textures"]
+            .asJsonObject["SKIN"]
+            .asJsonObject["url"]
+            .asString
+        return url.substringAfterLast("/")
+    }
+
 
     override suspend fun getTextureHistory(uuid: UUID): TextureHistory =
         surfPlayerTextureHistoryRepository.getTextureHistory(uuid)

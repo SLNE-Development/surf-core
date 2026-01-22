@@ -21,7 +21,7 @@ object PlayerClientLoadedListener : Listener {
         }
 
         player.sendText {
-            appendPrefix()
+            appendInfoPrefix()
             info("Du, ")
             append {
                 variableValue(player.name)

@@ -15,7 +15,7 @@ class SurfServerArgument(nodeName: String) :
         surfCoreApi.getServerByName(info.input)
             ?: throw CustomArgumentException.fromAdventureComponent(
                 buildText {
-                    appendPrefix()
+                    appendErrorPrefix()
                     error("Der Server wurde nicht gefunden.")
                 })
     }) {

@@ -31,7 +31,7 @@ open class SurfServerArgument(nodeName: String) :
         ?: throw SimpleCommandExceptionType(
             VelocityBrigadierMessage.tooltip(
                 buildText {
-                    appendPrefix()
+                    appendErrorPrefix()
                     error("Der Server wurde nicht gefunden.")
                 }
             )

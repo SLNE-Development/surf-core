@@ -13,14 +13,14 @@ fun networkListCommand() = commandTree("nlist") {
 
         if (players.isEmpty()) {
             executor.sendText {
-                appendPrefix()
+                appendErrorPrefix()
                 error("Es sind keine Spieler im Netzwerk online.")
             }
             return@anyExecutor
         }
 
         executor.sendText {
-            appendPrefix()
+            appendInfoPrefix()
             info("Derzeit sind ")
             variableValue(players.size)
             info(" Spieler auf dem Netzwerk online: ")

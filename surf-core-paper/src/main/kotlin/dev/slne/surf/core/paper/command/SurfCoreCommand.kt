@@ -15,7 +15,7 @@ fun surfCoreCommand() = commandTree("core") {
             PaperBootstrap.surfServerConfigHolder.reload()
 
             executor.sendText {
-                appendPrefix()
+                appendSuccessPrefix()
                 success("Die Konfiguration wurde neu geladen.")
             }
         }
@@ -26,7 +26,7 @@ fun surfCoreCommand() = commandTree("core") {
             surfPlayerService.clearPlayers()
 
             executor.sendText {
-                appendPrefix()
+                appendSuccessPrefix()
                 success("Die Spieler-Caches wurden geleert.")
             }
         }

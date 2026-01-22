@@ -19,7 +19,7 @@ fun networkInformationCommand() = commandTree("ninfo") {
 
     anyExecutor { sender, _ ->
         sender.sendText {
-            appendPrefix()
+            appendInfoPrefix()
             info("Derzeit sind ")
             variableValue(surfPlayerService.players.size)
             info(" Spieler verteilt auf ")
@@ -77,7 +77,7 @@ fun networkInformationCommand() = commandTree("ninfo") {
                     variableKey("Letzte Ip-Adresse:")
                     appendNewline()
                     darkSpacer("» | ")
-                    variableValue(target.lastKnownIpAddress.toString() ?: "/")
+                    variableValue(target.lastKnownIpAddress.toString())
                 }
             }
         }

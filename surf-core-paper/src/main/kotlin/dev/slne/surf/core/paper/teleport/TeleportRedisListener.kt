@@ -13,7 +13,7 @@ object TeleportRedisListener {
 
         bukkitPlayer.teleportAsync(targetBukkitPlayer.location).thenRun {
             bukkitPlayer.sendText {
-                appendPrefix()
+                appendSuccessPrefix()
                 success("Du wurdest zu ")
                 variableValue(targetBukkitPlayer.name)
                 success(" teleportiert.")

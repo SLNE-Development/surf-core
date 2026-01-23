@@ -15,14 +15,14 @@ fun whereAmICommand() = commandTree("whereami") {
         val surfPlayer =
             surfPlayerService.players.firstOrNull { it.uuid == player.uniqueId } ?: run {
                 player.sendText {
-                    appendPrefix()
+                    appendErrorPrefix()
                     error("Deine Spielerdaten konnten nicht geladen werden.")
                 }
                 return@playerExecutor
             }
 
         player.sendText {
-            appendPrefix()
+            appendInfoPrefix()
             info("Du, ")
             append {
                 variableValue(player.name)

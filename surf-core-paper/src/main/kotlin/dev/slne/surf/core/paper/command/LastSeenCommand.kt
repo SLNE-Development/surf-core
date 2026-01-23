@@ -21,7 +21,7 @@ fun lastSeenCommand() = commandTree("lastseen") {
             plugin.launch {
                 val surfPlayer = player.await() ?: run {
                     executor.sendText {
-                        appendPrefix()
+                        appendErrorPrefix()
                         error("Der Spieler wurde nicht gefunden.")
                     }
                     return@launch
@@ -29,7 +29,7 @@ fun lastSeenCommand() = commandTree("lastseen") {
 
                 if (surfPlayer.isOnline()) {
                     executor.sendText {
-                        appendPrefix()
+                        appendSuccessPrefix()
                         success("Der Spieler ")
                         variableValue(surfPlayer.lastKnownName ?: surfPlayer.uuid.toString())
                         success(" ist aktuell online.")
@@ -39,7 +39,7 @@ fun lastSeenCommand() = commandTree("lastseen") {
 
                 val lastSeen = surfPlayer.lastSeen ?: run {
                     executor.sendText {
-                        appendPrefix()
+                        appendErrorPrefix()
                         error("Der Spieler wurde noch nie auf dem Netzwerk gesehen.")
                     }
                     return@launch
@@ -47,7 +47,7 @@ fun lastSeenCommand() = commandTree("lastseen") {
 
 
                 executor.sendText {
-                    appendPrefix()
+                    appendInfoPrefix()
                     info("Der Spieler ")
                     variableValue(surfPlayer.lastKnownName ?: surfPlayer.uuid.toString())
                     info(" wurde zuletzt am ")

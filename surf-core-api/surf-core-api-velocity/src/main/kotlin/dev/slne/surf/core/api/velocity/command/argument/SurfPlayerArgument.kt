@@ -31,7 +31,7 @@ open class SurfPlayerArgument(nodeName: String) :
         ?: throw SimpleCommandExceptionType(
             VelocityBrigadierMessage.tooltip(
                 buildText {
-                    appendPrefix()
+                    appendErrorPrefix()
                     error("Der Spieler wurde nicht gefunden.")
                 }
             )

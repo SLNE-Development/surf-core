@@ -14,7 +14,7 @@ class SurfPlayerArgument(nodeName: String) :
     CustomArgument<SurfPlayer, String>(StringArgument(nodeName), { info ->
         surfCoreApi.getPlayer(info.input) ?: throw CustomArgumentException.fromAdventureComponent(
             buildText {
-                appendPrefix()
+                appendErrorPrefix()
                 error("Der Spieler wurde nicht gefunden.")
             })
     }) {

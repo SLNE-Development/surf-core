@@ -31,7 +31,7 @@ class TeleportManager {
 
         player.teleportAsync(bukkitTarget.location).thenRun {
             player.sendText {
-                appendPrefix()
+                appendSuccessPrefix()
                 success("Du wurdest zu ")
                 variableValue(bukkitTarget.name)
                 success(" teleportiert.")

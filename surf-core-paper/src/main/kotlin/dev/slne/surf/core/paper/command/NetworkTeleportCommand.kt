@@ -18,7 +18,7 @@ fun networkTeleportCommand() = commandTree("ntp") {
             val target: SurfPlayer by args
 
             player.sendText {
-                appendPrefix()
+                appendInfoPrefix()
                 info("Du wirst zu ")
                 variableValue(target.lastKnownName ?: target.uuid.toString())
                 info(" teleportiert...")

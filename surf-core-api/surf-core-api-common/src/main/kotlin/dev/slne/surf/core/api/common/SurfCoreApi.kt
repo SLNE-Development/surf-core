@@ -1,11 +1,13 @@
 package dev.slne.surf.core.api.common
 
+import dev.slne.surf.core.api.common.event.SurfEvent
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.surfapi.core.api.util.requiredService
 import it.unimi.dsi.fastutil.objects.ObjectSet
 import net.kyori.adventure.text.Component
 import java.util.*
+import kotlin.reflect.KClass
 
 val surfCoreApi = requiredService<SurfCoreApi>()
 
@@ -21,6 +23,10 @@ interface SurfCoreApi {
     fun getServerByName(name: String): SurfServer?
     fun getServerByCategory(category: String): ObjectSet<SurfServer>
     fun getServers(): ObjectSet<SurfServer>
+
+    fun registerListener(listener: Any)
+    fun fireEvent(event: SurfEvent)
+    fun subscribe(eventClass: KClass<out SurfEvent>, handler: (SurfEvent) -> Unit)
 
     /**
      * Sends a text message to the given player via the cross-server messaging system.

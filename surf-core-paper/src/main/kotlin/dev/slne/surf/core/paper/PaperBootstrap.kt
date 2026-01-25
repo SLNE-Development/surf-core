@@ -29,7 +29,8 @@ class PaperBootstrap : PluginBootstrap {
             name = surfServerConfig.serverName,
             category = surfServerConfig.serverCategory,
             state = SurfServerState.STARTING,
-            type = SurfServerType.SERVER
+            type = SurfServerType.SERVER,
+            connectionAddress = surfServerConfig.connectionAddress
         )
 
         surfEventBus.fire(SurfServerStartEvent(surfServerConfig.serverName))

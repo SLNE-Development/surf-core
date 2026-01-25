@@ -53,7 +53,11 @@ object ConnectionListener {
 
     @Subscribe
     fun onDisconnect(event: DisconnectEvent) {
-        handleDisconnect(event.player.uniqueId, event.player.username)
+        handleDisconnect(
+            event.player.uniqueId,
+            event.player.username,
+            event.loginStatus == DisconnectEvent.LoginStatus.SUCCESSFUL_LOGIN
+        )
     }
 
     private suspend fun handleConnect(
@@ -124,8 +128,13 @@ object ConnectionListener {
         surfPlayerService.cachePlayer(player)
     }
 
-    private fun handleDisconnect(playerUuid: UUID, playerName: String) {
-        println("[connection closed] $playerName disconnected")
+    private fun handleDisconnect(playerUuid: UUID, playerName: String, successfullyLogin: Boolean) {
+        if (successfullyLogin) {
+            println("[connection closed] $playerName disconnected")
+        } else {
+            println("[connection closed] $playerName tried to connect")
+        }
+
 
         val player = surfPlayerService.findPlayerByUuid(playerUuid) ?: return
 

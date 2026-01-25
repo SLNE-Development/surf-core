@@ -3,6 +3,7 @@ package dev.slne.surf.core.api.common.server
 import dev.slne.surf.core.api.common.server.state.SurfServerState
 import dev.slne.surf.core.api.common.server.type.SurfServerType
 import dev.slne.surf.core.api.common.surfCoreApi
+import dev.slne.surf.surfapi.core.api.serializer.java.ip.inetsocket.SerializableInetSocketAddress
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -10,7 +11,8 @@ data class SurfServer(
     val name: String,
     val category: String,
     val state: SurfServerState,
-    val type: SurfServerType
+    val type: SurfServerType,
+    val connectionAddress: SerializableInetSocketAddress
 ) {
     fun getPlayers() = surfCoreApi.getOnlinePlayers().filter { it.currentServer == this }
     fun getPlayerCount() = getPlayers().size

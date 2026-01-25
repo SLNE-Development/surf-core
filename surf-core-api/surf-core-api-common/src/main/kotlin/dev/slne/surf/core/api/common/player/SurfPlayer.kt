@@ -20,6 +20,7 @@ data class SurfPlayer(
     var lastKnownIpAddress: @Contextual InetAddress? = null
 ) {
     fun isOnline() = surfCoreApi.getOnlinePlayers().any { it.uuid == uuid }
+    fun send(server: SurfServer) = surfCoreApi.sendPlayer(this, server)
 
     override fun toString(): String {
         return "SurfPlayer(uuid=$uuid, lastKnownName=$lastKnownName, firstSeen=$firstSeen, lastSeen=$lastSeen, currentServer=${currentServer?.name}, currentProxy=${currentProxy?.name}, lastKnownIpAddress=$lastKnownIpAddress)"

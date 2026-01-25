@@ -50,7 +50,8 @@ class VelocityMain @Inject constructor(
             name = surfServerConfig.serverName,
             category = surfServerConfig.serverCategory,
             state = SurfServerState.STARTING,
-            type = SurfServerType.PROXY
+            type = SurfServerType.PROXY,
+            connectionAddress = surfServerConfig.connectionAddress
         )
 
         surfEventBus.fire(SurfServerStartEvent(surfServerConfig.serverName))

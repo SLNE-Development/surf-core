@@ -119,6 +119,16 @@ fun networkInformationCommand() = commandTree("ninfo") {
 
                     appendNewline()
                     darkSpacer("» | ")
+                    variableKey("Connection Address:")
+                    appendNewline()
+                    darkSpacer("» | ")
+                    variableValue(surfServer.connectionAddress.toString())
+
+                    appendNewline()
+                    darkSpacer("» | ")
+
+                    appendNewline()
+                    darkSpacer("» | ")
                     variableKey("Spieler:")
                     appendNewline()
                     darkSpacer("» | ")

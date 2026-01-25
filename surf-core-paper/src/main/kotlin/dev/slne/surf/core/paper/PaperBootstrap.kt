@@ -13,6 +13,7 @@ import dev.slne.surf.core.core.common.server.surfServerService
 import dev.slne.surf.core.paper.teleport.TeleportRedisListener
 import io.papermc.paper.plugin.bootstrap.BootstrapContext
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap
+import java.net.InetSocketAddress
 
 @Suppress("UnstableApiUsage")
 class PaperBootstrap : PluginBootstrap {
@@ -30,7 +31,10 @@ class PaperBootstrap : PluginBootstrap {
             category = surfServerConfig.serverCategory,
             state = SurfServerState.STARTING,
             type = SurfServerType.SERVER,
-            connectionAddress = surfServerConfig.connectionAddress
+            connectionAddress = InetSocketAddress(
+                surfServerConfig.connectionAddress.host,
+                surfServerConfig.connectionAddress.port
+            )
         )
 
         surfEventBus.fire(SurfServerStartEvent(surfServerConfig.serverName))

@@ -26,6 +26,7 @@ import dev.slne.surf.core.velocity.listener.ConnectionListener
 import dev.slne.surf.core.velocity.redis.listener.VelocitySurfPlayerRedisListener
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 import kotlinx.coroutines.runBlocking
+import java.net.InetSocketAddress
 import java.nio.file.Path
 
 class VelocityMain @Inject constructor(
@@ -51,7 +52,10 @@ class VelocityMain @Inject constructor(
             category = surfServerConfig.serverCategory,
             state = SurfServerState.STARTING,
             type = SurfServerType.PROXY,
-            connectionAddress = surfServerConfig.connectionAddress
+            connectionAddress = InetSocketAddress(
+                surfServerConfig.connectionAddress.host,
+                surfServerConfig.connectionAddress.port
+            )
         )
 
         surfEventBus.fire(SurfServerStartEvent(surfServerConfig.serverName))

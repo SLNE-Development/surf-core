@@ -33,6 +33,8 @@ class PaperMain : SuspendingJavaPlugin() {
         surfCoreCommand()
         whereAmICommand()
         networkInformationCommand()
+        networkServerCommand()
+        networkBroadcastCommand()
 
         PlayerClientLoadedListener.register()
 

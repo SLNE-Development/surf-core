@@ -51,20 +51,20 @@ object AuthenticationListener {
     @Subscribe
     fun onPreTransfer(event: PreTransferEvent) {
         val player = event.player()
-        val token = generateToken()
+        val tokenHash = generateTokenHash()
 
-        authentificationService.preTransfer(player.uniqueId, token)
+        authentificationService.preTransfer(player.uniqueId, tokenHash)
 
-        player.storeCookie(authentificationService.key, token)
+        player.storeCookie(authentificationService.key, tokenHash)
 
         player.currentServer.getOrNull()?.serverInfo?.name?.let {
             authentificationService.lastServerMap[player.uniqueId] = it
         }
     }
 
-    private fun generateToken(): ByteArray {
+    private fun generateTokenHash(): ByteArray {
         val bytes = ByteArray(32)
         random.nextBytes(bytes)
-        return bytes
+        return authentificationService.hash(bytes)
     }
 }

@@ -1,5 +1,6 @@
 package dev.slne.surf.core.api.common.server
 
+import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.server.state.SurfServerState
 import dev.slne.surf.core.api.common.server.type.SurfServerType
 import dev.slne.surf.core.api.common.surfCoreApi
@@ -16,6 +17,10 @@ data class SurfServer(
 ) {
     fun getPlayers() = surfCoreApi.getOnlinePlayers().filter { it.currentServer == this }
     fun getPlayerCount() = getPlayers().size
+
+    fun sendPlayers(otherServer: SurfServer) = getPlayers().forEach { it.send(otherServer) }
+    fun pullPlayers(otherServer: SurfServer) = otherServer.getPlayers().forEach { it.send(this) }
+    fun pullPlayers(vararg players: SurfPlayer) = players.forEach { it.send(this) }
 
     companion object {
         /**

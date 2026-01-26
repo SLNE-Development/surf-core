@@ -13,7 +13,7 @@ import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 @Suppress("UnstableApiUsage")
 object VelocityServerListener {
     @Subscribe
-    fun onPreShutdown(event: ProxyPreShutdownEvent) {
+    suspend fun onPreShutdown(event: ProxyPreShutdownEvent) {
         val currentProxy = SurfServer.current()
 
         val targetProxies = surfServerService.servers

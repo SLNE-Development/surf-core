@@ -6,11 +6,12 @@ import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.jorel.commandapi.kotlindsl.getValue
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.paper.command.argument.surfOfflinePlayerArgument
-import dev.slne.surf.core.core.common.util.formatDateTime
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.core.paper.plugin
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 import kotlinx.coroutines.Deferred
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 fun lastSeenCommand() = commandTree("lastseen") {
     withPermission(PermissionRegistry.COMMAND_LAST_SEEN)
@@ -51,12 +52,17 @@ fun lastSeenCommand() = commandTree("lastseen") {
                     info("Der Spieler ")
                     variableValue(surfPlayer.lastKnownName ?: surfPlayer.uuid.toString())
                     info(" wurde zuletzt am ")
-                    variableValue(lastSeen.formatDateTime())
+                    variableValue(lastSeen.format(dateFormatter))
                     info(" um ")
-                    variableValue(lastSeen.formatDateTime())
+                    variableValue(lastSeen.format(timeFormatter))
                     info(" gesehen.")
                 }
             }
         }
     }
 }
+
+private val berlinZone = ZoneId.of("Europe/Berlin")
+
+private val dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy").withZone(berlinZone)
+private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss").withZone(berlinZone)

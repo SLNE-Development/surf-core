@@ -36,6 +36,7 @@ class PaperMain : SuspendingJavaPlugin() {
         networkInformationCommand()
         networkServerCommand()
         networkBroadcastCommand()
+        networkSendCommand()
 
         PlayerClientLoadedListener.register()
 

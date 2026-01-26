@@ -48,8 +48,7 @@ object AuthenticationListener {
                                 error("Bitte verbinde dich über die offizielle Domain.")
                                 appendNewline()
                                 variableValue("castcrafter.de")
-                            },
-                            false
+                            }
                         )
                     })
                     return

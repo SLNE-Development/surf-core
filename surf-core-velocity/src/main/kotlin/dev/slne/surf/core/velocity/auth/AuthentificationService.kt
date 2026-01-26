@@ -17,17 +17,17 @@ class AuthentificationService {
     val lastServerKey = key("surf-core", "last-server")
 
     fun authenticate(uuid: UUID, token: ByteArray): Boolean {
-        println("Authenticating player $uuid")
-        val storedToken = authMap.remove(uuid) ?: return false
+        val storedToken = authMap.remove(uuid)
 
-        println("Stored token: ${storedToken.contentToString()}")
-
-        if (!storedToken.contentEquals(token)) {
-            println("Tokens do not match!")
+        if (storedToken == null) {
+            println("[transfer] Failed to authenticate player $uuid: no stored token")
             return false
         }
 
-        println("Tokens match, resuming continuation.")
+        if (!storedToken.contentEquals(token)) {
+            println("[transfer] Failed to authenticate player $uuid: invalid token")
+            return false
+        }
 
         continuations[uuid]?.resume()
         continuations.remove(uuid)

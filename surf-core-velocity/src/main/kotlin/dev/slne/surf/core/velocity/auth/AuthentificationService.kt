@@ -10,8 +10,8 @@ import kotlin.time.Duration.Companion.seconds
 val authentificationService = AuthentificationService()
 
 class AuthentificationService {
-    val authMap = redisApi.createSyncMap<UUID, ByteArray>("surf-core:authentification", 10.seconds)
-    val lastServerMap = redisApi.createSyncMap<UUID, String>("surf-core:last-server", 10.seconds)
+    val authMap = redisApi.createSyncMap<UUID, ByteArray>("surf-core:authentification", 5.seconds)
+    val lastServerMap = redisApi.createSyncMap<UUID, String>("surf-core:last-server", 5.seconds)
     val continuations = mutableObject2ObjectMapOf<UUID, Continuation>()
     val key = key("surf-core", "transfer-authentification")
 

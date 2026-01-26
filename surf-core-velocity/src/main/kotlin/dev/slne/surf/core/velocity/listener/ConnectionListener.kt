@@ -52,7 +52,7 @@ object ConnectionListener {
     }
 
     @Subscribe
-    fun onDisconnect(event: DisconnectEvent) {
+    suspend fun onDisconnect(event: DisconnectEvent) {
         handleDisconnect(
             event.player.uniqueId,
             event.player.username,
@@ -128,7 +128,11 @@ object ConnectionListener {
         surfPlayerService.cachePlayer(player)
     }
 
-    private fun handleDisconnect(playerUuid: UUID, playerName: String, successfullyLogin: Boolean) {
+    private suspend fun handleDisconnect(
+        playerUuid: UUID,
+        playerName: String,
+        successfullyLogin: Boolean
+    ) {
         if (successfullyLogin) {
             println("[connection closed] $playerName disconnected")
         } else {
@@ -146,10 +150,8 @@ object ConnectionListener {
 
         surfPlayerService.invalidatePlayer(player.uuid)
 
-        plugin.pluginContainer.launch {
-            surfPlayerService.savePlayer(player.apply {
-                lastSeen = OffsetDateTime.now()
-            })
-        }
+        surfPlayerService.savePlayer(player.apply {
+            lastSeen = OffsetDateTime.now()
+        })
     }
 }

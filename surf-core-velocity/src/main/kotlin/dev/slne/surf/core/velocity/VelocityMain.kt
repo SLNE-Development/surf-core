@@ -24,6 +24,7 @@ import dev.slne.surf.core.core.common.redis.redisLoader
 import dev.slne.surf.core.core.common.server.surfServerService
 import dev.slne.surf.core.velocity.auth.AuthenticationListener
 import dev.slne.surf.core.velocity.auth.authentificationService
+import dev.slne.surf.core.velocity.config.VelocityCoreConfigManager
 import dev.slne.surf.core.velocity.listener.ConnectionListener
 import dev.slne.surf.core.velocity.listener.VelocityServerListener
 import dev.slne.surf.core.velocity.redis.listener.VelocitySurfPlayerRedisListener
@@ -109,6 +110,8 @@ class VelocityMain @Inject constructor(
         lateinit var surfServerConfigHolder: SurfServerConfigHolder
     }
 }
+
+val velocityCoreConfigManager = VelocityCoreConfigManager()
 
 val proxy get() = VelocityMain.instance.proxy
 val plugin get() = VelocityMain.instance

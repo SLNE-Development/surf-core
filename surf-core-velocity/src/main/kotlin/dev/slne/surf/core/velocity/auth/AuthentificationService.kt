@@ -16,15 +16,17 @@ class AuthentificationService {
     val continuations = mutableObject2ObjectMapOf<UUID, Continuation>()
     val key = key("surf-core", "transfer-authentification")
 
-    fun authenticate(uuid: UUID, receivedHash: ByteArray): Boolean {
+    fun authenticate(uuid: UUID, token: ByteArray): Boolean {
         val storedHash = authMap.remove(uuid)
 
         if (storedHash == null) {
-            println("[connection] Failed to authenticate player $uuid: no stored token")
+            println("[connection] Failed to authenticate player $uuid: no stored hash")
             return false
         }
 
-        if (!storedHash.contentEquals(receivedHash)) {
+        val tokenHash = hash(token)
+
+        if (!storedHash.contentEquals(tokenHash)) {
             println("[connection] Failed to authenticate player $uuid: invalid token")
             return false
         }
@@ -35,12 +37,13 @@ class AuthentificationService {
         return true
     }
 
-    fun preTransfer(uuid: UUID, tokenHash: ByteArray) {
-        authMap[uuid] = tokenHash
+    fun preTransfer(uuid: UUID, token: ByteArray) {
+        authMap[uuid] = hash(token)
     }
 
-    fun hash(input: ByteArray): ByteArray =
-        MessageDigest.getInstance("SHA-256").digest(input)
+    private fun hash(data: ByteArray): ByteArray {
+        return MessageDigest.getInstance("SHA-256").digest(data)
+    }
 
     fun init() = Unit
 }

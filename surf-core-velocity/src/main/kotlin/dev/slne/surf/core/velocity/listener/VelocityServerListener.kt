@@ -20,9 +20,7 @@ object VelocityServerListener {
             .filter { it.type == SurfServerType.PROXY && it.name != currentProxy.name }
             .sortedBy { it.getPlayerCount() }
 
-        val players = plugin.proxy.allPlayers
-
-        players.forEach { player ->
+        plugin.proxy.allPlayers.forEach { player ->
             val target = targetProxies.firstOrNull { it.getPlayerCount() < it.maxPlayers }
 
             if (target == null) {
@@ -36,7 +34,7 @@ object VelocityServerListener {
                         false
                     )
                 })
-                return
+                return@forEach
             }
 
             target.pullPlayers(player.surfPlayer)

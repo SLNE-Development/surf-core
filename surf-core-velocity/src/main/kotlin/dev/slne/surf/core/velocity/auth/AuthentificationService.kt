@@ -1,14 +1,10 @@
 package dev.slne.surf.core.velocity.auth
 
-import com.github.shynixn.mccoroutine.velocity.launch
 import com.velocitypowered.api.event.Continuation
 import dev.slne.surf.core.core.common.redis.redisApi
-import dev.slne.surf.core.velocity.plugin
 import dev.slne.surf.surfapi.core.api.messages.adventure.key
 import dev.slne.surf.surfapi.core.api.util.mutableObject2ObjectMapOf
-import kotlinx.coroutines.delay
 import java.util.*
-import kotlin.jvm.optionals.getOrNull
 import kotlin.time.Duration.Companion.seconds
 
 val authentificationService = AuthentificationService()
@@ -35,19 +31,6 @@ class AuthentificationService {
 
         continuations[uuid]?.resume()
         continuations.remove(uuid)
-
-        plugin.pluginContainer.launch {
-            delay(2.seconds)
-            val lastServer = lastServers.remove(uuid) ?: return@launch
-
-            println("Transferring player $uuid to last server $lastServer")
-
-            plugin.proxy.getServer(lastServer).getOrNull()?.let {
-                println("Creating connection request to $lastServer")
-                plugin.proxy.getPlayer(uuid).getOrNull()?.createConnectionRequest(it)
-                    ?.fireAndForget()
-            }
-        }
 
         return true
     }

@@ -8,7 +8,9 @@ import com.velocitypowered.api.event.connection.LoginEvent
 import com.velocitypowered.api.event.connection.PreLoginEvent
 import com.velocitypowered.api.event.connection.PreTransferEvent
 import com.velocitypowered.api.event.player.CookieReceiveEvent
+import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent
 import com.velocitypowered.api.network.HandshakeIntent
+import dev.slne.surf.core.velocity.plugin
 import dev.slne.surf.surfapi.core.api.util.random
 import kotlin.jvm.optionals.getOrNull
 
@@ -61,6 +63,19 @@ object AuthenticationListener {
             }
 
             else -> {}
+        }
+    }
+
+    @Subscribe
+    fun onInitialServer(event: PlayerChooseInitialServerEvent) {
+        val player = event.player
+        val lastServerName = authentificationService.lastServers.remove(player.uniqueId) ?: return
+
+        println("[initial-server] ${player.username} is choosing initial server, last server was $lastServerName")
+
+        plugin.proxy.getServer(lastServerName).getOrNull()?.let {
+            println("[initial-server] Redirecting ${player.username} to last server $lastServerName")
+            event.setInitialServer(it)
         }
     }
 

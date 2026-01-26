@@ -22,6 +22,8 @@ import dev.slne.surf.core.core.common.event.surfEventBus
 import dev.slne.surf.core.core.common.player.surfPlayerService
 import dev.slne.surf.core.core.common.redis.redisLoader
 import dev.slne.surf.core.core.common.server.surfServerService
+import dev.slne.surf.core.velocity.auth.AuthenticationListener
+import dev.slne.surf.core.velocity.auth.authentificationService
 import dev.slne.surf.core.velocity.listener.ConnectionListener
 import dev.slne.surf.core.velocity.redis.listener.VelocitySurfPlayerRedisListener
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
@@ -45,6 +47,7 @@ class VelocityMain @Inject constructor(
         redisLoader.load()
         surfPlayerService.init()
         surfServerService.init()
+        authentificationService.init()
         redisLoader.connect(VelocitySurfPlayerRedisListener)
 
         val server = SurfServer(
@@ -70,6 +73,7 @@ class VelocityMain @Inject constructor(
 
         surfEventBus.fire(SurfServerOnlineEvent(surfServerConfig.serverName))
         eventManager.register(this, ConnectionListener)
+        eventManager.register(this, AuthenticationListener)
 
         surfServerService.changeState(SurfServer.current(), SurfServerState.RUNNING)
     }

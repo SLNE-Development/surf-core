@@ -20,12 +20,12 @@ class AuthentificationService {
         val storedToken = authMap.remove(uuid)
 
         if (storedToken == null) {
-            println("[transfer] Failed to authenticate player $uuid: no stored token")
+            println("[connection] Failed to authenticate player $uuid: no stored token")
             return false
         }
 
         if (!storedToken.contentEquals(token)) {
-            println("[transfer] Failed to authenticate player $uuid: invalid token")
+            println("[connection] Failed to authenticate player $uuid: invalid token")
             return false
         }
 

@@ -25,6 +25,7 @@ import dev.slne.surf.core.core.common.server.surfServerService
 import dev.slne.surf.core.velocity.auth.AuthenticationListener
 import dev.slne.surf.core.velocity.auth.authentificationService
 import dev.slne.surf.core.velocity.listener.ConnectionListener
+import dev.slne.surf.core.velocity.listener.VelocityServerListener
 import dev.slne.surf.core.velocity.redis.listener.VelocitySurfPlayerRedisListener
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 import kotlinx.coroutines.runBlocking
@@ -55,6 +56,7 @@ class VelocityMain @Inject constructor(
             category = surfServerConfig.serverCategory,
             state = SurfServerState.STARTING,
             type = SurfServerType.PROXY,
+            maxPlayers = plugin.proxy.configuration.showMaxPlayers,
             connectionAddress = InetSocketAddress(
                 surfServerConfig.connectionAddress.host,
                 surfServerConfig.connectionAddress.port
@@ -74,6 +76,7 @@ class VelocityMain @Inject constructor(
         surfEventBus.fire(SurfServerOnlineEvent(surfServerConfig.serverName))
         eventManager.register(this, ConnectionListener)
         eventManager.register(this, AuthenticationListener)
+        eventManager.register(this, VelocityServerListener)
 
         surfServerService.changeState(SurfServer.current(), SurfServerState.RUNNING)
     }

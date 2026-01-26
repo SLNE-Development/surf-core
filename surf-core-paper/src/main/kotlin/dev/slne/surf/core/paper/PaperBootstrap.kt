@@ -31,6 +31,7 @@ class PaperBootstrap : PluginBootstrap {
             category = surfServerConfig.serverCategory,
             state = SurfServerState.STARTING,
             type = SurfServerType.SERVER,
+            maxPlayers = 0,
             connectionAddress = InetSocketAddress(
                 surfServerConfig.connectionAddress.host,
                 surfServerConfig.connectionAddress.port

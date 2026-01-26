@@ -23,18 +23,11 @@ object AuthenticationListener {
 
         authentificationService.continuations[event.player.uniqueId] = continuation
         event.player.requestCookie(authentificationService.key)
-        event.player.requestCookie(authentificationService.lastServerKey)
     }
 
     @Subscribe
     fun onCookieReceive(event: CookieReceiveEvent) {
         when (event.originalKey) {
-            authentificationService.lastServerKey -> {
-                event.originalData?.let {
-                    authentificationService.lastServers[event.player.uniqueId] = String(it)
-                }
-            }
-
             authentificationService.key -> {
                 event.originalData?.let {
                     authentificationService.authenticate(event.player.uniqueId, it)
@@ -48,7 +41,7 @@ object AuthenticationListener {
     @Subscribe
     fun onInitialServer(event: PlayerChooseInitialServerEvent) {
         val player = event.player
-        val lastServerName = authentificationService.lastServers.remove(player.uniqueId) ?: return
+        val lastServerName = authentificationService.lastServerMap.remove(player.uniqueId) ?: return
 
         plugin.proxy.getServer(lastServerName).getOrNull()?.let {
             event.setInitialServer(it)
@@ -63,10 +56,10 @@ object AuthenticationListener {
         authentificationService.preTransfer(player.uniqueId, token)
 
         player.storeCookie(authentificationService.key, token)
-        player.storeCookie(
-            authentificationService.lastServerKey,
-            player.currentServer.getOrNull()?.serverInfo?.name?.toByteArray()
-        )
+
+        player.currentServer.getOrNull()?.serverInfo?.name?.let {
+            authentificationService.lastServerMap[player.uniqueId] = it
+        }
     }
 
     private fun generateToken(): ByteArray {

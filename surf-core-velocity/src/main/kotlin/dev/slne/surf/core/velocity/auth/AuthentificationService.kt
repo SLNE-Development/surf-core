@@ -11,10 +11,9 @@ val authentificationService = AuthentificationService()
 
 class AuthentificationService {
     val authMap = redisApi.createSyncMap<UUID, ByteArray>("surf-core:authentification", 10.seconds)
+    val lastServerMap = redisApi.createSyncMap<UUID, String>("surf-core:last-server", 10.seconds)
     val continuations = mutableObject2ObjectMapOf<UUID, Continuation>()
-    val lastServers = mutableObject2ObjectMapOf<UUID, String>()
     val key = key("surf-core", "transfer-authentification")
-    val lastServerKey = key("surf-core", "last-server")
 
     fun authenticate(uuid: UUID, token: ByteArray): Boolean {
         val storedToken = authMap.remove(uuid)

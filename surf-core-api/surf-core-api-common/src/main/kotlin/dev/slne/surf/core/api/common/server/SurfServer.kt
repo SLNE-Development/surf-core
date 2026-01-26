@@ -13,6 +13,7 @@ data class SurfServer(
     val category: String,
     val state: SurfServerState,
     val type: SurfServerType,
+    val maxPlayers: Int,
     val connectionAddress: SerializableInetSocketAddress
 ) {
     fun getPlayers() = surfCoreApi.getOnlinePlayers().filter { it.currentServer == this }

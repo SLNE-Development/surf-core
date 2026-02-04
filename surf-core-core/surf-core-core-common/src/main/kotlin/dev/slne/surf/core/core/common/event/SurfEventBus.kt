@@ -52,6 +52,7 @@ class SurfEventBus {
         listeners.computeIfAbsent(eventClass) { mutableListOf() }.add(handler)
     }
 
+
     fun fireLocal(event: SurfEvent) {
         listeners[event::class]?.forEach { handler ->
             handler(event)

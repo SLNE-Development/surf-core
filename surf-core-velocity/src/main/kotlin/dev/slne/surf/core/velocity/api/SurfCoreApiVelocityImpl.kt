@@ -30,7 +30,7 @@ class SurfCoreApiVelocityImpl : SurfCoreApiImpl(), Services.Fallback {
                 val velocityServer = plugin.proxy.getServer(server.name).getOrNull()
                     ?: error("SurfServer ${server.name} not found on proxy")
                 plugin.proxy.getPlayer(player.uuid).getOrNull()
-                    ?.createConnectionRequest(velocityServer)
+                    ?.createConnectionRequest(velocityServer)?.fireAndForget()
             }
         }
     }

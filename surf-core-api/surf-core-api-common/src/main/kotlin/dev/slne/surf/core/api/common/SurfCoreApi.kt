@@ -28,6 +28,8 @@ interface SurfCoreApi {
     fun fireEvent(event: SurfEvent)
     fun subscribe(eventClass: KClass<out SurfEvent>, handler: (SurfEvent) -> Unit)
 
+    fun sendPlayer(player: SurfPlayer, server: SurfServer)
+
     /**
      * Sends a text message to the given player via the cross-server messaging system.
      *

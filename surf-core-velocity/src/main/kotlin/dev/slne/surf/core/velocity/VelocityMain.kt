@@ -22,10 +22,15 @@ import dev.slne.surf.core.core.common.event.surfEventBus
 import dev.slne.surf.core.core.common.player.surfPlayerService
 import dev.slne.surf.core.core.common.redis.redisLoader
 import dev.slne.surf.core.core.common.server.surfServerService
+import dev.slne.surf.core.velocity.auth.AuthenticationListener
+import dev.slne.surf.core.velocity.auth.authentificationService
+import dev.slne.surf.core.velocity.config.VelocityCoreConfigManager
 import dev.slne.surf.core.velocity.listener.ConnectionListener
+import dev.slne.surf.core.velocity.listener.VelocityServerListener
 import dev.slne.surf.core.velocity.redis.listener.VelocitySurfPlayerRedisListener
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 import kotlinx.coroutines.runBlocking
+import java.net.InetSocketAddress
 import java.nio.file.Path
 
 class VelocityMain @Inject constructor(
@@ -44,13 +49,19 @@ class VelocityMain @Inject constructor(
         redisLoader.load()
         surfPlayerService.init()
         surfServerService.init()
+        authentificationService.init()
         redisLoader.connect(VelocitySurfPlayerRedisListener)
 
         val server = SurfServer(
             name = surfServerConfig.serverName,
             category = surfServerConfig.serverCategory,
             state = SurfServerState.STARTING,
-            type = SurfServerType.PROXY
+            type = SurfServerType.PROXY,
+            maxPlayers = plugin.proxy.configuration.showMaxPlayers,
+            connectionAddress = InetSocketAddress(
+                surfServerConfig.connectionAddress.host,
+                surfServerConfig.connectionAddress.port
+            )
         )
 
         surfEventBus.fire(SurfServerStartEvent(surfServerConfig.serverName))
@@ -65,6 +76,8 @@ class VelocityMain @Inject constructor(
 
         surfEventBus.fire(SurfServerOnlineEvent(surfServerConfig.serverName))
         eventManager.register(this, ConnectionListener)
+        eventManager.register(this, AuthenticationListener)
+        eventManager.register(this, VelocityServerListener)
 
         surfServerService.changeState(SurfServer.current(), SurfServerState.RUNNING)
     }
@@ -97,6 +110,8 @@ class VelocityMain @Inject constructor(
         lateinit var surfServerConfigHolder: SurfServerConfigHolder
     }
 }
+
+val velocityCoreConfigManager = VelocityCoreConfigManager()
 
 val proxy get() = VelocityMain.instance.proxy
 val plugin get() = VelocityMain.instance

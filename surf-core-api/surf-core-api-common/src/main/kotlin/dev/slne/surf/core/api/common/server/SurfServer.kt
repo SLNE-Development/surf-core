@@ -1,8 +1,12 @@
 package dev.slne.surf.core.api.common.server
 
+import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.server.state.SurfServerState
 import dev.slne.surf.core.api.common.server.type.SurfServerType
 import dev.slne.surf.core.api.common.surfCoreApi
+import dev.slne.surf.surfapi.core.api.serializer.java.ip.inetsocket.SerializableInetSocketAddress
+import dev.slne.surf.surfapi.core.api.util.toObjectSet
+import it.unimi.dsi.fastutil.objects.ObjectSet
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -10,10 +14,21 @@ data class SurfServer(
     val name: String,
     val category: String,
     val state: SurfServerState,
-    val type: SurfServerType
+    val type: SurfServerType,
+    val maxPlayers: Int,
+    val connectionAddress: SerializableInetSocketAddress
 ) {
-    fun getPlayers() = surfCoreApi.getOnlinePlayers().filter { it.currentServer == this }
+    fun getPlayers(): ObjectSet<SurfPlayer> = if (type == SurfServerType.PROXY) {
+        surfCoreApi.getOnlinePlayers().filter { it.currentProxy?.name == name }.toObjectSet()
+    } else {
+        surfCoreApi.getOnlinePlayers().filter { it.currentServer?.name == name }.toObjectSet()
+    }
+
     fun getPlayerCount() = getPlayers().size
+
+    fun sendPlayers(otherServer: SurfServer) = getPlayers().forEach { it.send(otherServer) }
+    fun pullPlayers(otherServer: SurfServer) = otherServer.getPlayers().forEach { it.send(this) }
+    fun pullPlayers(vararg players: SurfPlayer) = players.forEach { it.send(this) }
 
     companion object {
         /**

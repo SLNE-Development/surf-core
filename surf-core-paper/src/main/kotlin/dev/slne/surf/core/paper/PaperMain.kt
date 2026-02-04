@@ -14,6 +14,7 @@ import dev.slne.surf.core.paper.event.SurfServerEventListener
 import dev.slne.surf.core.paper.listener.PlayerClientLoadedListener
 import dev.slne.surf.surfapi.bukkit.api.event.register
 import kotlinx.coroutines.runBlocking
+import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 
 val plugin get() = JavaPlugin.getPlugin(PaperMain::class.java)
@@ -33,8 +34,13 @@ class PaperMain : SuspendingJavaPlugin() {
         surfCoreCommand()
         whereAmICommand()
         networkInformationCommand()
+        networkServerCommand()
+        networkBroadcastCommand()
+        networkSendCommand()
 
         PlayerClientLoadedListener.register()
+
+        surfServerService.addServer(SurfServer.current().copy(maxPlayers = Bukkit.getMaxPlayers()))
 
         runBlocking {
             databaseLoader.connect(plugin.dataPath)

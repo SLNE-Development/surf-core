@@ -1,12 +1,10 @@
 package dev.slne.surf.core.core.common.error
 
 import dev.slne.surf.core.core.common.config.surfServerConfig
-import dev.slne.surf.core.core.common.player.surfCoreErrorLoggingService
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.*
 import java.util.logging.Level
 import java.util.logging.Logger
 
@@ -23,7 +21,7 @@ object GlobalErrorHandler {
      */
     fun install() {
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
-            handleError(thread.name, throwable, UUID(0, 0)) // System UUID for non-player errors
+            handleError(thread.name, throwable)
         }
         logger.info("Global error handler installed")
     }
@@ -31,24 +29,23 @@ object GlobalErrorHandler {
     /**
      * Creates a coroutine exception handler that logs errors to the database.
      */
-    fun createCoroutineExceptionHandler(playerUuid: UUID = UUID(0, 0)): CoroutineExceptionHandler {
+    fun createCoroutineExceptionHandler(): CoroutineExceptionHandler {
         return CoroutineExceptionHandler { context, throwable ->
-            handleError(context.toString(), throwable, playerUuid)
+            handleError(context.toString(), throwable)
         }
     }
     
     /**
      * Handles an error by logging it to the database.
      */
-    private fun handleError(source: String, throwable: Throwable, playerUuid: UUID) {
+    private fun handleError(source: String, throwable: Throwable) {
         try {
             logger.log(Level.SEVERE, "Uncaught exception from $source", throwable)
             
             // Log to database asynchronously
             errorScope.launch {
                 try {
-                    surfCoreErrorLoggingService.logError(
-                        playerUuid = playerUuid,
+                    systemErrorService.logError(
                         throwable = throwable,
                         server = surfServerConfig.serverName
                     )
@@ -63,9 +60,9 @@ object GlobalErrorHandler {
     }
     
     /**
-     * Logs an error manually with a specific player UUID.
+     * Logs an error manually.
      */
-    fun logError(throwable: Throwable, playerUuid: UUID = UUID(0, 0)) {
-        handleError("Manual", throwable, playerUuid)
+    fun logError(throwable: Throwable) {
+        handleError("Manual", throwable)
     }
 }

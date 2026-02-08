@@ -3,6 +3,8 @@ package dev.slne.surf.core.fallback.repository
 import dev.slne.surf.core.api.common.error.SurfCoreError
 import dev.slne.surf.core.api.common.error.SurfCoreErrorFilter
 import dev.slne.surf.core.fallback.table.SurfCoreErrorLogsTable
+import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.Op
+import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.SqlExpressionBuilder
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.and
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.eq
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.greaterEq
@@ -20,6 +22,9 @@ import java.time.OffsetDateTime
 import java.util.*
 
 val surfCoreErrorLoggingRepository = SurfCoreErrorLoggingRepository()
+
+private fun Op<Boolean>?.andCondition(newCondition: Op<Boolean>): Op<Boolean> =
+    this?.let { it and newCondition } ?: newCondition
 
 class SurfCoreErrorLoggingRepository {
     suspend fun logError(
@@ -56,31 +61,26 @@ class SurfCoreErrorLoggingRepository {
     suspend fun getErrors(filter: SurfCoreErrorFilter): ObjectList<SurfCoreError> = suspendTransaction {
         var query = SurfCoreErrorLogsTable.selectAll()
 
-        var whereCondition = filter.playerUuid?.let { SurfCoreErrorLogsTable.playerUuid eq it }
+        var whereCondition: Op<Boolean>? = filter.playerUuid?.let { SurfCoreErrorLogsTable.playerUuid eq it }
 
         filter.code?.let {
-            whereCondition = whereCondition?.let { cond -> cond and (SurfCoreErrorLogsTable.errorCode eq it) }
-                ?: (SurfCoreErrorLogsTable.errorCode eq it)
+            whereCondition = whereCondition.andCondition(SurfCoreErrorLogsTable.errorCode eq it)
         }
 
         filter.messageLike?.let {
-            whereCondition = whereCondition?.let { cond -> cond and (SurfCoreErrorLogsTable.errorMessage like "%$it%") }
-                ?: (SurfCoreErrorLogsTable.errorMessage like "%$it%")
+            whereCondition = whereCondition.andCondition(SurfCoreErrorLogsTable.errorMessage like "%$it%")
         }
 
         filter.server?.let {
-            whereCondition = whereCondition?.let { cond -> cond and (SurfCoreErrorLogsTable.server eq it) }
-                ?: (SurfCoreErrorLogsTable.server eq it)
+            whereCondition = whereCondition.andCondition(SurfCoreErrorLogsTable.server eq it)
         }
 
         filter.timestampAfter?.let {
-            whereCondition = whereCondition?.let { cond -> cond and (SurfCoreErrorLogsTable.timestamp greaterEq it) }
-                ?: (SurfCoreErrorLogsTable.timestamp greaterEq it)
+            whereCondition = whereCondition.andCondition(SurfCoreErrorLogsTable.timestamp greaterEq it)
         }
 
         filter.timestampBefore?.let {
-            whereCondition = whereCondition?.let { cond -> cond and (SurfCoreErrorLogsTable.timestamp lessEq it) }
-                ?: (SurfCoreErrorLogsTable.timestamp lessEq it)
+            whereCondition = whereCondition.andCondition(SurfCoreErrorLogsTable.timestamp lessEq it)
         }
 
         whereCondition?.let { query = query.where(it) }

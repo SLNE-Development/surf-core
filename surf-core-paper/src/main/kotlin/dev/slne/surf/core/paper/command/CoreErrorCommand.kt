@@ -517,12 +517,12 @@ private val systemErrorPagination = Pagination<SurfCoreSystemError> {
     }
 }
 
+private fun parseDateTime(input: String): OffsetDateTime? {
+    return runCatching { OffsetDateTime.parse(input) }.getOrNull()
+}
+
 private suspend fun Map<String, String>.parsePlayerErrorFilters(): SurfCoreErrorFilter {
     val playerUuid = this["--player"]?.let { PlayerLookupService.getUuid(it) }
-    
-    fun parseDateTime(input: String): OffsetDateTime? {
-        return runCatching { OffsetDateTime.parse(input) }.getOrNull()
-    }
 
     return SurfCoreErrorFilter(
         playerUuid = playerUuid,
@@ -536,10 +536,6 @@ private suspend fun Map<String, String>.parsePlayerErrorFilters(): SurfCoreError
 }
 
 private fun Map<String, String>.parseSystemErrorFilters(): SurfCoreSystemErrorFilter {
-    fun parseDateTime(input: String): OffsetDateTime? {
-        return runCatching { OffsetDateTime.parse(input) }.getOrNull()
-    }
-
     return SurfCoreSystemErrorFilter(
         uuid = this["--uuid"]?.let { runCatching { UUID.fromString(it) }.getOrNull() },
         errorCode = this["--code"],

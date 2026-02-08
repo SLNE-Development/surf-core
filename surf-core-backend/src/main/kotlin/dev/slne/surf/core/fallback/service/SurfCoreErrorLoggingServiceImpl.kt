@@ -2,6 +2,7 @@ package dev.slne.surf.core.fallback.service
 
 import com.google.auto.service.AutoService
 import dev.slne.surf.core.api.common.error.SurfCoreError
+import dev.slne.surf.core.api.common.error.SurfCoreErrorFilter
 import dev.slne.surf.core.core.common.player.SurfCoreErrorLoggingService
 import dev.slne.surf.core.fallback.repository.surfCoreErrorLoggingRepository
 import it.unimi.dsi.fastutil.objects.ObjectList
@@ -19,6 +20,9 @@ class SurfCoreErrorLoggingServiceImpl : SurfCoreErrorLoggingService, Services.Fa
 
     override suspend fun getErrors(playerUuid: UUID): ObjectList<SurfCoreError> =
         surfCoreErrorLoggingRepository.getErrors(playerUuid)
+
+    override suspend fun getErrors(filter: SurfCoreErrorFilter): ObjectList<SurfCoreError> =
+        surfCoreErrorLoggingRepository.getErrors(filter)
 
     override suspend fun getError(code: String): SurfCoreError? =
         surfCoreErrorLoggingRepository.getError(code)

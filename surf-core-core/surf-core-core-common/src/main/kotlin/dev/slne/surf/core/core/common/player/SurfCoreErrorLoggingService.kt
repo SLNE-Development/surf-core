@@ -1,6 +1,7 @@
 package dev.slne.surf.core.core.common.player
 
 import dev.slne.surf.core.api.common.error.SurfCoreError
+import dev.slne.surf.core.api.common.error.SurfCoreErrorFilter
 import dev.slne.surf.surfapi.core.api.util.random
 import dev.slne.surf.surfapi.core.api.util.requiredService
 import it.unimi.dsi.fastutil.objects.ObjectList
@@ -17,6 +18,7 @@ interface SurfCoreErrorLoggingService {
     ): SurfCoreError
 
     suspend fun getErrors(playerUuid: UUID): ObjectList<SurfCoreError>
+    suspend fun getErrors(filter: SurfCoreErrorFilter): ObjectList<SurfCoreError>
     suspend fun getError(code: String): SurfCoreError?
 
     fun generateCode(): String {

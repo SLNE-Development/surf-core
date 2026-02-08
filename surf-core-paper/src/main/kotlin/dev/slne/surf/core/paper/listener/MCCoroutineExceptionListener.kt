@@ -21,7 +21,10 @@ object MCCoroutineExceptionListener : Listener {
 
         event.isCancelled = true
 
-        logger.atSevere().log("MCCoroutine exception occurred", event.exception)
+        logger.atSevere()
+            .log(
+                "MCCoroutine exception occurred: ${event.exception.message}\n${event.exception.stackTraceToString()}"
+            )
 
 
         runCatching {

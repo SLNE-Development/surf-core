@@ -16,7 +16,11 @@ object MCCoroutineExceptionListener {
     fun onMCCoroutineException(event: MCCoroutineExceptionEvent) {
         event.result = ResultedEvent.GenericResult.denied()
 
-        logger.atSevere().log("MCCoroutine exception occurred", event.exception)
+        logger.atSevere()
+            .log(
+                "MCCoroutine exception occurred: ${event.exception.message}\n${event.exception.stackTraceToString()}"
+            )
+
         runCatching {
             runBlocking {
                 launch {

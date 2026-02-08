@@ -2,10 +2,7 @@ package dev.slne.surf.core.fallback
 
 import com.google.auto.service.AutoService
 import dev.slne.surf.core.core.common.database.DatabaseLoader
-import dev.slne.surf.core.fallback.table.SurfPlayerIpAddressHistoryTable
-import dev.slne.surf.core.fallback.table.SurfPlayerNameHistoryTable
-import dev.slne.surf.core.fallback.table.SurfPlayerTable
-import dev.slne.surf.core.fallback.table.SurfPlayerTexturesHistoryTable
+import dev.slne.surf.core.fallback.table.*
 import dev.slne.surf.database.DatabaseApi
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.SchemaUtils
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.transactions.suspendTransaction
@@ -23,7 +20,8 @@ class DatabaseLoaderImpl : DatabaseLoader, Services.Fallback {
                 SurfPlayerTable,
                 SurfPlayerNameHistoryTable,
                 SurfPlayerIpAddressHistoryTable,
-                SurfPlayerTexturesHistoryTable
+                SurfPlayerTexturesHistoryTable,
+                SurfCoreErrorLogsTable
             )
         }
     }

@@ -1,10 +1,12 @@
 package dev.slne.surf.core.core.common
 
 import dev.slne.surf.core.api.common.SurfCoreApi
+import dev.slne.surf.core.api.common.error.SurfCoreError
 import dev.slne.surf.core.api.common.event.SurfEvent
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.core.common.event.surfEventBus
+import dev.slne.surf.core.core.common.player.surfCoreErrorLoggingService
 import dev.slne.surf.core.core.common.player.surfPlayerService
 import dev.slne.surf.core.core.common.redis.event.SurfPlayerMessageRedisEvent
 import dev.slne.surf.core.core.common.redis.redisApi
@@ -59,4 +61,23 @@ abstract class SurfCoreApiImpl : SurfCoreApi {
     override fun fireEvent(event: SurfEvent) {
         surfEventBus.fire(event)
     }
+
+    override suspend fun logErrorAwaiting(
+        playerUuid: UUID,
+        code: String,
+        message: String,
+        server: String
+    ): SurfCoreError = surfCoreErrorLoggingService.logError(playerUuid, code, message, server)
+
+    override suspend fun logErrorAwaiting(
+        playerUuid: UUID,
+        message: String,
+        server: String
+    ): SurfCoreError =
+        surfCoreErrorLoggingService.logError(
+            playerUuid,
+            surfCoreErrorLoggingService.generateCode(),
+            message,
+            server
+        )
 }

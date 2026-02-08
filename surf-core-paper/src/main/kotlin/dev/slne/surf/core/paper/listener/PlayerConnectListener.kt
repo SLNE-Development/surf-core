@@ -1,5 +1,6 @@
 package dev.slne.surf.core.paper.listener
 
+import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.core.core.common.player.surfPlayerService
 import dev.slne.surf.core.core.common.util.formatMillis
 import dev.slne.surf.core.paper.permission.PermissionRegistry
@@ -20,7 +21,11 @@ object PlayerConnectListener : Listener {
         val surfPlayer = surfPlayerService.findPlayerByUuid(player.uniqueId)
 
         if (surfPlayer == null) {
-            player.kick(buildDisconnectComponent(), PlayerKickEvent.Cause.UNKNOWN)
+            val code = surfCoreApi.logError(
+                player.uniqueId,
+                "Failed to load player data on PlayerClientLoadedWorldEvent"
+            )
+            player.kick(buildDisconnectComponent(code), PlayerKickEvent.Cause.UNKNOWN)
             return
         }
 
@@ -56,11 +61,18 @@ object PlayerConnectListener : Listener {
         val surfPlayer = surfPlayerService.findPlayerByUuid(event.uniqueId)
 
         if (surfPlayer == null) {
-            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, buildDisconnectComponent())
+            val code = surfCoreApi.logError(
+                event.uniqueId,
+                "Failed to load player data on AsyncPlayerPreLoginEvent"
+            )
+            event.disallow(
+                AsyncPlayerPreLoginEvent.Result.KICK_OTHER,
+                buildDisconnectComponent(code)
+            )
         }
     }
 
-    private fun buildDisconnectComponent() = buildText {
+    private fun buildDisconnectComponent(code: String) = buildText {
         appendNewline(2)
         primary("CASTCRAFTER")
         appendNewline()

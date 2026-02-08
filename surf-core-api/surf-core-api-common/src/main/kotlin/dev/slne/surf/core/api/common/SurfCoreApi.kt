@@ -1,5 +1,6 @@
 package dev.slne.surf.core.api.common
 
+import dev.slne.surf.core.api.common.error.SurfCoreError
 import dev.slne.surf.core.api.common.event.SurfEvent
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.server.SurfServer
@@ -27,6 +28,18 @@ interface SurfCoreApi {
     fun registerListener(listener: Any)
     fun fireEvent(event: SurfEvent)
     fun subscribe(eventClass: KClass<out SurfEvent>, handler: (SurfEvent) -> Unit)
+
+    fun logError(playerUuid: UUID, code: String, message: String)
+    fun logError(playerUUid: UUID, message: String): String
+
+    suspend fun logErrorAwaiting(
+        playerUuid: UUID,
+        code: String,
+        message: String,
+        server: String
+    ): SurfCoreError
+
+    suspend fun logErrorAwaiting(playerUuid: UUID, message: String, server: String): SurfCoreError
 
     fun sendPlayer(player: SurfPlayer, server: SurfServer)
 

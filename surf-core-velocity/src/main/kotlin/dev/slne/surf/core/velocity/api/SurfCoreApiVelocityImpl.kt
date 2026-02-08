@@ -1,20 +1,50 @@
 package dev.slne.surf.core.velocity.api
 
+import com.github.shynixn.mccoroutine.velocity.launch
 import com.google.auto.service.AutoService
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.common.server.type.SurfServerType
 import dev.slne.surf.core.core.common.SurfCoreApiImpl
+import dev.slne.surf.core.core.common.player.surfCoreErrorLoggingService
 import dev.slne.surf.core.velocity.plugin
 import dev.slne.surf.core.velocity.surfServerConfig
 import net.kyori.adventure.util.Services
+import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
 @AutoService(SurfCoreApi::class)
 class SurfCoreApiVelocityImpl : SurfCoreApiImpl(), Services.Fallback {
     override fun getCurrentServerName() = surfServerConfig.serverName
     override fun getCurrentServerCategory() = surfServerConfig.serverCategory
+
+    override fun logError(playerUuid: UUID, code: String, message: String) {
+        plugin.pluginContainer.launch {
+            surfCoreErrorLoggingService.logError(
+                playerUuid,
+                code,
+                message,
+                SurfServer.current().name
+            )
+        }
+    }
+
+    override fun logError(playerUUid: UUID, message: String): String {
+        val code = surfCoreErrorLoggingService.generateCode()
+
+        plugin.pluginContainer.launch {
+            surfCoreErrorLoggingService.logError(
+                playerUUid,
+                code,
+                message,
+                SurfServer.current().name
+            )
+        }
+
+        return code
+    }
+
     override fun sendPlayer(
         player: SurfPlayer,
         server: SurfServer

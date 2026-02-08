@@ -10,4 +10,14 @@ object SurfCoreErrorLogsTable : LongIdTable("surf_player_error_logs") {
     val errorMessage = text("error_message")
     val server = varchar("server", 255)
     val timestamp = offsetDateTime("timestamp")
+    val stacktrace = text("stacktrace")
+    val location = varchar("location", 500)
+    val lastOccurred = offsetDateTime("last_occurred")
+    val occurrenceCount = integer("occurrence_count").default(1)
+    
+    init {
+        // Create a unique index on the combination of message, location, and server
+        // This helps identify duplicate errors
+        index(isUnique = false, errorMessage, location, server)
+    }
 }

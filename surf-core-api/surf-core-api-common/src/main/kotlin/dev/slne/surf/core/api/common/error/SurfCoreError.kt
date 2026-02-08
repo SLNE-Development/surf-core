@@ -8,5 +8,9 @@ data class SurfCoreError(
     val code: String,
     val message: String,
     val server: String,
-    val timestamp: OffsetDateTime
+    val timestamp: OffsetDateTime,
+    val stacktrace: String,
+    val location: String,
+    val lastOccurred: OffsetDateTime,
+    val occurrenceCount: Int
 )

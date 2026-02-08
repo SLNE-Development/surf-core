@@ -6,6 +6,7 @@ import dev.slne.surf.core.api.common.event.SurfServerStoppingEvent
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.common.server.state.SurfServerState
 import dev.slne.surf.core.core.common.database.databaseLoader
+import dev.slne.surf.core.core.common.error.GlobalErrorHandler
 import dev.slne.surf.core.core.common.event.surfEventBus
 import dev.slne.surf.core.core.common.redis.redisLoader
 import dev.slne.surf.core.core.common.server.surfServerService
@@ -21,6 +22,9 @@ val plugin get() = JavaPlugin.getPlugin(PaperMain::class.java)
 
 class PaperMain : SuspendingJavaPlugin() {
     override fun onLoad() {
+        // Install global error handler early
+        GlobalErrorHandler.install()
+        
         surfEventBus.registerListener(SurfServerEventListener)
     }
 

@@ -14,8 +14,17 @@ class SurfCoreErrorLoggingServiceImpl : SurfCoreErrorLoggingService, Services.Fa
         playerUuid: UUID,
         code: String,
         message: String,
-        server: String
-    ): SurfCoreError = surfCoreErrorLoggingRepository.logError(playerUuid, code, message, server)
+        server: String,
+        stacktrace: String,
+        location: String
+    ): SurfCoreError = surfCoreErrorLoggingRepository.logError(
+        playerUuid,
+        code,
+        message,
+        server,
+        stacktrace,
+        location
+    )
 
     override suspend fun getErrors(playerUuid: UUID): ObjectList<SurfCoreError> =
         surfCoreErrorLoggingRepository.getErrors(playerUuid)

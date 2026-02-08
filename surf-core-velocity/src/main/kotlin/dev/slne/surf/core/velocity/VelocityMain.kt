@@ -18,6 +18,7 @@ import dev.slne.surf.core.api.common.server.state.SurfServerState
 import dev.slne.surf.core.api.common.server.type.SurfServerType
 import dev.slne.surf.core.core.common.config.SurfServerConfigHolder
 import dev.slne.surf.core.core.common.database.databaseLoader
+import dev.slne.surf.core.core.common.error.GlobalErrorHandler
 import dev.slne.surf.core.core.common.event.surfEventBus
 import dev.slne.surf.core.core.common.player.surfPlayerService
 import dev.slne.surf.core.core.common.redis.redisLoader
@@ -43,6 +44,9 @@ class VelocityMain @Inject constructor(
 ) {
     init {
         suspendingPluginContainer.initialize(this)
+        
+        // Install global error handler early
+        GlobalErrorHandler.install()
 
         instance = this
         surfServerConfigHolder = SurfServerConfigHolder(dataPath)

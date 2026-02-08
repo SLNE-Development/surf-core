@@ -21,7 +21,8 @@ class DatabaseLoaderImpl : DatabaseLoader, Services.Fallback {
                 SurfPlayerNameHistoryTable,
                 SurfPlayerIpAddressHistoryTable,
                 SurfPlayerTexturesHistoryTable,
-                SurfCoreErrorLogsTable
+                SurfCoreErrorLogsTable,
+                SurfCoreSystemErrorTable
             )
         }
     }

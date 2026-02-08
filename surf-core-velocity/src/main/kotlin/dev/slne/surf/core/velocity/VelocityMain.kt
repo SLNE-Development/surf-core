@@ -18,6 +18,7 @@ import dev.slne.surf.core.api.common.server.state.SurfServerState
 import dev.slne.surf.core.api.common.server.type.SurfServerType
 import dev.slne.surf.core.core.common.config.SurfServerConfigHolder
 import dev.slne.surf.core.core.common.database.databaseLoader
+import dev.slne.surf.core.core.common.error.GlobalErrorHandler
 import dev.slne.surf.core.core.common.event.surfEventBus
 import dev.slne.surf.core.core.common.player.surfPlayerService
 import dev.slne.surf.core.core.common.redis.redisLoader
@@ -26,6 +27,7 @@ import dev.slne.surf.core.velocity.auth.AuthenticationListener
 import dev.slne.surf.core.velocity.auth.authenticationService
 import dev.slne.surf.core.velocity.config.VelocityCoreConfigManager
 import dev.slne.surf.core.velocity.listener.ConnectionListener
+import dev.slne.surf.core.velocity.listener.MCCoroutineExceptionListener
 import dev.slne.surf.core.velocity.listener.VelocityServerListener
 import dev.slne.surf.core.velocity.redis.listener.VelocitySurfPlayerRedisListener
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
@@ -43,6 +45,9 @@ class VelocityMain @Inject constructor(
 ) {
     init {
         suspendingPluginContainer.initialize(this)
+        
+        // Install global error handler early
+        GlobalErrorHandler.install()
 
         instance = this
         surfServerConfigHolder = SurfServerConfigHolder(dataPath)
@@ -78,6 +83,7 @@ class VelocityMain @Inject constructor(
         eventManager.register(this, ConnectionListener)
         eventManager.register(this, AuthenticationListener)
         eventManager.register(this, VelocityServerListener)
+        eventManager.register(this, MCCoroutineExceptionListener)
 
         surfServerService.changeState(SurfServer.current(), SurfServerState.RUNNING)
     }
@@ -101,6 +107,7 @@ class VelocityMain @Inject constructor(
             })
         }
 
+        GlobalErrorHandler.shutdown()
         redisLoader.disconnect()
         databaseLoader.disconnect()
     }

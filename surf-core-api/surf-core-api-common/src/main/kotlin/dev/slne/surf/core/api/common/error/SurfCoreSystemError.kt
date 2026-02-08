@@ -5,6 +5,7 @@ import java.util.*
 
 data class SurfCoreSystemError(
     val uuid: UUID,
+    val errorCode: String,
     val errorMessage: String,
     val stacktrace: String,
     val location: String,

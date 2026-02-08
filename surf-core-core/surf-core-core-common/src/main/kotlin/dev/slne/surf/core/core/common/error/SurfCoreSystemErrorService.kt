@@ -47,4 +47,13 @@ interface SurfCoreSystemErrorService {
     suspend fun getAllErrors(): ObjectList<SurfCoreSystemError>
 
     suspend fun getError(uuid: UUID): SurfCoreSystemError?
+    
+    suspend fun getError(code: String): SurfCoreSystemError?
+    
+    fun generateCode(): String {
+        val chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        return (1..10)
+            .map { chars[dev.slne.surf.surfapi.core.api.util.random.nextInt(chars.length)] }
+            .joinToString("")
+    }
 }

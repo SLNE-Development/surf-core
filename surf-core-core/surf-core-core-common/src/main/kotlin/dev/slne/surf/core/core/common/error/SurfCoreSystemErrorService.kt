@@ -1,6 +1,7 @@
 package dev.slne.surf.core.core.common.error
 
 import dev.slne.surf.core.api.common.error.SurfCoreSystemError
+import dev.slne.surf.core.api.common.error.SurfCoreSystemErrorFilter
 import dev.slne.surf.surfapi.core.api.util.requiredService
 import it.unimi.dsi.fastutil.objects.ObjectList
 import java.util.*
@@ -45,6 +46,8 @@ interface SurfCoreSystemErrorService {
     ): SurfCoreSystemError
 
     suspend fun getAllErrors(): ObjectList<SurfCoreSystemError>
+    
+    suspend fun getAllErrors(filter: SurfCoreSystemErrorFilter): ObjectList<SurfCoreSystemError>
 
     suspend fun getError(uuid: UUID): SurfCoreSystemError?
     

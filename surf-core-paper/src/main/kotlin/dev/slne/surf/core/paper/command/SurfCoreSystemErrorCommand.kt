@@ -77,24 +77,38 @@ fun surfCoreSystemErrorCommand() = commandTree("surfcoresystemerror") {
                     variableValue(error.lastOccurred.format(dateTimeFormatter))
                     appendNewline()
                     appendInfoPrefix()
-                    info("Anzahl: ")
+                    info("Anzahl in den letzten 24h: ")
                     variableValue(error.occurrenceCount.toString())
                     appendNewline()
                     appendInfoPrefix()
                     info("Nachricht: ")
                     appendNewline()
-                    spacer(error.errorMessage.take(50))
-                    if (error.errorMessage.length > 50) {
-                        spacer("... (gekürzt)")
+                    append {
+                        spacer(error.errorMessage.take(50))
+                        if (error.errorMessage.length > 50) {
+                            spacer("... (gekürzt)")
+                        }
+                        hoverEvent(buildText {
+                            spacer(error.errorMessage)
+                        })
+                        clickCopiesToClipboard(error.errorMessage)
                     }
+
                     appendNewline()
                     appendInfoPrefix()
                     info("Stacktrace: ")
                     appendNewline()
-                    spacer(error.stacktrace.take(75))
-                    if (error.stacktrace.length > 75) {
-                        appendNewline()
-                        spacer("... (gekürzt, ${error.stacktrace.length} Zeichen total)")
+                    append {
+                        spacer(error.stacktrace.take(75))
+                        if (error.stacktrace.length > 75) {
+                            appendNewline()
+                            spacer("... (gekürzt, ${error.stacktrace.length} Zeichen total)")
+                        }
+
+                        hoverEvent(buildText {
+                            spacer(error.stacktrace)
+                        })
+                        clickCopiesToClipboard(error.stacktrace)
                     }
                     appendNewline()
                     appendNewline()

@@ -11,6 +11,7 @@ import it.unimi.dsi.fastutil.objects.ObjectList
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
+import java.time.OffsetDateTime
 import java.util.*
 
 val surfCoreErrorLoggingRepository = SurfCoreErrorLoggingRepository()
@@ -22,14 +23,16 @@ class SurfCoreErrorLoggingRepository {
         message: String,
         server: String,
     ): SurfCoreError = suspendTransaction {
+        val timestamp = OffsetDateTime.now()
         SurfCoreErrorLogsTable.insert {
             it[SurfCoreErrorLogsTable.playerUuid] = playerUuid
             it[SurfCoreErrorLogsTable.errorCode] = code
             it[SurfCoreErrorLogsTable.errorMessage] = message
             it[SurfCoreErrorLogsTable.server] = server
+            it[SurfCoreErrorLogsTable.timestamp] = timestamp
         }
 
-        SurfCoreError(code, message, server)
+        SurfCoreError(code, message, server, timestamp)
     }
 
     suspend fun getErrors(playerUuid: UUID): ObjectList<SurfCoreError> = suspendTransaction {
@@ -39,6 +42,7 @@ class SurfCoreErrorLoggingRepository {
                     code = it[SurfCoreErrorLogsTable.errorCode],
                     message = it[SurfCoreErrorLogsTable.errorMessage],
                     server = it[SurfCoreErrorLogsTable.server],
+                    timestamp = it[SurfCoreErrorLogsTable.timestamp]
                 )
             }.toList().toObjectList()
     }
@@ -49,6 +53,7 @@ class SurfCoreErrorLoggingRepository {
                 code = it[SurfCoreErrorLogsTable.errorCode],
                 message = it[SurfCoreErrorLogsTable.errorMessage],
                 server = it[SurfCoreErrorLogsTable.server],
+                timestamp = it[SurfCoreErrorLogsTable.timestamp]
             )
         }.firstOrNull()
     }

@@ -80,7 +80,7 @@ object PlayerConnectListener : Listener {
         appendNewline(2)
         error("DEINE SPIELERDATEN KONNTEN NICHT GELADEN WERDEN.")
         appendNewline()
-        error("Code: $code")
+        error("Code: #$code")
         appendNewline(3)
         spacer("Beim laden deiner Spielerdaten ist ein interner Fehler aufgetreten.")
         appendNewline()

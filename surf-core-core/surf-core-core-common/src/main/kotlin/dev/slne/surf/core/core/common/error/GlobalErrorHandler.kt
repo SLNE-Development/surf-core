@@ -26,7 +26,7 @@ object GlobalErrorHandler {
                         server = SurfServer.current().name
                     )
                     logger.atInfo()
-                        .log("This error has been logged with ID: ${surfCoreSystemError.uuid}")
+                        .log("This error has been logged with code: ${surfCoreSystemError.errorCode} (ID: ${surfCoreSystemError.uuid})")
                 }.onFailure {
                     logger.atSevere().log("Failed to log error to database")
                 }

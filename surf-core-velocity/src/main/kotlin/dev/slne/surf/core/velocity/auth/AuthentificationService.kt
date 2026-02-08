@@ -1,6 +1,7 @@
 package dev.slne.surf.core.velocity.auth
 
 import com.velocitypowered.api.event.Continuation
+import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.core.core.common.redis.redisApi
 import dev.slne.surf.surfapi.core.api.messages.adventure.key
 import dev.slne.surf.surfapi.core.api.util.mutableObject2ObjectMapOf
@@ -20,6 +21,7 @@ class AuthentificationService {
         val storedHash = authMap.remove(uuid)
 
         if (storedHash == null) {
+            surfCoreApi.logError(uuid, "Failed authentication attempt: no stored hash")
             println("[connection] Failed to authenticate player $uuid: no stored hash")
             return false
         }
@@ -27,6 +29,7 @@ class AuthentificationService {
         val tokenHash = hash(token)
 
         if (!storedHash.contentEquals(tokenHash)) {
+            surfCoreApi.logError(uuid, "Failed authentication attempt: invalid token")
             println("[connection] Failed to authenticate player $uuid: invalid token")
             return false
         }

@@ -9,9 +9,9 @@ import java.security.MessageDigest
 import java.util.*
 import kotlin.time.Duration.Companion.seconds
 
-val authentificationService = AuthentificationService()
+val authenticationService = AuthenticationService()
 
-class AuthentificationService {
+class AuthenticationService {
     val authMap = redisApi.createSyncMap<UUID, ByteArray>("surf-core:authentification", 5.seconds)
     val lastServerMap = redisApi.createSyncMap<UUID, String>("surf-core:last-server", 5.seconds)
     val continuations = mutableObject2ObjectMapOf<UUID, Continuation>()

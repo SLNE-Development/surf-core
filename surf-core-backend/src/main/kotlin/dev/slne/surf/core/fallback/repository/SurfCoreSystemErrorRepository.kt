@@ -111,45 +111,54 @@ class SurfCoreSystemErrorRepository {
     suspend fun getAllErrors(filter: SurfCoreSystemErrorFilter): ObjectList<SurfCoreSystemError> = suspendTransaction {
         var query = SurfCoreSystemErrorTable.selectAll()
 
-        filter.uuid?.let {
-            query = query.where(SurfCoreSystemErrorTable.uuid eq it)
-        }
+        var whereCondition = filter.uuid?.let { SurfCoreSystemErrorTable.uuid eq it }
 
         filter.errorCode?.let {
-            query = query.andWhere { SurfCoreSystemErrorTable.errorCode eq it }
+            whereCondition = whereCondition?.let { cond -> cond and (SurfCoreSystemErrorTable.errorCode eq it) }
+                ?: (SurfCoreSystemErrorTable.errorCode eq it)
         }
 
         filter.messageLike?.let {
-            query = query.andWhere { SurfCoreSystemErrorTable.errorMessage like "%$it%" }
+            whereCondition = whereCondition?.let { cond -> cond and (SurfCoreSystemErrorTable.errorMessage like "%$it%") }
+                ?: (SurfCoreSystemErrorTable.errorMessage like "%$it%")
         }
 
         filter.locationLike?.let {
-            query = query.andWhere { SurfCoreSystemErrorTable.location like "%$it%" }
+            whereCondition = whereCondition?.let { cond -> cond and (SurfCoreSystemErrorTable.location like "%$it%") }
+                ?: (SurfCoreSystemErrorTable.location like "%$it%")
         }
 
         filter.server?.let {
-            query = query.andWhere { SurfCoreSystemErrorTable.server eq it }
+            whereCondition = whereCondition?.let { cond -> cond and (SurfCoreSystemErrorTable.server eq it) }
+                ?: (SurfCoreSystemErrorTable.server eq it)
         }
 
         filter.firstOccurredAfter?.let {
-            query = query.andWhere { SurfCoreSystemErrorTable.firstOccurred greaterEq it }
+            whereCondition = whereCondition?.let { cond -> cond and (SurfCoreSystemErrorTable.firstOccurred greaterEq it) }
+                ?: (SurfCoreSystemErrorTable.firstOccurred greaterEq it)
         }
 
         filter.firstOccurredBefore?.let {
-            query = query.andWhere { SurfCoreSystemErrorTable.firstOccurred lessEq it }
+            whereCondition = whereCondition?.let { cond -> cond and (SurfCoreSystemErrorTable.firstOccurred lessEq it) }
+                ?: (SurfCoreSystemErrorTable.firstOccurred lessEq it)
         }
 
         filter.lastOccurredAfter?.let {
-            query = query.andWhere { SurfCoreSystemErrorTable.lastOccurred greaterEq it }
+            whereCondition = whereCondition?.let { cond -> cond and (SurfCoreSystemErrorTable.lastOccurred greaterEq it) }
+                ?: (SurfCoreSystemErrorTable.lastOccurred greaterEq it)
         }
 
         filter.lastOccurredBefore?.let {
-            query = query.andWhere { SurfCoreSystemErrorTable.lastOccurred lessEq it }
+            whereCondition = whereCondition?.let { cond -> cond and (SurfCoreSystemErrorTable.lastOccurred lessEq it) }
+                ?: (SurfCoreSystemErrorTable.lastOccurred lessEq it)
         }
 
         filter.minOccurrenceCount?.let {
-            query = query.andWhere { SurfCoreSystemErrorTable.occurrenceCount greaterEq it }
+            whereCondition = whereCondition?.let { cond -> cond and (SurfCoreSystemErrorTable.occurrenceCount greaterEq it) }
+                ?: (SurfCoreSystemErrorTable.occurrenceCount greaterEq it)
         }
+
+        whereCondition?.let { query = query.where(it) }
 
         query
             .limit(filter.limit)

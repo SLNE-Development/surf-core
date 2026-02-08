@@ -56,29 +56,34 @@ class SurfCoreErrorLoggingRepository {
     suspend fun getErrors(filter: SurfCoreErrorFilter): ObjectList<SurfCoreError> = suspendTransaction {
         var query = SurfCoreErrorLogsTable.selectAll()
 
-        filter.playerUuid?.let {
-            query = query.where(SurfCoreErrorLogsTable.playerUuid eq it)
-        }
+        var whereCondition = filter.playerUuid?.let { SurfCoreErrorLogsTable.playerUuid eq it }
 
         filter.code?.let {
-            query = query.andWhere { SurfCoreErrorLogsTable.errorCode eq it }
+            whereCondition = whereCondition?.let { cond -> cond and (SurfCoreErrorLogsTable.errorCode eq it) }
+                ?: (SurfCoreErrorLogsTable.errorCode eq it)
         }
 
         filter.messageLike?.let {
-            query = query.andWhere { SurfCoreErrorLogsTable.errorMessage like "%$it%" }
+            whereCondition = whereCondition?.let { cond -> cond and (SurfCoreErrorLogsTable.errorMessage like "%$it%") }
+                ?: (SurfCoreErrorLogsTable.errorMessage like "%$it%")
         }
 
         filter.server?.let {
-            query = query.andWhere { SurfCoreErrorLogsTable.server eq it }
+            whereCondition = whereCondition?.let { cond -> cond and (SurfCoreErrorLogsTable.server eq it) }
+                ?: (SurfCoreErrorLogsTable.server eq it)
         }
 
         filter.timestampAfter?.let {
-            query = query.andWhere { SurfCoreErrorLogsTable.timestamp greaterEq it }
+            whereCondition = whereCondition?.let { cond -> cond and (SurfCoreErrorLogsTable.timestamp greaterEq it) }
+                ?: (SurfCoreErrorLogsTable.timestamp greaterEq it)
         }
 
         filter.timestampBefore?.let {
-            query = query.andWhere { SurfCoreErrorLogsTable.timestamp lessEq it }
+            whereCondition = whereCondition?.let { cond -> cond and (SurfCoreErrorLogsTable.timestamp lessEq it) }
+                ?: (SurfCoreErrorLogsTable.timestamp lessEq it)
         }
+
+        whereCondition?.let { query = query.where(it) }
 
         query
             .limit(filter.limit)

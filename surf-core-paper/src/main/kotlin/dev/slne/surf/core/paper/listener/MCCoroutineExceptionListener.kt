@@ -3,16 +3,15 @@ package dev.slne.surf.core.paper.listener
 import com.github.shynixn.mccoroutine.folia.MCCoroutineExceptionEvent
 import dev.slne.surf.core.core.common.error.surfCoreSystemErrorService
 import dev.slne.surf.core.paper.surfServerConfig
+import dev.slne.surf.surfapi.core.api.util.logger
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import java.util.logging.Level
-import java.util.logging.Logger
 import kotlin.coroutines.cancellation.CancellationException
 
 object MCCoroutineExceptionListener : Listener {
-    private val logger = Logger.getLogger(MCCoroutineExceptionListener::class.java.name)
+    private val logger = logger()
 
     @EventHandler
     fun onMCCoroutineException(event: MCCoroutineExceptionEvent) {
@@ -22,28 +21,28 @@ object MCCoroutineExceptionListener : Listener {
 
         event.isCancelled = true
 
-        logger.log(Level.SEVERE, "MCCoroutine exception occurred", event.exception)
+        logger.atSevere().log("MCCoroutine exception occurred", event.exception)
 
-        try {
+
+        runCatching {
             runBlocking {
                 launch {
-                    try {
+                    runCatching {
                         val surfCoreSystemError = surfCoreSystemErrorService.logError(
                             throwable = event.exception,
                             server = surfServerConfig.serverName
                         )
-                        logger.info("This error has been logged with ID: ${surfCoreSystemError.id}")
-                    } catch (e: Exception) {
-                        logger.log(
-                            Level.SEVERE,
-                            "Failed to log MCCoroutine exception to database",
-                            e
+                        logger.atInfo()
+                            .log("This error has been logged with Uuid: ${surfCoreSystemError.uuid}")
+                    }.onFailure {
+                        logger.atSevere().log(
+                            "Failed to log MCCoroutine exception to database"
                         )
                     }
                 }
             }
-        } catch (e: Exception) {
-            logger.log(Level.SEVERE, "Error while handling MCCoroutine exception", e)
+        }.onFailure {
+            logger.atSevere().log("Error while handling MCCoroutine exception")
         }
     }
 }

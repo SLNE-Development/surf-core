@@ -12,9 +12,9 @@ import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent
 import com.velocitypowered.api.network.HandshakeIntent
 import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.core.core.common.player.surfCoreErrorLoggingService
+import dev.slne.surf.core.core.common.util.renderErrorCodeDisconnectMessage
 import dev.slne.surf.core.velocity.plugin
 import dev.slne.surf.core.velocity.velocityCoreConfigManager
-import dev.slne.surf.surfapi.core.api.messages.CommonComponents
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 import dev.slne.surf.surfapi.core.api.util.random
@@ -49,15 +49,13 @@ object AuthenticationListener {
                     )
 
                     event.result = ResultedEvent.ComponentResult.denied(buildText {
-                        CommonComponents.renderDisconnectMessage(
-                            this,
-                            "INOFFIZIELLE DOMAIN",
-                            {
-                                error("Bitte verbinde dich über die offizielle Domain.")
-                                appendNewline()
-                                variableValue("castcrafter.de")
-                            }
-                        )
+                        renderErrorCodeDisconnectMessage(code, "INOFFIZIELLE DOMAIN", {
+                            error("Bitte verbinde dich über die offizielle Domain.")
+                            appendNewline()
+                            variableValue("castcrafter.de")
+                        }, {
+                            spacer("Wenn du denkst, dass dies ein Fehler ist, kontaktiere den Support mit diesem Code.")
+                        })
                     })
                     return
                 }

@@ -3,7 +3,7 @@ package dev.slne.surf.core.paper.listener
 import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.core.core.common.player.surfPlayerService
 import dev.slne.surf.core.core.common.util.formatMillis
-import dev.slne.surf.core.core.common.util.renderDisconnectMessage
+import dev.slne.surf.core.core.common.util.renderErrorCodeDisconnectMessage
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 import dev.slne.surf.surfapi.core.api.messages.adventure.clickCopiesToClipboard
@@ -73,10 +73,7 @@ object PlayerConnectListener : Listener {
     }
 
     private fun buildDisconnectComponent(code: String) = buildText {
-        renderDisconnectMessage("DEINE SPIELERDATEN KONNTEN NICHT GELADEN WERDEN", {
-            spacer("Code: ")
-            error("#$code")
-            appendNewline()
+        renderErrorCodeDisconnectMessage(code, "DEINE SPIELERDATEN KONNTEN NICHT GELADEN WERDEN", {
             spacer("Beim laden deiner Spielerdaten ist ein interner Fehler aufgetreten.")
         })
     }

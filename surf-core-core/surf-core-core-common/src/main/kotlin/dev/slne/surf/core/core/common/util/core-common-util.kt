@@ -1,7 +1,7 @@
 package dev.slne.surf.core.core.common.util
 
 import dev.slne.surf.surfapi.core.api.messages.adventure.appendNewline
-import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
+import dev.slne.surf.surfapi.core.api.messages.adventure.clickCopiesToClipboard
 import dev.slne.surf.surfapi.core.api.messages.builder.SurfComponentBuilder
 import java.time.Instant
 import java.time.OffsetDateTime
@@ -35,22 +35,38 @@ fun OffsetDateTime.formatDateTime(
 ): String = this.format(formatter)
 
 
-fun SurfComponentBuilder.renderDisconnectMessage(
+fun SurfComponentBuilder.renderErrorCodeDisconnectMessage(
+    errorCode: String,
     titleReason: String,
     reason: SurfComponentBuilder.() -> Unit,
     footer: SurfComponentBuilder.() -> Unit = { spacer("Sollte das Problem weiterhin bestehen, wende dich bitte an den Support.") }
 ) =
-    buildText {
-        appendNewline(2)
-        primary("CASTCRAFTER")
+    renderDisconnectMessage(titleReason, {
+        spacer("Fehlercode: ")
+        append {
+            error("#$errorCode")
+            clickCopiesToClipboard(errorCode)
+        }
         appendNewline()
-        primary("COMMUNITY SERVER")
-        appendNewline(2)
-        error(titleReason)
-        appendNewline(3)
         append(reason)
-        appendNewline()
-        append(footer)
-        appendNewline(2)
-        primary("discord.gg/castcrafter")
-    }
+    }, footer)
+
+
+fun SurfComponentBuilder.renderDisconnectMessage(
+    titleReason: String,
+    reason: SurfComponentBuilder.() -> Unit,
+    footer: SurfComponentBuilder.() -> Unit = { spacer("Sollte das Problem weiterhin bestehen, wende dich bitte an den Support.") }
+) = append {
+    appendNewline(2)
+    primary("CASTCRAFTER")
+    appendNewline()
+    primary("COMMUNITY SERVER")
+    appendNewline(2)
+    error(titleReason)
+    appendNewline(3)
+    append(reason)
+    appendNewline()
+    append(footer)
+    appendNewline(2)
+    primary("discord.gg/castcrafter")
+}

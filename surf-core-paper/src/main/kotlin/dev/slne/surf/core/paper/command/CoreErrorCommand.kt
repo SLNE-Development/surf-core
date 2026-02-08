@@ -144,6 +144,15 @@ fun coreErrorCommand() = commandTree("coreerror") {
                     }
                 }
             }
+
+            anyExecutorSuspend { executor, _ ->
+                val errors = surfCoreErrorLoggingService.getErrors(SurfCoreErrorFilter.empty())
+
+                executor.sendText {
+                    appendNewline()
+                    append(playerErrorPagination.renderComponent(errors))
+                }
+            }
         }
     }
 
@@ -283,6 +292,15 @@ fun coreErrorCommand() = commandTree("coreerror") {
                         appendNewline()
                         append(systemErrorPagination.renderComponent(errors, page))
                     }
+                }
+            }
+
+            anyExecutorSuspend { executor, _ ->
+                val errors = surfCoreSystemErrorService.getAllErrors()
+
+                executor.sendText {
+                    appendNewline()
+                    append(systemErrorPagination.renderComponent(errors))
                 }
             }
         }

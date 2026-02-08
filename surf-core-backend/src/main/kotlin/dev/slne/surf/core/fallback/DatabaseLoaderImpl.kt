@@ -22,7 +22,7 @@ class DatabaseLoaderImpl : DatabaseLoader, Services.Fallback {
                 SurfPlayerIpAddressHistoryTable,
                 SurfPlayerTexturesHistoryTable,
                 SurfCoreErrorLogsTable,
-                SystemErrorTable
+                SurfCoreSystemErrorTable
             )
         }
     }

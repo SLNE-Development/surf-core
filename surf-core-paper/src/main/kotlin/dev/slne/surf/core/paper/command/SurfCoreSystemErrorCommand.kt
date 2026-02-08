@@ -5,7 +5,7 @@ import dev.jorel.commandapi.kotlindsl.getValue
 import dev.jorel.commandapi.kotlindsl.literalArgument
 import dev.jorel.commandapi.kotlindsl.longArgument
 import dev.slne.surf.core.api.common.error.SystemError
-import dev.slne.surf.core.core.common.error.systemErrorService
+import dev.slne.surf.core.core.common.error.surfCoreSystemErrorService
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.surfapi.bukkit.api.command.executors.anyExecutorSuspend
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
@@ -15,11 +15,11 @@ import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 import dev.slne.surf.surfapi.core.api.messages.pagination.Pagination
 import dev.slne.surf.surfapi.core.api.util.dateTimeFormatter
 
-fun systemErrorCommand() = commandTree("systemerror") {
+fun surfCoreSystemErrorCommand() = commandTree("surfcoresystemerror") {
     withPermission(PermissionRegistry.COMMAND_CORE_ERROR)
     literalArgument("list") {
         anyExecutorSuspend { executor, _ ->
-            val errors = systemErrorService.getAllErrors()
+            val errors = surfCoreSystemErrorService.getAllErrors()
 
             executor.sendText {
                 appendNewline()
@@ -31,7 +31,7 @@ fun systemErrorCommand() = commandTree("systemerror") {
         longArgument("id") {
             anyExecutorSuspend { executor, args ->
                 val id: Long by args
-                val error = systemErrorService.getError(id) ?: run {
+                val error = surfCoreSystemErrorService.getError(id) ?: run {
                     executor.sendText {
                         appendErrorPrefix()
                         error("Der Fehler wurde nicht gefunden.")

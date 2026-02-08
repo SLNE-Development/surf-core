@@ -1,10 +1,10 @@
 package dev.slne.surf.core.core.common.error
 
-import dev.slne.surf.core.api.common.error.SystemError
+import dev.slne.surf.core.api.common.error.SurfCoreSystemError
 import dev.slne.surf.surfapi.core.api.util.requiredService
 import it.unimi.dsi.fastutil.objects.ObjectList
 
-val systemErrorService = requiredService<SystemErrorService>()
+val surfCoreSystemErrorService = requiredService<SurfCoreSystemErrorService>()
 
 fun extractErrorLocation(throwable: Throwable): String {
     val stackTrace = throwable.stackTrace
@@ -24,11 +24,11 @@ fun extractErrorLocation(throwable: Throwable): String {
     return "${relevantElement.className}.${relevantElement.methodName}:${relevantElement.lineNumber}"
 }
 
-interface SystemErrorService {
+interface SurfCoreSystemErrorService {
     suspend fun logError(
         throwable: Throwable,
         server: String
-    ): SystemError {
+    ): SurfCoreSystemError {
         val message = throwable.message ?: throwable::class.java.simpleName
         val stacktrace = throwable.stackTraceToString()
         val location = extractErrorLocation(throwable)
@@ -41,9 +41,9 @@ interface SystemErrorService {
         stacktrace: String,
         location: String,
         server: String
-    ): SystemError
+    ): SurfCoreSystemError
 
-    suspend fun getAllErrors(): ObjectList<SystemError>
+    suspend fun getAllErrors(): ObjectList<SurfCoreSystemError>
     
-    suspend fun getError(id: Long): SystemError?
+    suspend fun getError(id: Long): SurfCoreSystemError?
 }

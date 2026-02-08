@@ -28,11 +28,11 @@ object GlobalErrorHandler {
 
             errorScope.launch {
                 try {
-                    val systemError = systemErrorService.logError(
+                    val surfCoreSystemError = surfCoreSystemErrorService.logError(
                         throwable = throwable,
                         server = SurfServer.current().name
                     )
-                    logger.info("This error has been logged with ID: ${systemError.id}")
+                    logger.info("This error has been logged with ID: ${surfCoreSystemError.id}")
                 } catch (e: Exception) {
                     logger.log(Level.SEVERE, "Failed to log error to database", e)
                 }

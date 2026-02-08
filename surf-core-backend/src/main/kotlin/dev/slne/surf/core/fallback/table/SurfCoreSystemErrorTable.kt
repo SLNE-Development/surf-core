@@ -3,7 +3,7 @@ package dev.slne.surf.core.fallback.table
 import dev.slne.surf.database.columns.time.offsetDateTime
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.dao.id.LongIdTable
 
-object SystemErrorTable : LongIdTable("system_errors") {
+object SurfCoreSystemErrorTable : LongIdTable("surf_core_system_errors") {
     val errorMessage = text("error_message")
     val stacktrace = text("stacktrace")
     val location = varchar("location", 500)

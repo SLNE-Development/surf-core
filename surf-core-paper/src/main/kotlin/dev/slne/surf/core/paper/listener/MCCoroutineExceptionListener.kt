@@ -1,7 +1,7 @@
 package dev.slne.surf.core.paper.listener
 
 import com.github.shynixn.mccoroutine.folia.MCCoroutineExceptionEvent
-import dev.slne.surf.core.core.common.error.systemErrorService
+import dev.slne.surf.core.core.common.error.surfCoreSystemErrorService
 import dev.slne.surf.core.paper.plugin
 import dev.slne.surf.core.paper.surfServerConfig
 import kotlinx.coroutines.launch
@@ -33,11 +33,11 @@ object MCCoroutineExceptionListener : Listener {
             runBlocking {
                 launch {
                     try {
-                        val systemError = systemErrorService.logError(
+                        val surfCoreSystemError = surfCoreSystemErrorService.logError(
                             throwable = event.exception,
                             server = surfServerConfig.serverName
                         )
-                        logger.info("This error has been logged with ID: ${systemError.id}")
+                        logger.info("This error has been logged with ID: ${surfCoreSystemError.id}")
                     } catch (e: Exception) {
                         logger.log(
                             Level.SEVERE,

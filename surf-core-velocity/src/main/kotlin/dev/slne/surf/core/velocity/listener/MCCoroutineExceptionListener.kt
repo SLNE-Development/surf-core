@@ -3,7 +3,7 @@ package dev.slne.surf.core.velocity.listener
 import com.github.shynixn.mccoroutine.velocity.MCCoroutineExceptionEvent
 import com.velocitypowered.api.event.ResultedEvent
 import com.velocitypowered.api.event.Subscribe
-import dev.slne.surf.core.core.common.error.systemErrorService
+import dev.slne.surf.core.core.common.error.surfCoreSystemErrorService
 import dev.slne.surf.core.velocity.surfServerConfig
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -27,11 +27,11 @@ object MCCoroutineExceptionListener {
             runBlocking {
                 launch {
                     try {
-                        val systemError = systemErrorService.logError(
+                        val surfCoreSystemError = surfCoreSystemErrorService.logError(
                             throwable = event.exception,
                             server = surfServerConfig.serverName
                         )
-                        logger.info("This error has been logged with ID: ${systemError.id}")
+                        logger.info("This error has been logged with ID: ${surfCoreSystemError.id}")
                     } catch (e: Exception) {
                         logger.log(
                             Level.SEVERE,

@@ -80,4 +80,6 @@ abstract class SurfCoreApiImpl : SurfCoreApi {
             message,
             server
         )
+
+    override fun generateCode() = surfCoreErrorLoggingService.generateCode()
 }

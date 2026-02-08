@@ -1,5 +1,8 @@
 package dev.slne.surf.core.core.common.util
 
+import dev.slne.surf.surfapi.core.api.messages.adventure.appendNewline
+import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
+import dev.slne.surf.surfapi.core.api.messages.builder.SurfComponentBuilder
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.ZoneId
@@ -30,3 +33,24 @@ fun Long.formatTimeMillis(): String =
 fun OffsetDateTime.formatDateTime(
     formatter: DateTimeFormatter = dateTimeFormatter
 ): String = this.format(formatter)
+
+
+fun SurfComponentBuilder.renderDisconnectMessage(
+    titleReason: String,
+    reason: SurfComponentBuilder.() -> Unit,
+    footer: SurfComponentBuilder.() -> Unit = { spacer("Sollte das Problem weiterhin bestehen, wende dich bitte an den Support.") }
+) =
+    buildText {
+        appendNewline(2)
+        primary("CASTCRAFTER")
+        appendNewline()
+        primary("COMMUNITY SERVER")
+        appendNewline(2)
+        error(titleReason)
+        appendNewline(3)
+        append(reason)
+        appendNewline()
+        append(footer)
+        appendNewline(2)
+        primary("discord.gg/castcrafter")
+    }

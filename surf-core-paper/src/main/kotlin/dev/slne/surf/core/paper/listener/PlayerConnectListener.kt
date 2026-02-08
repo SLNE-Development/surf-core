@@ -3,8 +3,8 @@ package dev.slne.surf.core.paper.listener
 import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.core.core.common.player.surfPlayerService
 import dev.slne.surf.core.core.common.util.formatMillis
+import dev.slne.surf.core.core.common.util.renderDisconnectMessage
 import dev.slne.surf.core.paper.permission.PermissionRegistry
-import dev.slne.surf.surfapi.core.api.messages.adventure.appendNewline
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 import dev.slne.surf.surfapi.core.api.messages.adventure.clickCopiesToClipboard
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
@@ -73,19 +73,11 @@ object PlayerConnectListener : Listener {
     }
 
     private fun buildDisconnectComponent(code: String) = buildText {
-        appendNewline(2)
-        primary("CASTCRAFTER")
-        appendNewline()
-        primary("COMMUNITY SERVER")
-        appendNewline(2)
-        error("DEINE SPIELERDATEN KONNTEN NICHT GELADEN WERDEN.")
-        appendNewline()
-        error("Code: #$code")
-        appendNewline(3)
-        spacer("Beim laden deiner Spielerdaten ist ein interner Fehler aufgetreten.")
-        appendNewline()
-        spacer("Sollte das Problem weiterhin bestehen, wende dich bitte an den Support.")
-        appendNewline(2)
-        primary("discord.gg/castcrafter")
+        renderDisconnectMessage("DEINE SPIELERDATEN KONNTEN NICHT GELADEN WERDEN", {
+            spacer("Code: ")
+            error("#$code")
+            appendNewline()
+            spacer("Beim laden deiner Spielerdaten ist ein interner Fehler aufgetreten.")
+        })
     }
 }

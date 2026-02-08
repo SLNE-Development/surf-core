@@ -10,6 +10,8 @@ import com.velocitypowered.api.event.connection.PreTransferEvent
 import com.velocitypowered.api.event.player.CookieReceiveEvent
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent
 import com.velocitypowered.api.network.HandshakeIntent
+import dev.slne.surf.core.api.common.surfCoreApi
+import dev.slne.surf.core.core.common.player.surfCoreErrorLoggingService
 import dev.slne.surf.core.velocity.plugin
 import dev.slne.surf.core.velocity.velocityCoreConfigManager
 import dev.slne.surf.surfapi.core.api.messages.CommonComponents
@@ -23,15 +25,6 @@ object AuthenticationListener {
     @Subscribe
     fun onLogin(event: LoginEvent, continuation: Continuation) {
         if (event.player.handshakeIntent != HandshakeIntent.TRANSFER) {
-            if (event.player.hasPermission("surf.core.bypass")) {
-                continuation.resume()
-                event.player.sendText {
-                    appendWarningPrefix()
-                    error("Du verbindest dich über eine inoffizielle Methode, hast aber die Berechtigung zum Umgehen.")
-                }
-                return
-            }
-
             event.player.virtualHost.getOrNull()?.hostString?.let { domain ->
                 if (velocityCoreConfigManager.config.blockedDomains.any {
                         it.equals(
@@ -40,6 +33,21 @@ object AuthenticationListener {
                         )
                     }) {
                     continuation.resume()
+                    if (event.player.hasPermission("surf.core.bypass")) {
+                        event.player.sendText {
+                            appendWarningPrefix()
+                            error("Du verbindest dich über eine inoffizielle Methode, hast aber die Berechtigung zum Umgehen.")
+                        }
+                        return
+                    }
+
+                    val code = surfCoreErrorLoggingService.generateCode()
+                    val errorCode = surfCoreApi.logError(
+                        event.player.uniqueId,
+                        code,
+                        "Blocked connection from domain: $domain"
+                    )
+
                     event.result = ResultedEvent.ComponentResult.denied(buildText {
                         CommonComponents.renderDisconnectMessage(
                             this,

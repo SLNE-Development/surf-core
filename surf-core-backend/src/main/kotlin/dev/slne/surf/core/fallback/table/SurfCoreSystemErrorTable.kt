@@ -1,9 +1,11 @@
 package dev.slne.surf.core.fallback.table
 
+import dev.slne.surf.database.columns.nativeUuid
 import dev.slne.surf.database.columns.time.offsetDateTime
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.dao.id.LongIdTable
 
 object SurfCoreSystemErrorTable : LongIdTable("surf_core_system_errors") {
+    val uuid = nativeUuid("error_uuid").uniqueIndex()
     val errorMessage = text("error_message")
     val stacktrace = text("stacktrace")
     val location = varchar("location", 500)
@@ -11,8 +13,4 @@ object SurfCoreSystemErrorTable : LongIdTable("surf_core_system_errors") {
     val firstOccurred = offsetDateTime("first_occurred")
     val lastOccurred = offsetDateTime("last_occurred")
     val occurrenceCount = integer("occurrence_count").default(1)
-    
-    init {
-        index(isUnique = true, errorMessage, location, server)
-    }
 }

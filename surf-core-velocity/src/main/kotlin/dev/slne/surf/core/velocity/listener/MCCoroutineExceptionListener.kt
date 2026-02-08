@@ -18,7 +18,6 @@ object MCCoroutineExceptionListener {
         event.result = ResultedEvent.GenericResult.denied()
 
         logger.log(Level.SEVERE, "MCCoroutine exception occurred", event.exception)
-
         try {
             runBlocking {
                 launch {

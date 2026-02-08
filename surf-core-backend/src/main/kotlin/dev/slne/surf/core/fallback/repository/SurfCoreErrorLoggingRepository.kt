@@ -32,13 +32,14 @@ class SurfCoreErrorLoggingRepository {
             it[SurfCoreErrorLogsTable.timestamp] = timestamp
         }
 
-        SurfCoreError(code, message, server, timestamp)
+        SurfCoreError(playerUuid, code, message, server, timestamp)
     }
 
     suspend fun getErrors(playerUuid: UUID): ObjectList<SurfCoreError> = suspendTransaction {
         SurfCoreErrorLogsTable.selectAll().where(SurfCoreErrorLogsTable.playerUuid eq playerUuid)
             .map {
                 SurfCoreError(
+                    playerUuid = it[SurfCoreErrorLogsTable.playerUuid],
                     code = it[SurfCoreErrorLogsTable.errorCode],
                     message = it[SurfCoreErrorLogsTable.errorMessage],
                     server = it[SurfCoreErrorLogsTable.server],
@@ -50,6 +51,7 @@ class SurfCoreErrorLoggingRepository {
     suspend fun getError(code: String): SurfCoreError? = suspendTransaction {
         SurfCoreErrorLogsTable.selectAll().where(SurfCoreErrorLogsTable.errorCode eq code).map {
             SurfCoreError(
+                playerUuid = it[SurfCoreErrorLogsTable.playerUuid],
                 code = it[SurfCoreErrorLogsTable.errorCode],
                 message = it[SurfCoreErrorLogsTable.errorMessage],
                 server = it[SurfCoreErrorLogsTable.server],

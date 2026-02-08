@@ -9,6 +9,7 @@ import dev.slne.surf.core.core.common.player.surfCoreErrorLoggingService
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.surfapi.bukkit.api.command.executors.anyExecutorSuspend
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
+import dev.slne.surf.surfapi.core.api.messages.adventure.clickCopiesToClipboard
 import dev.slne.surf.surfapi.core.api.messages.adventure.clickRunsCommand
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 import dev.slne.surf.surfapi.core.api.messages.pagination.Pagination
@@ -54,6 +55,13 @@ fun coreErrorCommand() = commandTree("coreerror") {
                     appendNewline()
                     darkSpacer("*" + "-".repeat(20) + "*")
                     appendNewline()
+                    appendNewline()
+                    appendInfoPrefix()
+                    info("Spieler: ")
+                    append {
+                        variableValue(error.playerUuid.toString())
+                        clickCopiesToClipboard(error.playerUuid.toString())
+                    }
                     appendNewline()
                     appendInfoPrefix()
                     info("Fehlercode: ")

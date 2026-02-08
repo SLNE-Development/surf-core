@@ -3,12 +3,7 @@ package dev.slne.surf.core.fallback.repository
 import dev.slne.surf.core.api.common.error.SurfCoreError
 import dev.slne.surf.core.api.common.error.SurfCoreErrorFilter
 import dev.slne.surf.core.fallback.table.SurfCoreErrorLogsTable
-import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.Op
-import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.SqlExpressionBuilder
-import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.eq
-import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.greaterEq
-import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.lessEq
-import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.like
+import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.*
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.insert
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.selectAll
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.transactions.suspendTransaction
@@ -54,45 +49,50 @@ class SurfCoreErrorLoggingRepository {
             }.toList().toObjectList()
     }
 
-    suspend fun getErrors(filter: SurfCoreErrorFilter): ObjectList<SurfCoreError> = suspendTransaction {
-        var query = SurfCoreErrorLogsTable.selectAll()
+    suspend fun getErrors(filter: SurfCoreErrorFilter): ObjectList<SurfCoreError> =
+        suspendTransaction {
+            var query = SurfCoreErrorLogsTable.selectAll()
 
-        var whereCondition: Op<Boolean>? = filter.playerUuid?.let { SurfCoreErrorLogsTable.playerUuid eq it }
+            var whereCondition: Op<Boolean>? =
+                filter.playerUuid?.let { SurfCoreErrorLogsTable.playerUuid eq it }
 
-        filter.code?.let {
-            whereCondition = whereCondition.andCondition(SurfCoreErrorLogsTable.errorCode eq it)
+            filter.code?.let {
+                whereCondition = whereCondition.andCondition(SurfCoreErrorLogsTable.errorCode eq it)
+            }
+
+            filter.messageLike?.let {
+                whereCondition =
+                    whereCondition.andCondition(SurfCoreErrorLogsTable.errorMessage like "%$it%")
+            }
+
+            filter.server?.let {
+                whereCondition = whereCondition.andCondition(SurfCoreErrorLogsTable.server eq it)
+            }
+
+            filter.timestampAfter?.let {
+                whereCondition =
+                    whereCondition.andCondition(SurfCoreErrorLogsTable.timestamp greaterEq it)
+            }
+
+            filter.timestampBefore?.let {
+                whereCondition =
+                    whereCondition.andCondition(SurfCoreErrorLogsTable.timestamp lessEq it)
+            }
+
+            whereCondition?.let { query = query.where(it) }
+
+            query
+                .limit(filter.limit)
+                .map {
+                    SurfCoreError(
+                        playerUuid = it[SurfCoreErrorLogsTable.playerUuid],
+                        code = it[SurfCoreErrorLogsTable.errorCode],
+                        message = it[SurfCoreErrorLogsTable.errorMessage],
+                        server = it[SurfCoreErrorLogsTable.server],
+                        timestamp = it[SurfCoreErrorLogsTable.timestamp]
+                    )
+                }.toList().toObjectList()
         }
-
-        filter.messageLike?.let {
-            whereCondition = whereCondition.andCondition(SurfCoreErrorLogsTable.errorMessage like "%$it%")
-        }
-
-        filter.server?.let {
-            whereCondition = whereCondition.andCondition(SurfCoreErrorLogsTable.server eq it)
-        }
-
-        filter.timestampAfter?.let {
-            whereCondition = whereCondition.andCondition(SurfCoreErrorLogsTable.timestamp greaterEq it)
-        }
-
-        filter.timestampBefore?.let {
-            whereCondition = whereCondition.andCondition(SurfCoreErrorLogsTable.timestamp lessEq it)
-        }
-
-        whereCondition?.let { query = query.where(it) }
-
-        query
-            .limit(filter.limit)
-            .map {
-                SurfCoreError(
-                    playerUuid = it[SurfCoreErrorLogsTable.playerUuid],
-                    code = it[SurfCoreErrorLogsTable.errorCode],
-                    message = it[SurfCoreErrorLogsTable.errorMessage],
-                    server = it[SurfCoreErrorLogsTable.server],
-                    timestamp = it[SurfCoreErrorLogsTable.timestamp]
-                )
-            }.toList().toObjectList()
-    }
 
     suspend fun getError(code: String): SurfCoreError? = suspendTransaction {
         SurfCoreErrorLogsTable.selectAll().where(SurfCoreErrorLogsTable.errorCode eq code).map {

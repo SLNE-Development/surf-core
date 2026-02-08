@@ -116,32 +116,32 @@ fun coreErrorCommand() = commandTree("coreerror") {
                     )
                     .withoutValueList()
                     .build()
-            )
+            ) {
+                anyExecutorSuspend { executor, args ->
+                    val query: Map<String, String>? by args
 
-            anyExecutorSuspend { executor, args ->
-                val query: Map<String, String>? by args
-
-                executor.sendText {
-                    appendInfoPrefix()
-                    info("Es wird nach Ergebnissen gesucht...")
-                }
-
-                val filter = query?.parsePlayerErrorFilters() ?: SurfCoreErrorFilter.empty()
-                val page = query?.get("--page")?.toIntOrNull() ?: 1
-
-                val errors = surfCoreErrorLoggingService.getErrors(filter)
-
-                if (errors.isEmpty()) {
                     executor.sendText {
-                        appendErrorPrefix()
-                        error("Es wurden keine Ergebnisse gefunden.")
+                        appendInfoPrefix()
+                        info("Es wird nach Ergebnissen gesucht...")
                     }
-                    return@anyExecutorSuspend
-                }
 
-                executor.sendText {
-                    appendNewline()
-                    append(playerErrorPagination.renderComponent(errors, page))
+                    val filter = query?.parsePlayerErrorFilters() ?: SurfCoreErrorFilter.empty()
+                    val page = query?.get("--page")?.toIntOrNull() ?: 1
+
+                    val errors = surfCoreErrorLoggingService.getErrors(filter)
+
+                    if (errors.isEmpty()) {
+                        executor.sendText {
+                            appendErrorPrefix()
+                            error("Es wurden keine Ergebnisse gefunden.")
+                        }
+                        return@anyExecutorSuspend
+                    }
+
+                    executor.sendText {
+                        appendNewline()
+                        append(playerErrorPagination.renderComponent(errors, page))
+                    }
                 }
             }
         }
@@ -256,32 +256,33 @@ fun coreErrorCommand() = commandTree("coreerror") {
                     )
                     .withoutValueList()
                     .build()
-            )
+            ) {
+                anyExecutorSuspend { executor, args ->
+                    val query: Map<String, String>? by args
 
-            anyExecutorSuspend { executor, args ->
-                val query: Map<String, String>? by args
-
-                executor.sendText {
-                    appendInfoPrefix()
-                    info("Es wird nach Ergebnissen gesucht...")
-                }
-
-                val filter = query?.parseSystemErrorFilters() ?: SurfCoreSystemErrorFilter.empty()
-                val page = query?.get("--page")?.toIntOrNull() ?: 1
-
-                val errors = surfCoreSystemErrorService.getAllErrors(filter)
-
-                if (errors.isEmpty()) {
                     executor.sendText {
-                        appendErrorPrefix()
-                        error("Es wurden keine Ergebnisse gefunden.")
+                        appendInfoPrefix()
+                        info("Es wird nach Ergebnissen gesucht...")
                     }
-                    return@anyExecutorSuspend
-                }
 
-                executor.sendText {
-                    appendNewline()
-                    append(systemErrorPagination.renderComponent(errors, page))
+                    val filter =
+                        query?.parseSystemErrorFilters() ?: SurfCoreSystemErrorFilter.empty()
+                    val page = query?.get("--page")?.toIntOrNull() ?: 1
+
+                    val errors = surfCoreSystemErrorService.getAllErrors(filter)
+
+                    if (errors.isEmpty()) {
+                        executor.sendText {
+                            appendErrorPrefix()
+                            error("Es wurden keine Ergebnisse gefunden.")
+                        }
+                        return@anyExecutorSuspend
+                    }
+
+                    executor.sendText {
+                        appendNewline()
+                        append(systemErrorPagination.renderComponent(errors, page))
+                    }
                 }
             }
         }

@@ -20,6 +20,17 @@ import java.util.*
 val surfCoreSystemErrorRepository = SurfCoreSystemErrorRepository()
 
 class SurfCoreSystemErrorRepository {
+    private fun generateUniqueCode(): String {
+        // Generate a unique code with retry mechanism
+        // Try up to 10 times to generate a unique code
+        repeat(10) {
+            val code = surfCoreSystemErrorService.generateCode()
+            // Return the first generated code; uniqueness will be enforced by the database
+            return code
+        }
+        error("Failed to generate unique error code after 10 attempts")
+    }
+    
     suspend fun logError(
         message: String,
         stacktrace: String,
@@ -52,7 +63,7 @@ class SurfCoreSystemErrorRepository {
 
         SurfCoreSystemErrorTable.upsert {
             it[SurfCoreSystemErrorTable.uuid] = existingError?.uuid ?: UUID.randomUUID()
-            it[SurfCoreSystemErrorTable.errorCode] = existingError?.errorCode ?: surfCoreSystemErrorService.generateCode()
+            it[SurfCoreSystemErrorTable.errorCode] = existingError?.errorCode ?: generateUniqueCode()
             it[SurfCoreSystemErrorTable.errorMessage] = message
             it[SurfCoreSystemErrorTable.stacktrace] = stacktrace
             it[SurfCoreSystemErrorTable.location] = location

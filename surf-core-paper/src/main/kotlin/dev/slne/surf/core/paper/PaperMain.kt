@@ -42,8 +42,6 @@ class PaperMain : SuspendingJavaPlugin() {
         networkBroadcastCommand()
         networkSendCommand()
         coreErrorCommand()
-        surfCoreSystemErrorCommand()
-        testErrorCommand()
 
         PlayerConnectListener.register()
         MCCoroutineExceptionListener.register()

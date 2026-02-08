@@ -20,6 +20,8 @@ object PermissionRegistry : PermissionRegistry() {
 
     val COMMAND_CORE = create("$BASE_COMMAND.core")
     val COMMAND_CORE_ERROR = create("$BASE_COMMAND.coreerror")
+    val COMMAND_CORE_ERROR_SYSTEM = create("$BASE_COMMAND.coreerror.system")
+    val COMMAND_CORE_ERROR_PLAYER = create("$BASE_COMMAND.coreerror.player")
 
     val JOIN_WHERE_AM_I = create("$BASE.whereamijoin")
 }

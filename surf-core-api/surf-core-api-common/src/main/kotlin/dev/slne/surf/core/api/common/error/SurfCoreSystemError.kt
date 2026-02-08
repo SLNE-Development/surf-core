@@ -16,7 +16,9 @@ data class SurfCoreSystemError(
     fun getLocationClassName(): String =
         location
             .substringBefore(':')
+            .substringBeforeLast('.')
             .substringAfterLast('.')
             .substringBefore('$')
+
 
 }

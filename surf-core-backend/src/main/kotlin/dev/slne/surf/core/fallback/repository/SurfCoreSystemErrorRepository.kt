@@ -1,6 +1,7 @@
 package dev.slne.surf.core.fallback.repository
 
 import dev.slne.surf.core.api.common.error.SurfCoreSystemError
+import dev.slne.surf.core.core.common.error.surfCoreSystemErrorService
 import dev.slne.surf.core.fallback.table.SurfCoreSystemErrorTable
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.and
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.eq
@@ -37,6 +38,7 @@ class SurfCoreSystemErrorRepository {
             .map { row ->
                 SurfCoreSystemError(
                     uuid = row[SurfCoreSystemErrorTable.uuid],
+                    errorCode = row[SurfCoreSystemErrorTable.errorCode],
                     errorMessage = row[SurfCoreSystemErrorTable.errorMessage],
                     stacktrace = row[SurfCoreSystemErrorTable.stacktrace],
                     location = row[SurfCoreSystemErrorTable.location],
@@ -50,6 +52,7 @@ class SurfCoreSystemErrorRepository {
 
         SurfCoreSystemErrorTable.upsert {
             it[SurfCoreSystemErrorTable.uuid] = existingError?.uuid ?: UUID.randomUUID()
+            it[SurfCoreSystemErrorTable.errorCode] = existingError?.errorCode ?: surfCoreSystemErrorService.generateCode()
             it[SurfCoreSystemErrorTable.errorMessage] = message
             it[SurfCoreSystemErrorTable.stacktrace] = stacktrace
             it[SurfCoreSystemErrorTable.location] = location
@@ -68,6 +71,7 @@ class SurfCoreSystemErrorRepository {
             .map { row ->
                 SurfCoreSystemError(
                     uuid = row[SurfCoreSystemErrorTable.uuid],
+                    errorCode = row[SurfCoreSystemErrorTable.errorCode],
                     errorMessage = row[SurfCoreSystemErrorTable.errorMessage],
                     stacktrace = row[SurfCoreSystemErrorTable.stacktrace],
                     location = row[SurfCoreSystemErrorTable.location],
@@ -88,6 +92,7 @@ class SurfCoreSystemErrorRepository {
             .map { row ->
                 SurfCoreSystemError(
                     uuid = row[SurfCoreSystemErrorTable.uuid],
+                    errorCode = row[SurfCoreSystemErrorTable.errorCode],
                     errorMessage = row[SurfCoreSystemErrorTable.errorMessage],
                     stacktrace = row[SurfCoreSystemErrorTable.stacktrace],
                     location = row[SurfCoreSystemErrorTable.location],
@@ -105,6 +110,25 @@ class SurfCoreSystemErrorRepository {
             .map { row ->
                 SurfCoreSystemError(
                     uuid = row[SurfCoreSystemErrorTable.uuid],
+                    errorCode = row[SurfCoreSystemErrorTable.errorCode],
+                    errorMessage = row[SurfCoreSystemErrorTable.errorMessage],
+                    stacktrace = row[SurfCoreSystemErrorTable.stacktrace],
+                    location = row[SurfCoreSystemErrorTable.location],
+                    server = row[SurfCoreSystemErrorTable.server],
+                    firstOccurred = row[SurfCoreSystemErrorTable.firstOccurred],
+                    lastOccurred = row[SurfCoreSystemErrorTable.lastOccurred],
+                    occurrenceCount = row[SurfCoreSystemErrorTable.occurrenceCount]
+                )
+            }.firstOrNull()
+    }
+    
+    suspend fun getError(code: String): SurfCoreSystemError? = suspendTransaction {
+        SurfCoreSystemErrorTable.selectAll()
+            .where(SurfCoreSystemErrorTable.errorCode eq code)
+            .map { row ->
+                SurfCoreSystemError(
+                    uuid = row[SurfCoreSystemErrorTable.uuid],
+                    errorCode = row[SurfCoreSystemErrorTable.errorCode],
                     errorMessage = row[SurfCoreSystemErrorTable.errorMessage],
                     stacktrace = row[SurfCoreSystemErrorTable.stacktrace],
                     location = row[SurfCoreSystemErrorTable.location],

@@ -191,6 +191,98 @@ fun coreErrorCommand() = commandTree("coreerror") {
                 }
             }
         }
+        literalArgument("viewCode") {
+            stringArgument("code") {
+                anyExecutorSuspend { executor, args ->
+                    val code: String by args
+                    val error = surfCoreSystemErrorService.getError(code) ?: run {
+                        executor.sendText {
+                            appendErrorPrefix()
+                            error("Der Fehler wurde nicht gefunden.")
+                        }
+                        return@anyExecutorSuspend
+                    }
+
+                    executor.sendText {
+                        appendNewline()
+                        darkSpacer("*" + "-".repeat(40) + "*")
+                        appendNewline()
+                        primary("Systemfehler Details", TextDecoration.BOLD)
+                        appendNewline()
+                        appendNewline()
+                        appendInfoPrefix()
+                        info("Fehlercode: ")
+                        variableValue(error.errorCode)
+                        appendNewline()
+                        appendInfoPrefix()
+                        info("Fehler-Uuid: ")
+                        variableValue(error.uuid.toString())
+                        appendNewline()
+                        appendInfoPrefix()
+                        info("Server: ")
+                        variableValue(error.server)
+                        appendNewline()
+                        appendInfoPrefix()
+                        info("Ort: ")
+                        append {
+                            variableValue(error.getLocationClassName())
+                            hoverEvent(buildText {
+                                variableValue(error.location)
+                                appendNewline()
+                                spacer("Klicke, um den vollständigen Ort zu kopieren.")
+                            })
+                            clickCopiesToClipboard(error.location)
+                        }
+                        appendNewline()
+                        appendInfoPrefix()
+                        info("Erstmals aufgetreten: ")
+                        variableValue(error.firstOccurred.format(dateTimeFormatter))
+                        appendNewline()
+                        appendInfoPrefix()
+                        info("Zuletzt aufgetreten: ")
+                        variableValue(error.lastOccurred.format(dateTimeFormatter))
+                        appendNewline()
+                        appendInfoPrefix()
+                        info("Anzahl in den letzten 24h: ")
+                        variableValue(error.occurrenceCount.toString())
+                        appendNewline()
+                        appendInfoPrefix()
+                        info("Nachricht: ")
+                        appendNewline()
+                        append {
+                            spacer(error.errorMessage.take(50))
+                            if (error.errorMessage.length > 50) {
+                                spacer("... (gekürzt)")
+                            }
+                            hoverEvent(buildText {
+                                spacer(error.errorMessage)
+                            })
+                            clickCopiesToClipboard(error.errorMessage)
+                        }
+
+                        appendNewline()
+                        appendInfoPrefix()
+                        info("Stacktrace: ")
+                        appendNewline()
+                        append {
+                            spacer(error.stacktrace.take(75))
+                            if (error.stacktrace.length > 75) {
+                                appendNewline()
+                                spacer("... (gekürzt, ${error.stacktrace.length} Zeichen total)")
+                            }
+
+                            hoverEvent(buildText {
+                                spacer(error.stacktrace)
+                            })
+                            clickCopiesToClipboard(error.stacktrace)
+                        }
+                        appendNewline()
+                        appendNewline()
+                        darkSpacer("*" + "-".repeat(40) + "*")
+                    }
+                }
+            }
+        }
         literalArgument("view") {
             uuidArgument("uuid") {
                 anyExecutorSuspend { executor, args ->
@@ -209,6 +301,10 @@ fun coreErrorCommand() = commandTree("coreerror") {
                         appendNewline()
                         primary("Systemfehler Details", TextDecoration.BOLD)
                         appendNewline()
+                        appendNewline()
+                        appendInfoPrefix()
+                        info("Fehlercode: ")
+                        variableValue(error.errorCode)
                         appendNewline()
                         appendInfoPrefix()
                         info("Fehler-Uuid: ")
@@ -307,8 +403,8 @@ private val systemErrorPagination = Pagination<SurfCoreSystemError> {
         listOf(
             buildText {
                 appendInfoPrefix()
-                variableKey("Fehler-Uuid: ")
-                variableValue(row.uuid.toString())
+                variableKey("Fehlercode: ")
+                variableValue(row.errorCode)
                 appendSpace()
                 spacer("(${row.occurrenceCount}x)")
                 appendSpace()
@@ -316,7 +412,7 @@ private val systemErrorPagination = Pagination<SurfCoreSystemError> {
                 if (row.getLocationClassName().length > 50) {
                     spacer("...")
                 }
-                clickRunsCommand("/coreerror system view ${row.uuid}")
+                clickRunsCommand("/coreerror system viewCode ${row.errorCode}")
                 hoverEvent(buildText {
                     spacer("Klicke, um Details zu diesem Fehler anzuzeigen.")
                     appendNewline()

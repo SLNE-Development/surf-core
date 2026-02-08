@@ -6,6 +6,7 @@ import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.dao.id.LongIdTa
 
 object SurfCoreSystemErrorTable : LongIdTable("surf_core_system_errors") {
     val uuid = nativeUuid("error_uuid").uniqueIndex()
+    val errorCode = varchar("error_code", 10).uniqueIndex()
     val errorMessage = text("error_message")
     val stacktrace = text("stacktrace")
     val location = varchar("location", 500)

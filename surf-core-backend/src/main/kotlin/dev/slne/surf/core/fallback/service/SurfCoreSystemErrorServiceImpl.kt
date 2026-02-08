@@ -23,4 +23,7 @@ class SurfCoreSystemErrorServiceImpl : SurfCoreSystemErrorService, Services.Fall
 
     override suspend fun getError(uuid: UUID): SurfCoreSystemError? =
         surfCoreSystemErrorRepository.getError(uuid)
+        
+    override suspend fun getError(code: String): SurfCoreSystemError? =
+        surfCoreSystemErrorRepository.getError(code)
 }

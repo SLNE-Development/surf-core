@@ -24,9 +24,6 @@ import java.util.*
 
 val surfCoreSystemErrorRepository = SurfCoreSystemErrorRepository()
 
-private fun Op<Boolean>?.andCondition(newCondition: Op<Boolean>): Op<Boolean> =
-    this?.let { it and newCondition } ?: newCondition
-
 class SurfCoreSystemErrorRepository {
     suspend fun logError(
         message: String,

@@ -13,5 +13,10 @@ data class SurfCoreSystemError(
     val lastOccurred: OffsetDateTime,
     val occurrenceCount: Int
 ) {
-    fun getLocationClassName() = location.substringBeforeLast('.')
+    fun getLocationClassName(): String =
+        location
+            .substringBefore(':')
+            .substringAfterLast('.')
+            .substringBefore('$')
+
 }

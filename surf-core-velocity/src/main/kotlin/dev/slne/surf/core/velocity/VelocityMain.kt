@@ -27,6 +27,7 @@ import dev.slne.surf.core.velocity.auth.AuthenticationListener
 import dev.slne.surf.core.velocity.auth.authenticationService
 import dev.slne.surf.core.velocity.config.VelocityCoreConfigManager
 import dev.slne.surf.core.velocity.listener.ConnectionListener
+import dev.slne.surf.core.velocity.listener.MCCoroutineExceptionListener
 import dev.slne.surf.core.velocity.listener.VelocityServerListener
 import dev.slne.surf.core.velocity.redis.listener.VelocitySurfPlayerRedisListener
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
@@ -82,6 +83,7 @@ class VelocityMain @Inject constructor(
         eventManager.register(this, ConnectionListener)
         eventManager.register(this, AuthenticationListener)
         eventManager.register(this, VelocityServerListener)
+        eventManager.register(this, MCCoroutineExceptionListener)
 
         surfServerService.changeState(SurfServer.current(), SurfServerState.RUNNING)
     }

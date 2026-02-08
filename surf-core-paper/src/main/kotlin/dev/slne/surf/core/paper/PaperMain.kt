@@ -12,6 +12,7 @@ import dev.slne.surf.core.core.common.redis.redisLoader
 import dev.slne.surf.core.core.common.server.surfServerService
 import dev.slne.surf.core.paper.command.*
 import dev.slne.surf.core.paper.event.SurfServerEventListener
+import dev.slne.surf.core.paper.listener.MCCoroutineExceptionListener
 import dev.slne.surf.core.paper.listener.PlayerConnectListener
 import dev.slne.surf.surfapi.bukkit.api.event.register
 import kotlinx.coroutines.runBlocking
@@ -46,6 +47,7 @@ class PaperMain : SuspendingJavaPlugin() {
         testErrorCommand() // Test command for error logging
 
         PlayerConnectListener.register()
+        MCCoroutineExceptionListener.register()
 
         surfServerService.addServer(SurfServer.current().copy(maxPlayers = Bukkit.getMaxPlayers()))
 

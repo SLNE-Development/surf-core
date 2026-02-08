@@ -67,10 +67,17 @@ This implementation provides a comprehensive system-wide error logging infrastru
 
 **GlobalErrorHandler** (`surf-core-core-common`)
 - Singleton object managing global error handling
-- `install()` - Installs the global uncaught exception handler
+- `install()` - Installs the global uncaught exception handler for non-coroutine threads
 - `createCoroutineExceptionHandler()` - Creates a CoroutineExceptionHandler
 - `logError(throwable)` - Manually logs an error
 - Logs errors asynchronously to avoid blocking execution
+
+**MCCoroutineExceptionListener** (`surf-core-paper` / `surf-core-velocity`)
+- Listens to `MCCoroutineExceptionEvent` from MCCoroutine
+- Handles exceptions from coroutines managed by MCCoroutine
+- Automatically logs exceptions to the system error database
+- Cancels the event to prevent duplicate logging
+- Skips `CancellationException` as per MCCoroutine best practices
 
 ## Installation & Setup
 
@@ -80,7 +87,13 @@ The error handler is automatically installed during plugin initialization:
 ```kotlin
 // In PaperMain.kt
 override fun onLoad() {
-    GlobalErrorHandler.install()
+    GlobalErrorHandler.install()  // Handles non-coroutine thread exceptions
+    // ... other initialization
+}
+
+override fun onEnable() {
+    // Register MCCoroutine exception listener
+    MCCoroutineExceptionListener.register()  // Handles MCCoroutine exceptions
     // ... other initialization
 }
 ```
@@ -89,7 +102,14 @@ override fun onLoad() {
 ```kotlin
 // In VelocityMain.kt
 init {
-    GlobalErrorHandler.install()
+    GlobalErrorHandler.install()  // Handles non-coroutine thread exceptions
+    // ... other initialization
+}
+
+@Subscribe
+fun onProxyInitialize(event: ProxyInitializeEvent) {
+    // Register MCCoroutine exception listener
+    eventManager.register(this, MCCoroutineExceptionListener)  // Handles MCCoroutine exceptions
     // ... other initialization
 }
 ```
@@ -100,14 +120,22 @@ init {
 
 Errors are automatically captured from:
 
-1. **Uncaught Thread Exceptions**
+1. **Uncaught Thread Exceptions** (via GlobalErrorHandler)
    ```kotlin
    Thread {
        throw RuntimeException("This will be automatically logged")
    }.start()
    ```
 
-2. **Coroutine Exceptions** (when using the provided handler)
+2. **MCCoroutine Exceptions** (via MCCoroutineExceptionListener)
+   ```kotlin
+   // In a command or listener using MCCoroutine
+   suspend fun onCommand() {
+       throw RuntimeException("This will be automatically logged")
+   }
+   ```
+
+3. **Custom Coroutine Exceptions** (when using the provided handler)
    ```kotlin
    launch(GlobalErrorHandler.createCoroutineExceptionHandler()) {
        throw RuntimeException("This will be automatically logged")

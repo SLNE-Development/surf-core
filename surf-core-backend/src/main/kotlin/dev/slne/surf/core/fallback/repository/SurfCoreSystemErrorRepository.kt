@@ -4,13 +4,7 @@ import dev.slne.surf.core.api.common.error.SurfCoreSystemError
 import dev.slne.surf.core.api.common.error.SurfCoreSystemErrorFilter
 import dev.slne.surf.core.core.common.error.surfCoreSystemErrorService
 import dev.slne.surf.core.fallback.table.SurfCoreSystemErrorTable
-import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.Op
-import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.SqlExpressionBuilder
-import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.and
-import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.eq
-import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.greaterEq
-import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.lessEq
-import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.like
+import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.*
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.selectAll
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.transactions.suspendTransaction
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.upsert
@@ -110,65 +104,75 @@ class SurfCoreSystemErrorRepository {
             }.toList().toObjectList()
     }
 
-    suspend fun getAllErrors(filter: SurfCoreSystemErrorFilter): ObjectList<SurfCoreSystemError> = suspendTransaction {
-        var query = SurfCoreSystemErrorTable.selectAll()
+    suspend fun getAllErrors(filter: SurfCoreSystemErrorFilter): ObjectList<SurfCoreSystemError> =
+        suspendTransaction {
+            var query = SurfCoreSystemErrorTable.selectAll()
 
-        var whereCondition: Op<Boolean>? = filter.uuid?.let { SurfCoreSystemErrorTable.uuid eq it }
+            var whereCondition: Op<Boolean>? =
+                filter.uuid?.let { SurfCoreSystemErrorTable.uuid eq it }
 
-        filter.errorCode?.let {
-            whereCondition = whereCondition.andCondition(SurfCoreSystemErrorTable.errorCode eq it)
+            filter.errorCode?.let {
+                whereCondition =
+                    whereCondition.andCondition(SurfCoreSystemErrorTable.errorCode eq it)
+            }
+
+            filter.messageLike?.let {
+                whereCondition =
+                    whereCondition.andCondition(SurfCoreSystemErrorTable.errorMessage like "%$it%")
+            }
+
+            filter.locationLike?.let {
+                whereCondition =
+                    whereCondition.andCondition(SurfCoreSystemErrorTable.location like "%$it%")
+            }
+
+            filter.server?.let {
+                whereCondition = whereCondition.andCondition(SurfCoreSystemErrorTable.server eq it)
+            }
+
+            filter.firstOccurredAfter?.let {
+                whereCondition =
+                    whereCondition.andCondition(SurfCoreSystemErrorTable.firstOccurred greaterEq it)
+            }
+
+            filter.firstOccurredBefore?.let {
+                whereCondition =
+                    whereCondition.andCondition(SurfCoreSystemErrorTable.firstOccurred lessEq it)
+            }
+
+            filter.lastOccurredAfter?.let {
+                whereCondition =
+                    whereCondition.andCondition(SurfCoreSystemErrorTable.lastOccurred greaterEq it)
+            }
+
+            filter.lastOccurredBefore?.let {
+                whereCondition =
+                    whereCondition.andCondition(SurfCoreSystemErrorTable.lastOccurred lessEq it)
+            }
+
+            filter.minOccurrenceCount?.let {
+                whereCondition =
+                    whereCondition.andCondition(SurfCoreSystemErrorTable.occurrenceCount greaterEq it)
+            }
+
+            whereCondition?.let { query = query.where(it) }
+
+            query
+                .limit(filter.limit)
+                .map { row ->
+                    SurfCoreSystemError(
+                        uuid = row[SurfCoreSystemErrorTable.uuid],
+                        errorCode = row[SurfCoreSystemErrorTable.errorCode],
+                        errorMessage = row[SurfCoreSystemErrorTable.errorMessage],
+                        stacktrace = row[SurfCoreSystemErrorTable.stacktrace],
+                        location = row[SurfCoreSystemErrorTable.location],
+                        server = row[SurfCoreSystemErrorTable.server],
+                        firstOccurred = row[SurfCoreSystemErrorTable.firstOccurred],
+                        lastOccurred = row[SurfCoreSystemErrorTable.lastOccurred],
+                        occurrenceCount = row[SurfCoreSystemErrorTable.occurrenceCount]
+                    )
+                }.toList().toObjectList()
         }
-
-        filter.messageLike?.let {
-            whereCondition = whereCondition.andCondition(SurfCoreSystemErrorTable.errorMessage like "%$it%")
-        }
-
-        filter.locationLike?.let {
-            whereCondition = whereCondition.andCondition(SurfCoreSystemErrorTable.location like "%$it%")
-        }
-
-        filter.server?.let {
-            whereCondition = whereCondition.andCondition(SurfCoreSystemErrorTable.server eq it)
-        }
-
-        filter.firstOccurredAfter?.let {
-            whereCondition = whereCondition.andCondition(SurfCoreSystemErrorTable.firstOccurred greaterEq it)
-        }
-
-        filter.firstOccurredBefore?.let {
-            whereCondition = whereCondition.andCondition(SurfCoreSystemErrorTable.firstOccurred lessEq it)
-        }
-
-        filter.lastOccurredAfter?.let {
-            whereCondition = whereCondition.andCondition(SurfCoreSystemErrorTable.lastOccurred greaterEq it)
-        }
-
-        filter.lastOccurredBefore?.let {
-            whereCondition = whereCondition.andCondition(SurfCoreSystemErrorTable.lastOccurred lessEq it)
-        }
-
-        filter.minOccurrenceCount?.let {
-            whereCondition = whereCondition.andCondition(SurfCoreSystemErrorTable.occurrenceCount greaterEq it)
-        }
-
-        whereCondition?.let { query = query.where(it) }
-
-        query
-            .limit(filter.limit)
-            .map { row ->
-                SurfCoreSystemError(
-                    uuid = row[SurfCoreSystemErrorTable.uuid],
-                    errorCode = row[SurfCoreSystemErrorTable.errorCode],
-                    errorMessage = row[SurfCoreSystemErrorTable.errorMessage],
-                    stacktrace = row[SurfCoreSystemErrorTable.stacktrace],
-                    location = row[SurfCoreSystemErrorTable.location],
-                    server = row[SurfCoreSystemErrorTable.server],
-                    firstOccurred = row[SurfCoreSystemErrorTable.firstOccurred],
-                    lastOccurred = row[SurfCoreSystemErrorTable.lastOccurred],
-                    occurrenceCount = row[SurfCoreSystemErrorTable.occurrenceCount]
-                )
-            }.toList().toObjectList()
-    }
 
     suspend fun getError(uuid: UUID): SurfCoreSystemError? = suspendTransaction {
         SurfCoreSystemErrorTable.selectAll()

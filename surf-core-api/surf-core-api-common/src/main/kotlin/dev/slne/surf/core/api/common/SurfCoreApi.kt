@@ -30,7 +30,7 @@ interface SurfCoreApi {
     fun subscribe(eventClass: KClass<out SurfEvent>, handler: (SurfEvent) -> Unit)
 
     fun logError(playerUuid: UUID, code: String, message: String)
-    fun logError(playerUUid: UUID, message: String): String
+    fun logError(playerUuid: UUID, message: String): String
 
     suspend fun logErrorAwaiting(
         playerUuid: UUID,

@@ -1,10 +1,12 @@
 package dev.slne.surf.core.paper.command
 
+import com.github.shynixn.mccoroutine.folia.launch
 import dev.jorel.commandapi.kotlindsl.anyExecutor
 import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.jorel.commandapi.kotlindsl.literalArgument
 import dev.slne.surf.core.core.common.error.GlobalErrorHandler
 import dev.slne.surf.core.paper.permission.PermissionRegistry
+import dev.slne.surf.core.paper.plugin
 import dev.slne.surf.surfapi.bukkit.api.command.executors.anyExecutorSuspend
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 import kotlinx.coroutines.launch
@@ -38,6 +40,19 @@ fun testErrorCommand() = commandTree("testerror") {
                 launch(GlobalErrorHandler.createCoroutineExceptionHandler()) {
                     throw RuntimeException("Test coroutine exception from /testerror coroutine")
                 }
+            }
+        }
+    }
+
+    literalArgument("launch") {
+        anyExecutor { executor, _ ->
+            executor.sendText {
+                appendSuccessPrefix()
+                success("Triggering exception in launch...")
+            }
+
+            plugin.launch {
+                throw RuntimeException("Test exception from plugin.launch in /testerror launch")
             }
         }
     }

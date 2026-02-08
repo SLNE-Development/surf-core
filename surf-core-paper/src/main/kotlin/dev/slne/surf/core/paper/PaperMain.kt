@@ -43,6 +43,7 @@ class PaperMain : SuspendingJavaPlugin() {
         networkSendCommand()
         coreErrorCommand()
         systemErrorCommand()
+        testErrorCommand() // Test command for error logging
 
         PlayerConnectListener.register()
 
@@ -58,6 +59,7 @@ class PaperMain : SuspendingJavaPlugin() {
         surfServerService.changeState(SurfServer.current(), SurfServerState.STOPPING)
         surfServerService.removeServer(SurfServer.current())
 
+        GlobalErrorHandler.shutdown()
         redisLoader.disconnect()
         databaseLoader.disconnect()
     }

@@ -7,6 +7,28 @@ import it.unimi.dsi.fastutil.objects.ObjectList
 val systemErrorService = requiredService<SystemErrorService>()
 
 /**
+ * Extracts the relevant location from a throwable's stack trace.
+ */
+fun extractErrorLocation(throwable: Throwable): String {
+    val stackTrace = throwable.stackTrace
+    if (stackTrace.isEmpty()) {
+        return "Unknown"
+    }
+    
+    // Find the first stack trace element that's not from Java/Kotlin internals
+    val relevantElement = stackTrace.firstOrNull { element ->
+        !element.className.startsWith("java.") &&
+        !element.className.startsWith("kotlin.") &&
+        !element.className.startsWith("sun.") &&
+        !element.className.startsWith("jdk.") &&
+        !element.className.startsWith("org.jetbrains.exposed.") &&
+        !element.className.startsWith("kotlinx.coroutines.")
+    } ?: stackTrace.first()
+    
+    return "${relevantElement.className}.${relevantElement.methodName}:${relevantElement.lineNumber}"
+}
+
+/**
  * Service for managing system-wide errors.
  * This is separate from player-specific error logging.
  */
@@ -21,7 +43,7 @@ interface SystemErrorService {
     ): SystemError {
         val message = throwable.message ?: throwable::class.java.simpleName
         val stacktrace = throwable.stackTraceToString()
-        val location = extractLocation(throwable)
+        val location = extractErrorLocation(throwable)
         
         return logError(message, stacktrace, location, server)
     }
@@ -45,26 +67,4 @@ interface SystemErrorService {
      * Gets a specific error by ID.
      */
     suspend fun getError(id: Long): SystemError?
-
-    /**
-     * Extracts the relevant location from a throwable's stack trace.
-     */
-    fun extractLocation(throwable: Throwable): String {
-        val stackTrace = throwable.stackTrace
-        if (stackTrace.isEmpty()) {
-            return "Unknown"
-        }
-        
-        // Find the first stack trace element that's not from Java/Kotlin internals
-        val relevantElement = stackTrace.firstOrNull { element ->
-            !element.className.startsWith("java.") &&
-            !element.className.startsWith("kotlin.") &&
-            !element.className.startsWith("sun.") &&
-            !element.className.startsWith("jdk.") &&
-            !element.className.startsWith("org.jetbrains.exposed.") &&
-            !element.className.startsWith("kotlinx.coroutines.")
-        } ?: stackTrace.first()
-        
-        return "${relevantElement.className}.${relevantElement.methodName}:${relevantElement.lineNumber}"
-    }
 }

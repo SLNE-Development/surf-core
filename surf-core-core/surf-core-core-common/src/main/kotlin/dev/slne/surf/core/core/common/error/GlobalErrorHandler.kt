@@ -1,10 +1,7 @@
 package dev.slne.surf.core.core.common.error
 
 import dev.slne.surf.core.core.common.config.surfServerConfig
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.util.logging.Level
 import java.util.logging.Logger
 
@@ -14,7 +11,7 @@ import java.util.logging.Logger
  */
 object GlobalErrorHandler {
     private val logger = Logger.getLogger(GlobalErrorHandler::class.java.name)
-    private val errorScope = CoroutineScope(Dispatchers.IO)
+    private val errorScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     
     /**
      * Installs the global uncaught exception handler for all threads.
@@ -64,5 +61,19 @@ object GlobalErrorHandler {
      */
     fun logError(throwable: Throwable) {
         handleError("Manual", throwable)
+    }
+    
+    /**
+     * Shuts down the error logging scope gracefully, waiting for pending operations.
+     */
+    fun shutdown() {
+        runBlocking {
+            try {
+                errorScope.coroutineContext.job.cancelAndJoin()
+                logger.info("Global error handler shutdown complete")
+            } catch (e: Exception) {
+                logger.log(Level.WARNING, "Error during error handler shutdown", e)
+            }
+        }
     }
 }

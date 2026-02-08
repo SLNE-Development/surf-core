@@ -105,6 +105,7 @@ class VelocityMain @Inject constructor(
             })
         }
 
+        GlobalErrorHandler.shutdown()
         redisLoader.disconnect()
         databaseLoader.disconnect()
     }

@@ -23,9 +23,8 @@ val plugin get() = JavaPlugin.getPlugin(PaperMain::class.java)
 
 class PaperMain : SuspendingJavaPlugin() {
     override fun onLoad() {
-        // Install global error handler early
         GlobalErrorHandler.install()
-        
+
         surfEventBus.registerListener(SurfServerEventListener)
     }
 
@@ -44,7 +43,7 @@ class PaperMain : SuspendingJavaPlugin() {
         networkSendCommand()
         coreErrorCommand()
         systemErrorCommand()
-        testErrorCommand() // Test command for error logging
+        testErrorCommand()
 
         PlayerConnectListener.register()
         MCCoroutineExceptionListener.register()

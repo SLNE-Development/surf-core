@@ -17,7 +17,8 @@ object GlobalErrorHandler {
 
     private fun handleError(source: String, throwable: Throwable) {
         runCatching {
-            logger.atSevere().log("Uncaught exception from $source", throwable)
+            logger.atSevere()
+                .log("Uncaught exception from $source: ${throwable.message}\n${throwable.stackTraceToString()}")
 
             errorScope.launch {
                 runCatching {

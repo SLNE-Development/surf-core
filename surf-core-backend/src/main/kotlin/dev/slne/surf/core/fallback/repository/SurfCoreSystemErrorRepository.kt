@@ -5,7 +5,7 @@ import dev.slne.surf.core.core.common.error.surfCoreSystemErrorService
 import dev.slne.surf.core.fallback.table.SurfCoreSystemErrorTable
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.and
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.eq
-import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.lessEq
+import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.greaterEq
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.selectAll
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.transactions.suspendTransaction
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.upsert
@@ -33,7 +33,7 @@ class SurfCoreSystemErrorRepository {
                 (SurfCoreSystemErrorTable.errorMessage eq message) and
                         (SurfCoreSystemErrorTable.location eq location) and
                         (SurfCoreSystemErrorTable.server eq server) and
-                        (SurfCoreSystemErrorTable.lastOccurred lessEq now.minusDays(1))
+                        (SurfCoreSystemErrorTable.lastOccurred greaterEq now.minusDays(1))
             )
             .map { row ->
                 SurfCoreSystemError(
@@ -52,7 +52,8 @@ class SurfCoreSystemErrorRepository {
 
         SurfCoreSystemErrorTable.upsert {
             it[SurfCoreSystemErrorTable.uuid] = existingError?.uuid ?: UUID.randomUUID()
-            it[SurfCoreSystemErrorTable.errorCode] = existingError?.errorCode ?: surfCoreSystemErrorService.generateCode()
+            it[SurfCoreSystemErrorTable.errorCode] =
+                existingError?.errorCode ?: surfCoreSystemErrorService.generateCode()
             it[SurfCoreSystemErrorTable.errorMessage] = message
             it[SurfCoreSystemErrorTable.stacktrace] = stacktrace
             it[SurfCoreSystemErrorTable.location] = location
@@ -121,7 +122,7 @@ class SurfCoreSystemErrorRepository {
                 )
             }.firstOrNull()
     }
-    
+
     suspend fun getError(code: String): SurfCoreSystemError? = suspendTransaction {
         SurfCoreSystemErrorTable.selectAll()
             .where(SurfCoreSystemErrorTable.errorCode eq code)

@@ -6,6 +6,7 @@ import dev.slne.surf.core.core.common.error.SurfCoreSystemErrorService
 import dev.slne.surf.core.fallback.repository.surfCoreSystemErrorRepository
 import it.unimi.dsi.fastutil.objects.ObjectList
 import net.kyori.adventure.util.Services
+import java.util.*
 
 @AutoService(SurfCoreSystemErrorService::class)
 class SurfCoreSystemErrorServiceImpl : SurfCoreSystemErrorService, Services.Fallback {
@@ -20,6 +21,6 @@ class SurfCoreSystemErrorServiceImpl : SurfCoreSystemErrorService, Services.Fall
     override suspend fun getAllErrors(): ObjectList<SurfCoreSystemError> =
         surfCoreSystemErrorRepository.getAllErrors()
 
-    override suspend fun getError(id: Long): SurfCoreSystemError? =
-        surfCoreSystemErrorRepository.getError(id)
+    override suspend fun getError(uuid: UUID): SurfCoreSystemError? =
+        surfCoreSystemErrorRepository.getError(uuid)
 }

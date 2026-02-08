@@ -3,7 +3,7 @@ package dev.slne.surf.core.paper.command
 import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.jorel.commandapi.kotlindsl.getValue
 import dev.jorel.commandapi.kotlindsl.literalArgument
-import dev.jorel.commandapi.kotlindsl.longArgument
+import dev.jorel.commandapi.kotlindsl.uuidArgument
 import dev.slne.surf.core.api.common.error.SurfCoreSystemError
 import dev.slne.surf.core.core.common.error.surfCoreSystemErrorService
 import dev.slne.surf.core.paper.permission.PermissionRegistry
@@ -14,6 +14,8 @@ import dev.slne.surf.surfapi.core.api.messages.adventure.clickRunsCommand
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 import dev.slne.surf.surfapi.core.api.messages.pagination.Pagination
 import dev.slne.surf.surfapi.core.api.util.dateTimeFormatter
+import net.kyori.adventure.text.format.TextDecoration
+import java.util.*
 
 fun surfCoreSystemErrorCommand() = commandTree("surfcoresystemerror") {
     withPermission(PermissionRegistry.COMMAND_CORE_ERROR)
@@ -28,10 +30,10 @@ fun surfCoreSystemErrorCommand() = commandTree("surfcoresystemerror") {
         }
     }
     literalArgument("view") {
-        longArgument("id") {
+        uuidArgument("uuid") {
             anyExecutorSuspend { executor, args ->
-                val id: Long by args
-                val error = surfCoreSystemErrorService.getError(id) ?: run {
+                val uuid: UUID by args
+                val error = surfCoreSystemErrorService.getError(uuid) ?: run {
                     executor.sendText {
                         appendErrorPrefix()
                         error("Der Fehler wurde nicht gefunden.")
@@ -43,10 +45,12 @@ fun surfCoreSystemErrorCommand() = commandTree("surfcoresystemerror") {
                     appendNewline()
                     darkSpacer("*" + "-".repeat(40) + "*")
                     appendNewline()
+                    primary("Systemfehler Details", TextDecoration.BOLD)
+                    appendNewline()
                     appendNewline()
                     appendInfoPrefix()
-                    info("Fehler-ID: ")
-                    variableValue(error.id.toString())
+                    info("Fehler-Uuid: ")
+                    variableValue(error.uuid.toString())
                     appendNewline()
                     appendInfoPrefix()
                     info("Server: ")
@@ -55,7 +59,12 @@ fun surfCoreSystemErrorCommand() = commandTree("surfcoresystemerror") {
                     appendInfoPrefix()
                     info("Ort: ")
                     append {
-                        variableValue(error.location)
+                        variableValue(error.getLocationClassName())
+                        hoverEvent(buildText {
+                            variableValue(error.location)
+                            appendNewline()
+                            spacer("Klicke, um den vollständigen Ort zu kopieren.")
+                        })
                         clickCopiesToClipboard(error.location)
                     }
                     appendNewline()
@@ -74,16 +83,16 @@ fun surfCoreSystemErrorCommand() = commandTree("surfcoresystemerror") {
                     appendInfoPrefix()
                     info("Nachricht: ")
                     appendNewline()
-                    spacer(error.errorMessage.take(200))
-                    if (error.errorMessage.length > 200) {
+                    spacer(error.errorMessage.take(50))
+                    if (error.errorMessage.length > 50) {
                         spacer("... (gekürzt)")
                     }
                     appendNewline()
                     appendInfoPrefix()
                     info("Stacktrace: ")
                     appendNewline()
-                    spacer(error.stacktrace.take(1000))
-                    if (error.stacktrace.length > 1000) {
+                    spacer(error.stacktrace.take(75))
+                    if (error.stacktrace.length > 75) {
                         appendNewline()
                         spacer("... (gekürzt, ${error.stacktrace.length} Zeichen total)")
                     }
@@ -102,16 +111,16 @@ private val pagination = Pagination<SurfCoreSystemError> {
         listOf(
             buildText {
                 appendInfoPrefix()
-                variableKey("ID: ")
-                variableValue(row.id.toString())
+                variableKey("Fehler-Uuid: ")
+                variableValue(row.uuid.toString())
                 appendSpace()
                 spacer("(${row.occurrenceCount}x)")
                 appendSpace()
-                spacer("- ${row.location.take(50)}")
-                if (row.location.length > 50) {
+                spacer("- ${row.getLocationClassName().take(50)}")
+                if (row.getLocationClassName().length > 50) {
                     spacer("...")
                 }
-                clickRunsCommand("/systemerror view ${row.id}")
+                clickRunsCommand("/systemerror view ${row.uuid}")
                 hoverEvent(buildText {
                     spacer("Klicke, um Details zu diesem Fehler anzuzeigen.")
                     appendNewline()

@@ -1,44 +1,38 @@
 package dev.slne.surf.core.core.common.error
 
 import dev.slne.surf.core.api.common.server.SurfServer
+import dev.slne.surf.surfapi.core.api.util.logger
 import kotlinx.coroutines.*
-import java.util.logging.Level
-import java.util.logging.Logger
 
 object GlobalErrorHandler {
-    private val logger = Logger.getLogger(GlobalErrorHandler::class.java.name)
     private val errorScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    val logger = logger()
 
     fun install() {
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
             handleError(thread.name, throwable)
         }
-        logger.info("Global error handler installed")
-    }
-
-    fun createCoroutineExceptionHandler(): CoroutineExceptionHandler {
-        return CoroutineExceptionHandler { context, throwable ->
-            handleError(context.toString(), throwable)
-        }
+        logger.atInfo().log("Global error handler installed")
     }
 
     private fun handleError(source: String, throwable: Throwable) {
-        try {
-            logger.log(Level.SEVERE, "Uncaught exception from $source", throwable)
+        runCatching {
+            logger.atSevere().log("Uncaught exception from $source", throwable)
 
             errorScope.launch {
-                try {
+                runCatching {
                     val surfCoreSystemError = surfCoreSystemErrorService.logError(
                         throwable = throwable,
                         server = SurfServer.current().name
                     )
-                    logger.info("This error has been logged with ID: ${surfCoreSystemError.id}")
-                } catch (e: Exception) {
-                    logger.log(Level.SEVERE, "Failed to log error to database", e)
+                    logger.atInfo()
+                        .log("This error has been logged with ID: ${surfCoreSystemError.uuid}")
+                }.onFailure {
+                    logger.atSevere().log("Failed to log error to database")
                 }
             }
-        } catch (e: Exception) {
-            logger.log(Level.SEVERE, "Error handler failed", e)
+        }.onFailure {
+            logger.atSevere().log("Error handler failed")
         }
     }
 
@@ -48,11 +42,11 @@ object GlobalErrorHandler {
 
     fun shutdown() {
         runBlocking {
-            try {
+            runCatching {
                 errorScope.coroutineContext.job.cancelAndJoin()
-                logger.info("Global error handler shutdown complete")
-            } catch (e: Exception) {
-                logger.log(Level.WARNING, "Error during error handler shutdown", e)
+                logger.atInfo().log("Global error handler shutdown complete")
+            }.onFailure {
+                logger.atWarning().log("Error during error handler shutdown")
             }
         }
     }

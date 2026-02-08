@@ -1,5 +1,6 @@
 package dev.slne.surf.core.paper.command
 
+import com.github.shynixn.mccoroutine.folia.globalRegionDispatcher
 import com.github.shynixn.mccoroutine.folia.launch
 import dev.jorel.commandapi.kotlindsl.anyExecutor
 import dev.jorel.commandapi.kotlindsl.commandTree
@@ -22,7 +23,7 @@ fun testErrorCommand() = commandTree("testerror") {
             }
 
             Thread {
-                throw RuntimeException("Test thread exception from /testerror thread")
+                error("Test thread exception from /testerror thread")
             }.start()
         }
     }
@@ -34,8 +35,7 @@ fun testErrorCommand() = commandTree("testerror") {
                 success("Triggering coroutine exception...")
             }
 
-            // This will be caught by MCCoroutineExceptionListener
-            throw RuntimeException("Test coroutine exception from /testerror coroutine")
+            error("Test coroutine exception from /testerror coroutine")
         }
     }
 
@@ -47,7 +47,7 @@ fun testErrorCommand() = commandTree("testerror") {
             }
 
             plugin.launch {
-                throw RuntimeException("Test exception from plugin.launch in /testerror launch")
+                error("Test exception from plugin.launch in /testerror launch")
             }
         }
     }
@@ -68,6 +68,19 @@ fun testErrorCommand() = commandTree("testerror") {
         }
     }
 
+    literalArgument("customContext") {
+        anyExecutor { executor, _ ->
+            executor.sendText {
+                appendSuccessPrefix()
+                success("Triggering exception with custom context...")
+
+                plugin.launch(plugin.globalRegionDispatcher) {
+                    error("Test exception with custom context from /testerror customContext")
+                }
+            }
+        }
+    }
+
     literalArgument("duplicate") {
         anyExecutorSuspend { executor, _ ->
             executor.sendText {
@@ -75,7 +88,6 @@ fun testErrorCommand() = commandTree("testerror") {
                 success("Triggering duplicate errors...")
             }
 
-            // Trigger the same error multiple times to test deduplication
             repeat(3) {
                 Thread {
                     Thread.sleep(100L * it)

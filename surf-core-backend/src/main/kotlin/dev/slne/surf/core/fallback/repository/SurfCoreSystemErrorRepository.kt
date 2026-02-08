@@ -99,9 +99,9 @@ class SurfCoreSystemErrorRepository {
             }.toList().toObjectList()
     }
 
-    suspend fun getError(id: Long): SurfCoreSystemError? = suspendTransaction {
+    suspend fun getError(uuid: UUID): SurfCoreSystemError? = suspendTransaction {
         SurfCoreSystemErrorTable.selectAll()
-            .where(SurfCoreSystemErrorTable.id eq id)
+            .where(SurfCoreSystemErrorTable.uuid eq uuid)
             .map { row ->
                 SurfCoreSystemError(
                     uuid = row[SurfCoreSystemErrorTable.uuid],

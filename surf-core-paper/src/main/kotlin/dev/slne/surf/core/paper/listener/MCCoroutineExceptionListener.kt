@@ -2,7 +2,6 @@ package dev.slne.surf.core.paper.listener
 
 import com.github.shynixn.mccoroutine.folia.MCCoroutineExceptionEvent
 import dev.slne.surf.core.core.common.error.surfCoreSystemErrorService
-import dev.slne.surf.core.paper.plugin
 import dev.slne.surf.core.paper.surfServerConfig
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -17,10 +16,6 @@ object MCCoroutineExceptionListener : Listener {
 
     @EventHandler
     fun onMCCoroutineException(event: MCCoroutineExceptionEvent) {
-        if (event.plugin != plugin) {
-            return
-        }
-        
         if (event.exception is CancellationException) {
             return
         }

@@ -9,16 +9,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.logging.Level
 import java.util.logging.Logger
-import kotlin.coroutines.cancellation.CancellationException
 
 object MCCoroutineExceptionListener {
     private val logger = Logger.getLogger(MCCoroutineExceptionListener::class.java.name)
 
     @Subscribe
     fun onMCCoroutineException(event: MCCoroutineExceptionEvent) {
-        if (event.exception is CancellationException) {
-            return
-        }
         event.result = ResultedEvent.GenericResult.denied()
 
         logger.log(Level.SEVERE, "MCCoroutine exception occurred", event.exception)

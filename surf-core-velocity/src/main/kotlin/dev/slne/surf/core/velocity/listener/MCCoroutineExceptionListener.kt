@@ -27,10 +27,11 @@ object MCCoroutineExceptionListener {
             runBlocking {
                 launch {
                     try {
-                        systemErrorService.logError(
+                        val systemError = systemErrorService.logError(
                             throwable = event.exception,
                             server = surfServerConfig.serverName
                         )
+                        logger.info("This error has been logged with ID: ${systemError.id}")
                     } catch (e: Exception) {
                         logger.log(
                             Level.SEVERE,

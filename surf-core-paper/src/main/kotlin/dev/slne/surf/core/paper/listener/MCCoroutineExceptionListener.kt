@@ -42,10 +42,11 @@ object MCCoroutineExceptionListener : Listener {
             runBlocking {
                 launch {
                     try {
-                        systemErrorService.logError(
+                        val systemError = systemErrorService.logError(
                             throwable = event.exception,
                             server = surfServerConfig.serverName
                         )
+                        logger.info("This error has been logged with ID: ${systemError.id}")
                     } catch (e: Exception) {
                         // Log but don't rethrow to prevent infinite exception loop
                         logger.log(

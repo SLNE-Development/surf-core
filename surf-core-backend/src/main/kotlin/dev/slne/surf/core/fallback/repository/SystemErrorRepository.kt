@@ -4,10 +4,9 @@ import dev.slne.surf.core.api.common.error.SystemError
 import dev.slne.surf.core.fallback.table.SystemErrorTable
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.and
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.eq
-import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.insert
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.selectAll
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.transactions.suspendTransaction
-import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.update
+import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.upsert
 import dev.slne.surf.surfapi.core.api.util.toObjectList
 import it.unimi.dsi.fastutil.objects.ObjectList
 import kotlinx.coroutines.flow.firstOrNull
@@ -19,12 +18,13 @@ val systemErrorRepository = SystemErrorRepository()
 
 /**
  * Repository for managing system-wide errors.
- * Handles error logging with automatic deduplication.
+ * Handles error logging with automatic deduplication using upsert.
  */
 class SystemErrorRepository {
     /**
      * Logs a system error. If a similar error already exists (same message, location, and server),
      * it updates the lastOccurred timestamp and increments the occurrence count.
+     * Uses upsert to handle deduplication atomically at the database level.
      */
     suspend fun logError(
         message: String,
@@ -34,7 +34,7 @@ class SystemErrorRepository {
     ): SystemError = suspendTransaction {
         val now = OffsetDateTime.now()
         
-        // Check if a similar error already exists
+        // First, check if the error exists to get the current occurrence count
         val existingError = SystemErrorTable.selectAll()
             .where(
                 (SystemErrorTable.errorMessage eq message) and
@@ -55,46 +55,39 @@ class SystemErrorRepository {
             }
             .firstOrNull()
         
-        if (existingError != null) {
-            // Update the existing error with new lastOccurred and increment count
-            SystemErrorTable.update(
-                where = { SystemErrorTable.id eq existingError.id }
-            ) {
-                it[SystemErrorTable.lastOccurred] = now
-                it[SystemErrorTable.occurrenceCount] = existingError.occurrenceCount + 1
-                it[SystemErrorTable.stacktrace] = stacktrace // Update stacktrace in case it's slightly different
-            }
-            
-            return@suspendTransaction existingError.copy(
-                lastOccurred = now,
-                occurrenceCount = existingError.occurrenceCount + 1,
-                stacktrace = stacktrace
-            )
-        } else {
-            // Insert new error
-            val insertResult = SystemErrorTable.insert {
-                it[SystemErrorTable.errorMessage] = message
-                it[SystemErrorTable.stacktrace] = stacktrace
-                it[SystemErrorTable.location] = location
-                it[SystemErrorTable.server] = server
-                it[SystemErrorTable.firstOccurred] = now
-                it[SystemErrorTable.lastOccurred] = now
-                it[SystemErrorTable.occurrenceCount] = 1
-            }
-            
-            val id = insertResult[SystemErrorTable.id]
-
-            return@suspendTransaction SystemError(
-                id = id.value,
-                errorMessage = message,
-                stacktrace = stacktrace,
-                location = location,
-                server = server,
-                firstOccurred = now,
-                lastOccurred = now,
-                occurrenceCount = 1
-            )
+        // Use upsert to handle insert or update atomically
+        SystemErrorTable.upsert {
+            it[SystemErrorTable.errorMessage] = message
+            it[SystemErrorTable.stacktrace] = stacktrace
+            it[SystemErrorTable.location] = location
+            it[SystemErrorTable.server] = server
+            it[SystemErrorTable.firstOccurred] = existingError?.firstOccurred ?: now
+            it[SystemErrorTable.lastOccurred] = now
+            it[SystemErrorTable.occurrenceCount] = (existingError?.occurrenceCount ?: 0) + 1
         }
+        
+        // Fetch the final result
+        val resultError = SystemErrorTable.selectAll()
+            .where(
+                (SystemErrorTable.errorMessage eq message) and
+                (SystemErrorTable.location eq location) and
+                (SystemErrorTable.server eq server)
+            )
+            .map { row ->
+                SystemError(
+                    id = row[SystemErrorTable.id].value,
+                    errorMessage = row[SystemErrorTable.errorMessage],
+                    stacktrace = row[SystemErrorTable.stacktrace],
+                    location = row[SystemErrorTable.location],
+                    server = row[SystemErrorTable.server],
+                    firstOccurred = row[SystemErrorTable.firstOccurred],
+                    lastOccurred = row[SystemErrorTable.lastOccurred],
+                    occurrenceCount = row[SystemErrorTable.occurrenceCount]
+                )
+            }
+            .firstOrNull()
+        
+        return@suspendTransaction resultError ?: throw IllegalStateException("Failed to retrieve error after upsert")
     }
 
     /**

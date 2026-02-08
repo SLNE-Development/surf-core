@@ -9,8 +9,6 @@ import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.core.paper.plugin
 import dev.slne.surf.surfapi.bukkit.api.command.executors.anyExecutorSuspend
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 
 fun testErrorCommand() = commandTree("testerror") {
@@ -30,17 +28,14 @@ fun testErrorCommand() = commandTree("testerror") {
     }
 
     literalArgument("coroutine") {
-        anyExecutor { executor, _ ->
+        anyExecutorSuspend { executor, _ ->
             executor.sendText {
                 appendSuccessPrefix()
                 success("Triggering coroutine exception...")
             }
 
-            runBlocking {
-                launch(GlobalErrorHandler.createCoroutineExceptionHandler()) {
-                    throw RuntimeException("Test coroutine exception from /testerror coroutine")
-                }
-            }
+            // This will be caught by MCCoroutineExceptionListener
+            throw RuntimeException("Test coroutine exception from /testerror coroutine")
         }
     }
 

@@ -6,16 +6,12 @@ import it.unimi.dsi.fastutil.objects.ObjectList
 
 val systemErrorService = requiredService<SystemErrorService>()
 
-/**
- * Extracts the relevant location from a throwable's stack trace.
- */
 fun extractErrorLocation(throwable: Throwable): String {
     val stackTrace = throwable.stackTrace
     if (stackTrace.isEmpty()) {
         return "Unknown"
     }
     
-    // Find the first stack trace element that's not from Java/Kotlin internals
     val relevantElement = stackTrace.firstOrNull { element ->
         !element.className.startsWith("java.") &&
         !element.className.startsWith("kotlin.") &&
@@ -28,15 +24,7 @@ fun extractErrorLocation(throwable: Throwable): String {
     return "${relevantElement.className}.${relevantElement.methodName}:${relevantElement.lineNumber}"
 }
 
-/**
- * Service for managing system-wide errors.
- * This is separate from player-specific error logging.
- */
 interface SystemErrorService {
-    /**
-     * Logs a system error from a throwable.
-     * Automatically extracts stacktrace and location information.
-     */
     suspend fun logError(
         throwable: Throwable,
         server: String
@@ -48,9 +36,6 @@ interface SystemErrorService {
         return logError(message, stacktrace, location, server)
     }
     
-    /**
-     * Logs a system error with explicit parameters.
-     */
     suspend fun logError(
         message: String,
         stacktrace: String,
@@ -58,13 +43,7 @@ interface SystemErrorService {
         server: String
     ): SystemError
 
-    /**
-     * Gets all system errors.
-     */
     suspend fun getAllErrors(): ObjectList<SystemError>
     
-    /**
-     * Gets a specific error by ID.
-     */
     suspend fun getError(id: Long): SystemError?
 }

@@ -16,16 +16,7 @@ import java.time.OffsetDateTime
 
 val systemErrorRepository = SystemErrorRepository()
 
-/**
- * Repository for managing system-wide errors.
- * Handles error logging with automatic deduplication using upsert.
- */
 class SystemErrorRepository {
-    /**
-     * Logs a system error. If a similar error already exists (same message, location, and server),
-     * it updates the lastOccurred timestamp and increments the occurrence count.
-     * Uses upsert to handle deduplication atomically at the database level.
-     */
     suspend fun logError(
         message: String,
         stacktrace: String,
@@ -34,7 +25,6 @@ class SystemErrorRepository {
     ): SystemError = suspendTransaction {
         val now = OffsetDateTime.now()
         
-        // First, check if the error exists to get the current occurrence count
         val existingError = SystemErrorTable.selectAll()
             .where(
                 (SystemErrorTable.errorMessage eq message) and
@@ -55,7 +45,6 @@ class SystemErrorRepository {
             }
             .firstOrNull()
         
-        // Use upsert to handle insert or update atomically
         SystemErrorTable.upsert {
             it[SystemErrorTable.errorMessage] = message
             it[SystemErrorTable.stacktrace] = stacktrace
@@ -66,7 +55,6 @@ class SystemErrorRepository {
             it[SystemErrorTable.occurrenceCount] = (existingError?.occurrenceCount ?: 0) + 1
         }
         
-        // Fetch the final result
         val resultError = SystemErrorTable.selectAll()
             .where(
                 (SystemErrorTable.errorMessage eq message) and
@@ -90,9 +78,6 @@ class SystemErrorRepository {
         return@suspendTransaction resultError ?: throw IllegalStateException("Failed to retrieve error after upsert")
     }
 
-    /**
-     * Gets all system errors.
-     */
     suspend fun getAllErrors(): ObjectList<SystemError> = suspendTransaction {
         SystemErrorTable.selectAll()
             .map { row ->
@@ -109,9 +94,6 @@ class SystemErrorRepository {
             }.toList().toObjectList()
     }
 
-    /**
-     * Gets a specific error by ID.
-     */
     suspend fun getError(id: Long): SystemError? = suspendTransaction {
         SystemErrorTable.selectAll()
             .where(SystemErrorTable.id eq id)

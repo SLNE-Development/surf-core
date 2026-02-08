@@ -2,10 +2,6 @@ package dev.slne.surf.core.api.common.error
 
 import java.time.OffsetDateTime
 
-/**
- * Represents a system error that occurred during execution.
- * This is separate from player-specific errors (SurfCoreError).
- */
 data class SystemError(
     val id: Long,
     val errorMessage: String,

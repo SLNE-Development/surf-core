@@ -4,7 +4,7 @@ import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.jorel.commandapi.kotlindsl.getValue
 import dev.jorel.commandapi.kotlindsl.literalArgument
 import dev.jorel.commandapi.kotlindsl.longArgument
-import dev.slne.surf.core.api.common.error.SystemError
+import dev.slne.surf.core.api.common.error.SurfCoreSystemError
 import dev.slne.surf.core.core.common.error.surfCoreSystemErrorService
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.surfapi.bukkit.api.command.executors.anyExecutorSuspend
@@ -96,7 +96,7 @@ fun surfCoreSystemErrorCommand() = commandTree("surfcoresystemerror") {
     }
 }
 
-private val pagination = Pagination<SystemError> {
+private val pagination = Pagination<SurfCoreSystemError> {
     title { primary("System-Fehler Übersicht") }
     rowRenderer { row, _ ->
         listOf(

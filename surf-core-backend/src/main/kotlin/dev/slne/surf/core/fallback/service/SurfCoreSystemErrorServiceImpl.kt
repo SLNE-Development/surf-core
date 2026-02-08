@@ -7,14 +7,15 @@ import dev.slne.surf.core.fallback.repository.surfCoreSystemErrorRepository
 import it.unimi.dsi.fastutil.objects.ObjectList
 import net.kyori.adventure.util.Services
 
-@AutoService(SystemErrorService::class)
+@AutoService(SurfCoreSystemErrorService::class)
 class SurfCoreSystemErrorServiceImpl : SurfCoreSystemErrorService, Services.Fallback {
     override suspend fun logError(
         message: String,
         stacktrace: String,
         location: String,
         server: String
-    ): SurfCoreSystemError = surfCoreSystemErrorRepository.logError(message, stacktrace, location, server)
+    ): SurfCoreSystemError =
+        surfCoreSystemErrorRepository.logError(message, stacktrace, location, server)
 
     override suspend fun getAllErrors(): ObjectList<SurfCoreSystemError> =
         surfCoreSystemErrorRepository.getAllErrors()

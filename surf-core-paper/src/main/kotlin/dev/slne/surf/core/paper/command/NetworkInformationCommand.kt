@@ -93,6 +93,9 @@ fun networkInformationCommand() = commandTree("ninfo") {
                     appendNewline()
                     darkSpacer("» | ")
                     variableValue(surfServer.name)
+                    
+                    appendNewline()
+                    darkSpacer("» | ")
 
                     appendNewline()
                     darkSpacer("» | ")

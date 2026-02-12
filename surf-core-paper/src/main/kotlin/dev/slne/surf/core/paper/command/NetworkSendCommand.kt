@@ -52,8 +52,7 @@ fun networkSendCommand() = commandTree("nsend") {
 
                     executor.sendText {
                         appendSuccessPrefix()
-                        variableValue(amount)
-                        success(" Spieler wurden vom Server ")
+                        success("Die Spieler wurden vom Server ")
                         variableValue(server.name)
                         success(" zum Server ")
                         variableValue(targetServer.name)

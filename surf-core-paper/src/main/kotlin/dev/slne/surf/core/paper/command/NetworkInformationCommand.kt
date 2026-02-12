@@ -99,9 +99,7 @@ fun networkInformationCommand() = commandTree("ninfo") {
 
                     appendNewline()
                     darkSpacer("» | ")
-                    variableKey("Kategorie:")
-                    appendNewline()
-                    darkSpacer("» | ")
+                    variableKey("Kategorie: ")
                     variableValue(surfServer.category)
 
                     appendNewline()
@@ -109,9 +107,7 @@ fun networkInformationCommand() = commandTree("ninfo") {
 
                     appendNewline()
                     darkSpacer("» | ")
-                    variableKey("Status:")
-                    appendNewline()
-                    darkSpacer("» | ")
+                    variableKey("Status: ")
                     variableValue(surfServer.state.toString())
 
                     appendNewline()
@@ -119,9 +115,7 @@ fun networkInformationCommand() = commandTree("ninfo") {
 
                     appendNewline()
                     darkSpacer("» | ")
-                    variableKey("Connection Address:")
-                    appendNewline()
-                    darkSpacer("» | ")
+                    variableKey("Connection Address: ")
                     variableValue(surfServer.connectionAddress.toString())
 
                     appendNewline()
@@ -129,10 +123,8 @@ fun networkInformationCommand() = commandTree("ninfo") {
 
                     appendNewline()
                     darkSpacer("» | ")
-                    variableKey("Spieler:")
-                    appendNewline()
-                    darkSpacer("» | ")
-                    variableValue(surfServer.getPlayerCount())
+                    variableKey("Spieler: ")
+                    variableValue("${surfServer.getPlayerCount()}/${surfServer.maxPlayers}")
                 }
             }
         }

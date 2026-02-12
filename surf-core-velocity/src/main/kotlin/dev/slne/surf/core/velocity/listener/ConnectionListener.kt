@@ -56,7 +56,7 @@ object ConnectionListener {
         handleDisconnect(
             event.player.uniqueId,
             event.player.username,
-            event.loginStatus == DisconnectEvent.LoginStatus.SUCCESSFUL_LOGIN
+            event.loginStatus
         )
     }
 
@@ -131,12 +131,12 @@ object ConnectionListener {
     private suspend fun handleDisconnect(
         playerUuid: UUID,
         playerName: String,
-        successfullyLogin: Boolean
+        successfullyLogin: DisconnectEvent.LoginStatus
     ) {
-        if (successfullyLogin) {
+        if (successfullyLogin == DisconnectEvent.LoginStatus.SUCCESSFUL_LOGIN) {
             println("[connection closed] $playerName disconnected")
         } else {
-            println("[connection closed] $playerName tried to connect")
+            println("[connection closed] $playerName tried to connect: ${successfullyLogin.name}")
         }
 
 

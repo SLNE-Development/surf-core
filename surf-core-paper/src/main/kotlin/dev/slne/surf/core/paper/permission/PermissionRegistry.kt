@@ -13,6 +13,7 @@ object PermissionRegistry : PermissionRegistry() {
     val COMMAND_NETWORK_SERVER = create("$BASE_COMMAND.networkserver")
     val COMMAND_NETWORK_BROADCAST = create("$BASE_COMMAND.networkbroadcast")
     val COMMAND_NETWORK_SEND = create("$BASE_COMMAND.networksend")
+    val COMMAND_NETWORK_SERVER_MAX_PLAYERS = create("$BASE_COMMAND.nservermaxplayers")
 
     val COMMAND_INFO = create("$BASE_COMMAND.info")
     val COMMAND_INFO_PLAYER = create("$BASE_COMMAND.info.player")

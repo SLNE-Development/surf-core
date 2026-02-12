@@ -27,7 +27,7 @@ import dev.slne.surf.core.velocity.auth.authentificationService
 import dev.slne.surf.core.velocity.config.VelocityCoreConfigManager
 import dev.slne.surf.core.velocity.listener.ConnectionListener
 import dev.slne.surf.core.velocity.listener.VelocityServerListener
-import dev.slne.surf.core.velocity.redis.listener.VelocitySurfPlayerRedisListener
+import dev.slne.surf.core.velocity.redis.listener.VelocityRedisListener
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 import kotlinx.coroutines.runBlocking
 import java.net.InetSocketAddress
@@ -50,7 +50,7 @@ class VelocityMain @Inject constructor(
         surfPlayerService.init()
         surfServerService.init()
         authentificationService.init()
-        redisLoader.connect(VelocitySurfPlayerRedisListener)
+        redisLoader.connect(VelocityRedisListener)
 
         val server = SurfServer(
             name = surfServerConfig.serverName,

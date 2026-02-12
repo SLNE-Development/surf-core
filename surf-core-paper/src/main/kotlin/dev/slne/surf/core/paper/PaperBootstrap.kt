@@ -10,6 +10,7 @@ import dev.slne.surf.core.core.common.player.surfPlayerService
 import dev.slne.surf.core.core.common.redis.redisApi
 import dev.slne.surf.core.core.common.redis.redisLoader
 import dev.slne.surf.core.core.common.server.surfServerService
+import dev.slne.surf.core.paper.redis.listener.PaperRedisListener
 import dev.slne.surf.core.paper.teleport.TeleportRedisListener
 import io.papermc.paper.plugin.bootstrap.BootstrapContext
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap
@@ -22,7 +23,7 @@ class PaperBootstrap : PluginBootstrap {
         redisApi.subscribeToEvents(TeleportRedisListener)
         surfPlayerService.init()
         surfServerService.init()
-        redisLoader.connect()
+        redisLoader.connect(PaperRedisListener)
 
         surfServerConfigHolder = SurfServerConfigHolder(context.dataDirectory)
 

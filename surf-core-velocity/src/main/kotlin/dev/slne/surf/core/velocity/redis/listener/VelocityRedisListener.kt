@@ -5,7 +5,7 @@ import dev.slne.surf.core.velocity.plugin
 import dev.slne.surf.redis.event.OnRedisEvent
 import kotlin.jvm.optionals.getOrNull
 
-object VelocitySurfPlayerRedisListener {
+object VelocityRedisListener {
     @OnRedisEvent
     fun onSurfPlayerMessage(event: SurfPlayerMessageRedisEvent) {
         plugin.proxy.getPlayer(event.uuid).getOrNull()?.sendMessage(event.message)

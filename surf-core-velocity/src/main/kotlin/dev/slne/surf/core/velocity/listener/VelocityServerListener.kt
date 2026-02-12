@@ -1,5 +1,6 @@
 package dev.slne.surf.core.velocity.listener
 
+import com.velocitypowered.api.event.Continuation
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.proxy.ProxyPreShutdownEvent
 import dev.slne.surf.core.api.common.server.SurfServer
@@ -12,8 +13,8 @@ import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 
 @Suppress("UnstableApiUsage")
 object VelocityServerListener {
-    @Subscribe
-    suspend fun onPreShutdown(event: ProxyPreShutdownEvent) {
+    @Subscribe(priority = Short.MIN_VALUE)
+    fun onPreShutdown(event: ProxyPreShutdownEvent, continuation: Continuation) {
         val currentProxy = SurfServer.current()
 
         val targetProxies = surfServerService.servers
@@ -39,5 +40,7 @@ object VelocityServerListener {
 
             target.pullPlayers(player.surfPlayer)
         }
+
+        continuation.resume()
     }
 }

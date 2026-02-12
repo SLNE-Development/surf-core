@@ -96,14 +96,8 @@ fun networkInformationCommand() = commandTree("ninfo") {
 
                     appendNewline()
                     darkSpacer("» | ")
-
-                    appendNewline()
-                    darkSpacer("» | ")
                     variableKey("Kategorie: ")
                     variableValue(surfServer.category)
-
-                    appendNewline()
-                    darkSpacer("» | ")
 
                     appendNewline()
                     darkSpacer("» | ")
@@ -112,14 +106,8 @@ fun networkInformationCommand() = commandTree("ninfo") {
 
                     appendNewline()
                     darkSpacer("» | ")
-
-                    appendNewline()
-                    darkSpacer("» | ")
                     variableKey("Connection Address: ")
                     variableValue(surfServer.connectionAddress.toString())
-
-                    appendNewline()
-                    darkSpacer("» | ")
 
                     appendNewline()
                     darkSpacer("» | ")

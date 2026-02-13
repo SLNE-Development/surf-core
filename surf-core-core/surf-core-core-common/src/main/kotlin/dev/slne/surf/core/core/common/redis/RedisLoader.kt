@@ -12,10 +12,16 @@ class RedisLoader {
     fun load() {
     }
 
-    fun connect(vararg extraListeners: Any) {
-        redisApi.subscribeToEvents(LocalSurfEventBusListener)
-        extraListeners.forEach { redisApi.subscribeToEvents(it) }
+    fun withRequestResponseHandler(handler: Any) {
+        redisApi.registerRequestHandler(handler)
+    }
 
+    fun withListener(listener: Any) {
+        redisApi.subscribeToEvents(listener)
+    }
+
+    fun connect() {
+        redisApi.subscribeToEvents(LocalSurfEventBusListener)
         redisApi.freezeAndConnect()
     }
 

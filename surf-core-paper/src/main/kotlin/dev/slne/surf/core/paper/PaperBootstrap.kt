@@ -23,7 +23,8 @@ class PaperBootstrap : PluginBootstrap {
         redisApi.subscribeToEvents(TeleportRedisListener)
         surfPlayerService.init()
         surfServerService.init()
-        redisLoader.connect(PaperRedisListener)
+        redisLoader.withListener(PaperRedisListener)
+        redisLoader.connect()
 
         surfServerConfigHolder = SurfServerConfigHolder(context.dataDirectory)
 

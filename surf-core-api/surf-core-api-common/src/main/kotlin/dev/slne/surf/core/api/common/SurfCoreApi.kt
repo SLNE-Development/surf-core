@@ -3,6 +3,7 @@ package dev.slne.surf.core.api.common
 import dev.slne.surf.core.api.common.event.SurfEvent
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.server.SurfServer
+import dev.slne.surf.core.api.common.server.connection.SurfServerConnectResult
 import dev.slne.surf.surfapi.core.api.util.requiredService
 import it.unimi.dsi.fastutil.objects.ObjectSet
 import net.kyori.adventure.text.Component
@@ -29,6 +30,10 @@ interface SurfCoreApi {
     fun subscribe(eventClass: KClass<out SurfEvent>, handler: (SurfEvent) -> Unit)
 
     fun sendPlayer(player: SurfPlayer, server: SurfServer)
+    suspend fun sendPlayerAwaiting(
+        surfPlayer: SurfPlayer,
+        surfServer: SurfServer
+    ): SurfServerConnectResult
 
     /**
      * Sends a text message to the given player via the cross-server messaging system.

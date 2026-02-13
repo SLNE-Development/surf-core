@@ -4,10 +4,13 @@ import com.google.auto.service.AutoService
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.server.SurfServer
+import dev.slne.surf.core.api.common.server.connection.SurfServerConnectResult
 import dev.slne.surf.core.api.common.server.type.SurfServerType
 import dev.slne.surf.core.core.common.SurfCoreApiImpl
 import dev.slne.surf.core.velocity.plugin
+import dev.slne.surf.core.velocity.redis.handler.convertResult
 import dev.slne.surf.core.velocity.surfServerConfig
+import kotlinx.coroutines.future.await
 import net.kyori.adventure.util.Services
 import kotlin.jvm.optionals.getOrNull
 
@@ -32,6 +35,29 @@ class SurfCoreApiVelocityImpl : SurfCoreApiImpl(), Services.Fallback {
                 plugin.proxy.getPlayer(player.uuid).getOrNull()
                     ?.createConnectionRequest(velocityServer)?.fireAndForget()
             }
+        }
+    }
+
+    override suspend fun sendPlayerAwaiting(
+        surfPlayer: SurfPlayer,
+        surfServer: SurfServer
+    ): SurfServerConnectResult {
+        // try fast-path first
+        val player = plugin.proxy.getPlayer(surfPlayer.uuid).getOrNull()
+        if (player == null) {
+            // slow-path
+            return super.sendPlayerAwaiting(surfPlayer, surfServer)
+        } else {
+            // player is on this proxy
+            val velocityServer = plugin.proxy.getServer(surfServer.name).getOrNull()
+                ?: return SurfServerConnectResult(SurfServerConnectResult.Status.SERVER_NOT_FOUND, null)
+
+            val result = player.createConnectionRequest(velocityServer)
+                .connect()
+                .await()
+                .convertResult()
+
+            return result
         }
     }
 }

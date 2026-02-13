@@ -7,10 +7,12 @@ import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.common.server.connection.SurfServerConnectResult
 import dev.slne.surf.core.core.common.event.surfEventBus
 import dev.slne.surf.core.core.common.player.surfPlayerService
+import dev.slne.surf.core.core.common.redis.PlayerConnectionResultWatcher
 import dev.slne.surf.core.core.common.redis.SendPlayerToServerRequest
 import dev.slne.surf.core.core.common.redis.event.SurfPlayerMessageRedisEvent
 import dev.slne.surf.core.core.common.redis.redisApi
 import dev.slne.surf.core.core.common.server.surfServerService
+import dev.slne.surf.redis.request.RequestTimeoutException
 import it.unimi.dsi.fastutil.objects.ObjectSet
 import net.kyori.adventure.text.Component
 import java.util.*
@@ -65,6 +67,18 @@ abstract class SurfCoreApiImpl : SurfCoreApi {
     override suspend fun sendPlayerAwaiting(
         surfPlayer: SurfPlayer,
         surfServer: SurfServer
-    ): SurfServerConnectResult =
-        SendPlayerToServerRequest.sendPlayerToServer(surfPlayer, surfServer)
+    ): SurfServerConnectResult {
+        val requestId = UUID.randomUUID()
+        val awaitingResult = PlayerConnectionResultWatcher.watch(requestId)
+        try {
+            SendPlayerToServerRequest.createRequest(surfPlayer, surfServer, requestId)
+        } catch (_: RequestTimeoutException) {
+            PlayerConnectionResultWatcher.complete(
+                requestId,
+                SurfServerConnectResult(SurfServerConnectResult.Status.UNKNOWN_ERROR, null)
+            )
+        }
+
+        return awaitingResult.await()
+    }
 }

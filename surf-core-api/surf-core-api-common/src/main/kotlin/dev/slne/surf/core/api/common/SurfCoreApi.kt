@@ -30,6 +30,11 @@ interface SurfCoreApi {
     fun subscribe(eventClass: KClass<out SurfEvent>, handler: (SurfEvent) -> Unit)
 
     fun sendPlayer(player: SurfPlayer, server: SurfServer)
+
+    /**
+     * Sends a request to connect the specified player to the given server and awaits the result.
+     * This method can only send a player to a backend server, not a proxy.
+     */
     suspend fun sendPlayerAwaiting(
         surfPlayer: SurfPlayer,
         surfServer: SurfServer

@@ -19,7 +19,12 @@ object VelocityRedisResponseHandler {
             val server =
                 plugin.proxy.getServer(context.request.server.name).getOrNull() ?: run {
                     context.respond(
-                        SendPlayerToServerRequest.Response(SurfServerConnectResult.SERVER_NOT_FOUND)
+                        SendPlayerToServerRequest.Response(
+                            SurfServerConnectResult(
+                                SurfServerConnectResult.Status.SERVER_NOT_FOUND,
+                                null
+                            )
+                        )
                     )
                     return@launch
                 }
@@ -34,10 +39,29 @@ object VelocityRedisResponseHandler {
 
     private fun ConnectionRequestBuilder.Result.toLocal(): SurfServerConnectResult =
         when (this.status) {
-            ConnectionRequestBuilder.Status.ALREADY_CONNECTED -> SurfServerConnectResult.ALREADY_CONNECTED
-            ConnectionRequestBuilder.Status.CONNECTION_IN_PROGRESS -> SurfServerConnectResult.CONNECTION_IN_PROGRESS
-            ConnectionRequestBuilder.Status.CONNECTION_CANCELLED -> SurfServerConnectResult.CONNECTION_CANCELLED
-            ConnectionRequestBuilder.Status.SERVER_DISCONNECTED -> SurfServerConnectResult.SERVER_DISCONNECTED
-            ConnectionRequestBuilder.Status.SUCCESS -> SurfServerConnectResult.SUCCESS
+            ConnectionRequestBuilder.Status.ALREADY_CONNECTED -> SurfServerConnectResult(
+                SurfServerConnectResult.Status.ALREADY_CONNECTED,
+                this.reasonComponent.getOrNull()
+            )
+
+            ConnectionRequestBuilder.Status.CONNECTION_IN_PROGRESS -> SurfServerConnectResult(
+                SurfServerConnectResult.Status.CONNECTION_IN_PROGRESS,
+                this.reasonComponent.getOrNull()
+            )
+
+            ConnectionRequestBuilder.Status.CONNECTION_CANCELLED -> SurfServerConnectResult(
+                SurfServerConnectResult.Status.CONNECTION_CANCELLED,
+                this.reasonComponent.getOrNull()
+            )
+
+            ConnectionRequestBuilder.Status.SERVER_DISCONNECTED -> SurfServerConnectResult(
+                SurfServerConnectResult.Status.SERVER_DISCONNECTED,
+                this.reasonComponent.getOrNull()
+            )
+
+            ConnectionRequestBuilder.Status.SUCCESS -> SurfServerConnectResult(
+                SurfServerConnectResult.Status.SUCCESS,
+                null
+            )
         }
 }

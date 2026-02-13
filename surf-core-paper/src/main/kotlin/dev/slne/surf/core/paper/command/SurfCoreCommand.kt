@@ -60,7 +60,7 @@ fun surfCoreCommand() = commandTree("core") {
                     } else {
                         player.sendText {
                             appendErrorPrefix()
-                            error("Es gab ein Problem beim Senden zum Server: ${result.name}")
+                            error("Es gab ein Problem beim Senden zum Server: ${result.status.name}")
                         }
                     }
                 }

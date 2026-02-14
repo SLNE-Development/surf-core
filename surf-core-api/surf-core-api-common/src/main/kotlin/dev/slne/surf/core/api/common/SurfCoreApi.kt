@@ -19,6 +19,7 @@ interface SurfCoreApi {
 
     fun getCurrentServerName(): String
     fun getCurrentServerCategory(): String
+    fun getCurrentServerDisplayName(): String
     fun getCurrentServer(): SurfServer
 
     fun getServerByName(name: String): SurfServer?

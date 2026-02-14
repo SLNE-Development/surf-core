@@ -15,6 +15,7 @@ import net.kyori.adventure.util.Services
 class SurfCoreApiPaperImpl : SurfCoreApiImpl(), Services.Fallback {
     override fun getCurrentServerName() = surfServerConfig.serverName
     override fun getCurrentServerCategory() = surfServerConfig.serverCategory
+    override fun getCurrentServerDisplayName() = surfServerConfig.serverDisplayName
     override fun sendPlayer(
         player: SurfPlayer,
         server: SurfServer
@@ -22,8 +23,8 @@ class SurfCoreApiPaperImpl : SurfCoreApiImpl(), Services.Fallback {
         when (server.type) {
             SurfServerType.PROXY -> {
                 player.bukkitPlayer?.transfer(
-                    server.connectionAddress.hostName,
-                    server.connectionAddress.port
+                    server.externalConnectionAddress?.hostName ?: "",
+                    server.externalConnectionAddress?.port ?: 0
                 )
             }
 

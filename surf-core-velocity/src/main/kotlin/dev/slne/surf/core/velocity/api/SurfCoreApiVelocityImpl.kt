@@ -14,6 +14,7 @@ import kotlin.jvm.optionals.getOrNull
 @AutoService(SurfCoreApi::class)
 class SurfCoreApiVelocityImpl : SurfCoreApiImpl(), Services.Fallback {
     override fun getCurrentServerName() = surfServerConfig.serverName
+    override fun getCurrentServerDisplayName() = surfServerConfig.serverDisplayName
     override fun getCurrentServerCategory() = surfServerConfig.serverCategory
     override fun sendPlayer(
         player: SurfPlayer,
@@ -22,7 +23,8 @@ class SurfCoreApiVelocityImpl : SurfCoreApiImpl(), Services.Fallback {
         when (server.type) {
             SurfServerType.PROXY -> {
                 plugin.proxy.getPlayer(player.uuid).getOrNull()?.transferToHost(
-                    server.connectionAddress
+                    server.externalConnectionAddress
+                        ?: error("SurfServer ${server.name} does not have an external connection address")
                 )
             }
 

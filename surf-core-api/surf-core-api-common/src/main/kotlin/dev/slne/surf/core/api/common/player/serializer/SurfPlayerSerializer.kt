@@ -1,7 +1,7 @@
 package dev.slne.surf.core.api.common.player.serializer
 
 import dev.slne.surf.core.api.common.player.SurfPlayer
-import dev.slne.surf.core.api.common.server.SurfServer
+import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.surfapi.core.api.serializer.java.datetime.datetime.offset.OffsetDateTimeSerializer
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -79,8 +79,8 @@ object SurfPlayerSerializer : KSerializer<SurfPlayer> {
         var lastKnownName: String? = null
         var firstSeen: OffsetDateTime? = null
         var lastSeen: OffsetDateTime? = null
-        var currentServer: SurfServer? = null
-        var currentProxy: SurfServer? = null
+        var currentServer: CommonSurfServer? = null
+        var currentProxy: CommonSurfServer? = null
         var lastKnownIpAddress: InetAddress? = null
 
         loop@ while (true) {

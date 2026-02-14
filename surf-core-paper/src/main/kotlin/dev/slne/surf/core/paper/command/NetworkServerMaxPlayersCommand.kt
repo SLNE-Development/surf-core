@@ -4,7 +4,7 @@ import dev.jorel.commandapi.kotlindsl.anyExecutor
 import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.jorel.commandapi.kotlindsl.getValue
 import dev.jorel.commandapi.kotlindsl.integerArgument
-import dev.slne.surf.core.api.common.server.SurfServer
+import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.paper.command.argument.surfBackendServerArgument
 import dev.slne.surf.core.core.common.redis.event.SurfServerChangeMaxPlayersRedisEvent
 import dev.slne.surf.core.core.common.redis.redisApi
@@ -17,7 +17,7 @@ fun networkServerMaxPlayersCommand() = commandTree("nmaxplayers") {
     surfBackendServerArgument("backend") {
         integerArgument("maxPlayers") {
             anyExecutor { sender, args ->
-                val backend: SurfServer by args
+                val backend: CommonSurfServer by args
                 val maxPlayers: Int by args
 
                 redisApi.publishEvent(SurfServerChangeMaxPlayersRedisEvent(backend, maxPlayers))

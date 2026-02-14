@@ -9,15 +9,14 @@ import dev.jorel.commandapi.CommandTree
 import dev.jorel.commandapi.arguments.Argument
 import dev.jorel.commandapi.arguments.CommandAPIArgumentType
 import dev.jorel.commandapi.executors.CommandArguments
-import dev.slne.surf.core.api.common.server.SurfServer
-import dev.slne.surf.core.api.common.server.type.SurfServerType
+import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 
 open class SurfProxyServerArgument(nodeName: String) :
-    Argument<SurfServer>(nodeName, StringArgumentType.string()) {
-    override fun getPrimitiveType(): Class<SurfServer> {
-        return SurfServer::class.java
+    Argument<CommonSurfServer>(nodeName, StringArgumentType.string()) {
+    override fun getPrimitiveType(): Class<CommonSurfServer> {
+        return CommonSurfServer::class.java
     }
 
     override fun getArgumentType(): CommandAPIArgumentType? {
@@ -28,8 +27,8 @@ open class SurfProxyServerArgument(nodeName: String) :
         cmdCtx: CommandContext<Source>,
         key: String,
         previousArgs: CommandArguments,
-    ): SurfServer = surfCoreApi.getServerByName(StringArgumentType.getString(cmdCtx, key))
-        .takeIf { it?.type == SurfServerType.PROXY }
+    ): CommonSurfServer = surfCoreApi.getServerByName(StringArgumentType.getString(cmdCtx, key))
+        .takeIf { it?.isProxy() == true }
         ?: throw SimpleCommandExceptionType(
             VelocityBrigadierMessage.tooltip(
                 buildText {

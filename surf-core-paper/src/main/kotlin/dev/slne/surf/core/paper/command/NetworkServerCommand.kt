@@ -3,7 +3,7 @@ package dev.slne.surf.core.paper.command
 import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.jorel.commandapi.kotlindsl.getValue
 import dev.jorel.commandapi.kotlindsl.playerExecutor
-import dev.slne.surf.core.api.common.server.SurfServer
+import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.paper.command.argument.permissionSurfServerArgument
 import dev.slne.surf.core.api.paper.util.toSurfPlayer
 import dev.slne.surf.core.paper.permission.PermissionRegistry
@@ -14,7 +14,7 @@ fun networkServerCommand() = commandTree("nserver") {
 
     permissionSurfServerArgument("server") {
         playerExecutor { player, args ->
-            val server: SurfServer by args
+            val server: CommonSurfServer by args
             val surfPlayer = player.toSurfPlayer()
 
             player.sendText {

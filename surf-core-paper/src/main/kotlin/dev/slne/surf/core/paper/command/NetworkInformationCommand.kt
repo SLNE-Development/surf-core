@@ -5,7 +5,7 @@ import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.jorel.commandapi.kotlindsl.getValue
 import dev.jorel.commandapi.kotlindsl.literalArgument
 import dev.slne.surf.core.api.common.player.SurfPlayer
-import dev.slne.surf.core.api.common.server.SurfServer
+import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.paper.command.argument.surfPlayerArgument
 import dev.slne.surf.core.api.paper.command.argument.surfServerArgument
 import dev.slne.surf.core.core.common.player.surfPlayerService
@@ -87,12 +87,12 @@ fun networkInformationCommand() = commandTree("ninfo") {
         withPermission(PermissionRegistry.COMMAND_INFO_SERVER)
         surfServerArgument("surfServer") {
             anyExecutor { executor, args ->
-                val surfServer: SurfServer by args
+                val commonSurfServer: CommonSurfServer by args
 
                 executor.sendText {
                     appendNewline()
                     darkSpacer("» | ")
-                    variableValue(surfServer.name)
+                    variableValue(commonSurfServer.name)
 
                     appendNewline()
                     darkSpacer("» | ")
@@ -100,22 +100,17 @@ fun networkInformationCommand() = commandTree("ninfo") {
                     appendNewline()
                     darkSpacer("» | ")
                     variableKey("Kategorie: ")
-                    variableValue(surfServer.category)
+                    variableValue(commonSurfServer.category)
 
                     appendNewline()
                     darkSpacer("» | ")
                     variableKey("Status: ")
-                    variableValue(surfServer.state.toString())
-
-                    appendNewline()
-                    darkSpacer("» | ")
-                    variableKey("Connection Address: ")
-                    variableValue(surfServer.externalConnectionAddress.toString())
+                    variableValue(commonSurfServer.state.toString())
 
                     appendNewline()
                     darkSpacer("» | ")
                     variableKey("Spieler: ")
-                    variableValue("${surfServer.getPlayerCount()}/${surfServer.maxPlayers}")
+                    variableValue("${commonSurfServer.getPlayerCount()}/${commonSurfServer.maxPlayers}")
                 }
             }
         }

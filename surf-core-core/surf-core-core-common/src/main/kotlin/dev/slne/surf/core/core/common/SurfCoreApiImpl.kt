@@ -3,6 +3,8 @@ package dev.slne.surf.core.core.common
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.event.SurfEvent
 import dev.slne.surf.core.api.common.player.SurfPlayer
+import dev.slne.surf.core.api.common.server.CommonSurfServer
+import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.common.server.connection.SurfServerConnectResult
 import dev.slne.surf.core.core.common.event.surfEventBus
@@ -31,7 +33,12 @@ abstract class SurfCoreApiImpl : SurfCoreApi {
 
     override fun getCurrentServer(): SurfServer {
         return surfServerService.getServerByName(getCurrentServerName())
-            ?: error("Current server ${getCurrentServerName()} not found")
+            ?: error("Current server ${getCurrentServerName()} not found! Are you sure you're running on a backend server?")
+    }
+
+    override fun getCurrentProxy(): SurfProxyServer {
+        return surfServerService.getProxyServerByName(getCurrentServerName())
+            ?: error("Current proxy ${getCurrentServerName()} not found! Are you sure you're running on a proxy server?")
     }
 
     override fun getServerByName(name: String): SurfServer? {
@@ -48,6 +55,10 @@ abstract class SurfCoreApiImpl : SurfCoreApi {
 
     override fun getServers(): ObjectSet<SurfServer> {
         return surfServerService.servers
+    }
+
+    override fun getProxies(): ObjectSet<SurfProxyServer> {
+        return surfServerService.proxyServers
     }
 
     override fun sendText(player: SurfPlayer, text: Component) {
@@ -68,7 +79,7 @@ abstract class SurfCoreApiImpl : SurfCoreApi {
 
     override suspend fun sendPlayerAwaiting(
         surfPlayer: SurfPlayer,
-        surfServer: SurfServer
+        commonSurfServer: CommonSurfServer
     ): SurfServerConnectResult =
-        SendPlayerToServerRequest.sendPlayerToServer(surfPlayer, surfServer)
+        SendPlayerToServerRequest.sendPlayerToServer(surfPlayer, commonSurfServer)
 }

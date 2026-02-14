@@ -5,6 +5,7 @@ import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.jorel.commandapi.kotlindsl.getValue
 import dev.jorel.commandapi.kotlindsl.literalArgument
 import dev.slne.surf.core.api.common.player.SurfPlayer
+import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.core.api.paper.command.argument.surfPlayerArgument
@@ -20,7 +21,7 @@ fun networkSendCommand() = commandTree("nsend") {
             surfServerArgument("server") {
                 anyExecutor { executor, args ->
                     val player: SurfPlayer by args
-                    val server: SurfServer by args
+                    val server: CommonSurfServer by args
 
                     player.send(server)
 
@@ -41,8 +42,8 @@ fun networkSendCommand() = commandTree("nsend") {
         surfServerArgument("server") {
             surfServerArgument("targetServer") {
                 anyExecutor { executor, args ->
-                    val server: SurfServer by args
-                    val targetServer: SurfServer by args
+                    val server: CommonSurfServer by args
+                    val targetServer: CommonSurfServer by args
 
                     val amount = server.getPlayerCount()
 
@@ -66,7 +67,7 @@ fun networkSendCommand() = commandTree("nsend") {
     literalArgument("all") {
         surfServerArgument("targetServer") {
             anyExecutor { executor, args ->
-                val targetServer: SurfServer by args
+                val targetServer: CommonSurfServer by args
 
                 val amount = surfCoreApi.getOnlinePlayers().size
 
@@ -88,7 +89,7 @@ fun networkSendCommand() = commandTree("nsend") {
     literalArgument("current") {
         surfServerArgument("targetServer") {
             anyExecutor { executor, args ->
-                val targetServer: SurfServer by args
+                val targetServer: CommonSurfServer by args
                 val currentServer = SurfServer.current()
 
                 val amount = currentServer.getPlayers().size

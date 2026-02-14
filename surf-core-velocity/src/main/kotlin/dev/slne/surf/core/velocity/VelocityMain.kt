@@ -13,9 +13,8 @@ import com.velocitypowered.api.proxy.ProxyServer
 import dev.slne.surf.core.api.common.event.SurfServerOnlineEvent
 import dev.slne.surf.core.api.common.event.SurfServerStartEvent
 import dev.slne.surf.core.api.common.event.SurfServerStoppingEvent
-import dev.slne.surf.core.api.common.server.SurfServer
+import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.state.SurfServerState
-import dev.slne.surf.core.api.common.server.type.SurfServerType
 import dev.slne.surf.core.core.common.config.SurfServerConfigHolder
 import dev.slne.surf.core.core.common.database.databaseLoader
 import dev.slne.surf.core.core.common.event.surfEventBus
@@ -57,14 +56,13 @@ class VelocityMain @Inject constructor(
         redisLoader.withRequestResponseHandler(VelocityRedisResponseHandler)
         redisLoader.connect()
 
-        val server = SurfServer(
+        val server = SurfProxyServer(
             name = surfServerConfig.serverName,
             displayName = surfServerConfig.serverDisplayName,
             category = surfServerConfig.serverCategory,
             state = SurfServerState.STARTING,
-            type = SurfServerType.PROXY,
             maxPlayers = plugin.proxy.configuration.showMaxPlayers,
-            externalConnectionAddress = InetSocketAddress(
+            address = InetSocketAddress(
                 velocityCoreConfigManager.config.connectionAddress.host,
                 velocityCoreConfigManager.config.connectionAddress.port
             )
@@ -85,15 +83,15 @@ class VelocityMain @Inject constructor(
         eventManager.register(this, AuthenticationListener)
         eventManager.register(this, VelocityServerListener)
 
-        surfServerService.changeState(SurfServer.current(), SurfServerState.RUNNING)
+        surfServerService.changeState(SurfProxyServer.current(), SurfServerState.RUNNING)
     }
 
     @Subscribe
     fun onProxyShutdown(event: ProxyShutdownEvent) {
         surfEventBus.fire(SurfServerStoppingEvent(surfServerConfig.serverName))
 
-        surfServerService.changeState(SurfServer.current(), SurfServerState.STOPPING)
-        surfServerService.removeServer(SurfServer.current())
+        surfServerService.changeState(SurfProxyServer.current(), SurfServerState.STOPPING)
+        surfServerService.removeServer(SurfProxyServer.current())
 
         proxy.allPlayers.forEach {
             it.disconnect(buildText {

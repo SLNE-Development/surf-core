@@ -42,7 +42,9 @@ class PaperMain : SuspendingJavaPlugin() {
 
         PlayerConnectListener.register()
 
-        surfServerService.addServer(SurfServer.current().copy(maxPlayers = Bukkit.getMaxPlayers()))
+        surfServerService.addServer(
+            SurfServer.current().copy(maxPlayers = Bukkit.getMaxPlayers())
+        )
 
         runBlocking {
             databaseLoader.connect(plugin.dataPath)

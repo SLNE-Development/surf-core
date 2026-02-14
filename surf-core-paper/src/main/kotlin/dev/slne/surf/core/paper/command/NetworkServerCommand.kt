@@ -48,14 +48,14 @@ fun networkServerCommand() = commandTree("nserver") {
                         } else {
                             player.sendText {
                                 appendErrorPrefix()
-                                error("Du konntest nicht zum Server verbunden werden ")
+                                error("Du konntest nicht zum Server verbunden werden")
 
                                 status.velocityMessage.let {
                                     if (it != null) {
                                         error(": ")
                                         append(it)
                                     } else {
-                                        error(".")
+                                        error(": ${status.status}")
                                     }
                                 }
                             }

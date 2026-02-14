@@ -4,10 +4,12 @@ import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.server.state.SurfServerState
 import dev.slne.surf.core.api.common.surfCoreApi
 import it.unimi.dsi.fastutil.objects.ObjectSet
+import kotlinx.serialization.Serializable
 import org.jetbrains.annotations.ApiStatus
 
 @ApiStatus.NonExtendable
-interface CommonSurfServer {
+@Serializable
+sealed interface CommonSurfServer {
     val name: String
     val displayName: String
     val category: String
@@ -22,7 +24,6 @@ interface CommonSurfServer {
         otherServer.getPlayers().forEach { it.send(this) }
 
     fun pullPlayers(vararg players: SurfPlayer) = players.forEach { it.send(this) }
-
 
     fun isProxy() = this is SurfProxyServer
     fun isBackend() = this is SurfServer

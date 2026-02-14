@@ -43,7 +43,7 @@ interface SurfCoreApi {
      */
     suspend fun sendPlayerAwaiting(
         surfPlayer: SurfPlayer,
-        commonSurfServer: CommonSurfServer
+        surfServer: SurfServer
     ): SurfServerConnectResult
 
     /**

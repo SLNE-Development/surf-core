@@ -48,7 +48,7 @@ fun surfCoreCommand() = commandTree("core") {
                 }
 
                 plugin.launch {
-                    val result = surfCoreApi.sendPlayerAwaiting(surfPlayer, backend)
+                    val result = surfCoreApi.sendPlayerAwaiting(surfPlayer)
 
                     if (result.isSuccessful()) {
                         player.sendText {

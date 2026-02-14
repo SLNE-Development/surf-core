@@ -3,7 +3,6 @@ package dev.slne.surf.core.core.common
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.event.SurfEvent
 import dev.slne.surf.core.api.common.player.SurfPlayer
-import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.common.server.connection.SurfServerConnectResult
@@ -79,7 +78,7 @@ abstract class SurfCoreApiImpl : SurfCoreApi {
 
     override suspend fun sendPlayerAwaiting(
         surfPlayer: SurfPlayer,
-        commonSurfServer: CommonSurfServer
+        surfServer: SurfServer
     ): SurfServerConnectResult =
-        SendPlayerToServerRequest.sendPlayerToServer(surfPlayer, commonSurfServer)
+        SendPlayerToServerRequest.sendPlayerToServer(surfPlayer, surfServer)
 }

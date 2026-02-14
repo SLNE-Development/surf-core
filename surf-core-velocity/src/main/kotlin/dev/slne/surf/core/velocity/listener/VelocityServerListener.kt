@@ -42,7 +42,7 @@ object VelocityServerListener {
                             }
 
                             try {
-                                surfCoreApi.sendPlayerAwaiting(player.surfPlayer, target)
+                                surfCoreApi.sendPlayerAwaiting(player.surfPlayer)
                                 target.pullPlayers(player.surfPlayer)
                             } catch (e: Exception) {
                                 plugin.logger.error(

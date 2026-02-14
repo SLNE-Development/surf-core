@@ -93,7 +93,7 @@ fun networkInformationCommand() = commandTree("ninfo") {
                     appendNewline()
                     darkSpacer("» | ")
                     variableValue(surfServer.name)
-                    
+
                     appendNewline()
                     darkSpacer("» | ")
 
@@ -110,7 +110,7 @@ fun networkInformationCommand() = commandTree("ninfo") {
                     appendNewline()
                     darkSpacer("» | ")
                     variableKey("Connection Address: ")
-                    variableValue(surfServer.connectionAddress.toString())
+                    variableValue(surfServer.externalConnectionAddress.toString())
 
                     appendNewline()
                     darkSpacer("» | ")

@@ -59,13 +59,14 @@ class VelocityMain @Inject constructor(
 
         val server = SurfServer(
             name = surfServerConfig.serverName,
+            displayName = surfServerConfig.serverDisplayName,
             category = surfServerConfig.serverCategory,
             state = SurfServerState.STARTING,
             type = SurfServerType.PROXY,
             maxPlayers = plugin.proxy.configuration.showMaxPlayers,
-            connectionAddress = InetSocketAddress(
-                surfServerConfig.connectionAddress.host,
-                surfServerConfig.connectionAddress.port
+            externalConnectionAddress = InetSocketAddress(
+                velocityCoreConfigManager.config.connectionAddress.host,
+                velocityCoreConfigManager.config.connectionAddress.port
             )
         )
 

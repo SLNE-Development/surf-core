@@ -12,6 +12,7 @@ import dev.slne.surf.core.core.common.server.surfServerService
 import dev.slne.surf.core.paper.command.*
 import dev.slne.surf.core.paper.event.SurfServerEventListener
 import dev.slne.surf.core.paper.listener.PlayerConnectListener
+import dev.slne.surf.core.paper.task.surfServerInformationSyncTask
 import dev.slne.surf.surfapi.bukkit.api.event.register
 import kotlinx.coroutines.runBlocking
 import org.bukkit.Bukkit
@@ -46,12 +47,15 @@ class PaperMain : SuspendingJavaPlugin() {
             SurfServer.current().copy(maxPlayers = Bukkit.getMaxPlayers())
         )
 
+        surfServerInformationSyncTask.start()
+
         runBlocking {
             databaseLoader.connect(plugin.dataPath)
         }
     }
 
     override fun onDisable() {
+        surfServerInformationSyncTask.stop()
         surfEventBus.fire(SurfServerStoppingEvent(surfServerConfig.serverName))
         surfServerService.changeState(SurfServer.current(), SurfServerState.STOPPING)
         surfServerService.removeServer(SurfServer.current())

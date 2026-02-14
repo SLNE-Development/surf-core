@@ -6,12 +6,12 @@ import dev.jorel.commandapi.arguments.Argument
 import dev.jorel.commandapi.arguments.ArgumentSuggestions
 import dev.jorel.commandapi.arguments.CustomArgument
 import dev.jorel.commandapi.arguments.StringArgument
-import dev.slne.surf.core.api.common.server.SurfServer
+import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 
 class PermissionSurfServerArgument(nodeName: String) :
-    CustomArgument<SurfServer, String>(StringArgument(nodeName), { info ->
+    CustomArgument<CommonSurfServer, String>(StringArgument(nodeName), { info ->
         surfCoreApi.getServerByName(info.input)
             ?.takeIf { info.sender.hasPermission("surf.core.command.networkserver.${it.name}") }
             ?: throw CustomArgumentException.fromAdventureComponent(

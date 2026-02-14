@@ -1,6 +1,7 @@
 package dev.slne.surf.core.api.common.player.serializer
 
 import dev.slne.surf.core.api.common.player.SurfPlayer
+import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.surfapi.core.api.serializer.java.datetime.datetime.offset.OffsetDateTimeSerializer
@@ -80,7 +81,7 @@ object SurfPlayerSerializer : KSerializer<SurfPlayer> {
         var firstSeen: OffsetDateTime? = null
         var lastSeen: OffsetDateTime? = null
         var currentServer: SurfServer? = null
-        var currentProxy: SurfServer? = null
+        var currentProxy: SurfProxyServer? = null
         var lastKnownIpAddress: InetAddress? = null
 
         loop@ while (true) {
@@ -101,7 +102,7 @@ object SurfPlayerSerializer : KSerializer<SurfPlayer> {
 
                 5 -> currentProxy =
                     dec.decodeNullableSerializableElement(descriptor, 5, String.serializer())
-                        ?.let(surfCoreApi::getServerByName)
+                        ?.let(surfCoreApi::getProxyServerByName)
 
                 6 -> lastKnownIpAddress =
                     dec.decodeNullableSerializableElement(descriptor, 6, String.serializer())

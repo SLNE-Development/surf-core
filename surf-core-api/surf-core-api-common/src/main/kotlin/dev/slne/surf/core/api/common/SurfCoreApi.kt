@@ -23,6 +23,7 @@ interface SurfCoreApi {
 
     fun getServerByName(name: String): SurfServer?
     fun getServerByCategory(category: String): ObjectSet<SurfServer>
+    fun getServerWithLeastPlayers(category: String): SurfServer?
     fun getServers(): ObjectSet<SurfServer>
 
     fun registerListener(listener: Any)

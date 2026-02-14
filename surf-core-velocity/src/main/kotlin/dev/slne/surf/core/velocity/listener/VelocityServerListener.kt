@@ -4,9 +4,7 @@ import com.github.shynixn.mccoroutine.velocity.launch
 import com.velocitypowered.api.event.Continuation
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.proxy.ProxyPreShutdownEvent
-import dev.slne.surf.core.api.common.server.SurfServer
-import dev.slne.surf.core.api.common.server.type.SurfServerType
-import dev.slne.surf.core.api.common.surfCoreApi
+import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.velocity.util.surfPlayer
 import dev.slne.surf.core.core.common.server.surfServerService
 import dev.slne.surf.core.velocity.plugin
@@ -20,10 +18,10 @@ import kotlinx.coroutines.supervisorScope
 object VelocityServerListener {
     @Subscribe(priority = Short.MIN_VALUE)
     fun onPreShutdown(event: ProxyPreShutdownEvent, continuation: Continuation) {
-        val currentProxy = SurfServer.current()
+        val currentProxy = SurfProxyServer.current()
 
-        val targetProxies = surfServerService.servers
-            .filter { it.type == SurfServerType.PROXY && it.name != currentProxy.name }
+        val targetProxies = surfServerService.proxyServers
+            .filter { it.name != currentProxy.name }
             .sortedBy { it.getPlayerCount() }
 
         plugin.pluginContainer.launch {
@@ -43,7 +41,6 @@ object VelocityServerListener {
                             }
 
                             try {
-                                surfCoreApi.sendPlayerAwaiting(player.surfPlayer, target)
                                 target.pullPlayers(player.surfPlayer)
                             } catch (e: Exception) {
                                 plugin.logger.error(

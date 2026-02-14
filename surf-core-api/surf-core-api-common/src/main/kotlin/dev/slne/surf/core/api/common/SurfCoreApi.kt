@@ -2,6 +2,8 @@ package dev.slne.surf.core.api.common
 
 import dev.slne.surf.core.api.common.event.SurfEvent
 import dev.slne.surf.core.api.common.player.SurfPlayer
+import dev.slne.surf.core.api.common.server.CommonSurfServer
+import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.common.server.connection.SurfServerConnectResult
 import dev.slne.surf.surfapi.core.api.util.requiredService
@@ -19,17 +21,22 @@ interface SurfCoreApi {
 
     fun getCurrentServerName(): String
     fun getCurrentServerCategory(): String
+    fun getCurrentServerDisplayName(): String
     fun getCurrentServer(): SurfServer
+    fun getCurrentProxy(): SurfProxyServer
 
     fun getServerByName(name: String): SurfServer?
     fun getServerByCategory(category: String): ObjectSet<SurfServer>
+    fun getServerWithLeastPlayers(category: String): SurfServer?
+    fun getProxyServerByName(name: String): SurfProxyServer?
     fun getServers(): ObjectSet<SurfServer>
+    fun getProxies(): ObjectSet<SurfProxyServer>
 
     fun registerListener(listener: Any)
     fun fireEvent(event: SurfEvent)
     fun subscribe(eventClass: KClass<out SurfEvent>, handler: (SurfEvent) -> Unit)
 
-    fun sendPlayer(player: SurfPlayer, server: SurfServer)
+    fun sendPlayer(player: SurfPlayer, server: CommonSurfServer)
 
     /**
      * Sends a request to connect the specified player to the given server and awaits the result.

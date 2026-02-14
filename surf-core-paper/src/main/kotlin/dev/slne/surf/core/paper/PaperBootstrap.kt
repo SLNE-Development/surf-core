@@ -3,7 +3,6 @@ package dev.slne.surf.core.paper
 import dev.slne.surf.core.api.common.event.SurfServerStartEvent
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.common.server.state.SurfServerState
-import dev.slne.surf.core.api.common.server.type.SurfServerType
 import dev.slne.surf.core.core.common.config.SurfServerConfigHolder
 import dev.slne.surf.core.core.common.event.surfEventBus
 import dev.slne.surf.core.core.common.player.surfPlayerService
@@ -14,7 +13,6 @@ import dev.slne.surf.core.paper.redis.listener.PaperRedisListener
 import dev.slne.surf.core.paper.teleport.TeleportRedisListener
 import io.papermc.paper.plugin.bootstrap.BootstrapContext
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap
-import java.net.InetSocketAddress
 
 @Suppress("UnstableApiUsage")
 class PaperBootstrap : PluginBootstrap {
@@ -30,14 +28,10 @@ class PaperBootstrap : PluginBootstrap {
 
         val server = SurfServer(
             name = surfServerConfig.serverName,
+            displayName = surfServerConfig.serverDisplayName,
             category = surfServerConfig.serverCategory,
             state = SurfServerState.STARTING,
-            type = SurfServerType.SERVER,
-            maxPlayers = 0,
-            connectionAddress = InetSocketAddress(
-                surfServerConfig.connectionAddress.host,
-                surfServerConfig.connectionAddress.port
-            )
+            maxPlayers = 0
         )
 
         surfEventBus.fire(SurfServerStartEvent(surfServerConfig.serverName))

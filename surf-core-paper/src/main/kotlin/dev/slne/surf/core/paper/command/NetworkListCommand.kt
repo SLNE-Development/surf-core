@@ -14,17 +14,49 @@ fun networkListCommand() = commandTree("nlist") {
         if (players.isEmpty()) {
             executor.sendText {
                 appendErrorPrefix()
-                error("Es sind keine Spieler im Netzwerk online.")
+                error("Es sind derzeit keine Spieler im Netzwerk online.")
             }
             return@anyExecutor
         }
 
+        val serverGroups = players
+            .mapNotNull { player ->
+                player.currentServer?.name?.let { it to player }
+            }
+            .groupBy({ it.first }, { it.second })
+
+        val proxyGroups = players
+            .mapNotNull { player ->
+                player.currentProxy?.name?.let { it to player }
+            }
+            .groupBy({ it.first }, { it.second })
+
         executor.sendText {
             appendInfoPrefix()
-            info("Derzeit sind ")
+            info("Es sind derzeit ")
             variableValue(players.size)
-            info(" Spieler auf dem Netzwerk online: ")
-            variableValue(players.joinToString(", ") { it.lastKnownName ?: it.uuid.toString() })
+            info(" Spieler auf dem Netzwerk online:\n")
+
+            serverGroups.forEach { (server, list) ->
+                spacer("- ")
+                variableValue(server)
+                info(" (")
+                variableValue(list.size)
+                info("): ")
+                variableValue(list.joinToString(", ") { it.lastKnownName ?: it.uuid.toString() })
+                info("\n")
+            }
+
+            proxyGroups.forEach { (proxy, list) ->
+                spacer("- ")
+                variableValue(proxy)
+                info(" (")
+                variableValue(list.size)
+                info("): ")
+                variableValue(list.joinToString(", ") { it.lastKnownName ?: it.uuid.toString() })
+                info("\n")
+            }
         }
     }
 }
+

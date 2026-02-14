@@ -26,9 +26,9 @@ fun networkSendCommand() = commandTree("nsend") {
             surfServerArgument("server") {
                 anyExecutor { executor, args ->
                     val player: SurfPlayer by args
-                    val target: CommonSurfServer by args
+                    val server: CommonSurfServer by args
 
-                    when (val commonServer = target) {
+                    when (val commonServer = server) {
                         is SurfProxyServer -> {
                             player.send(commonServer)
 
@@ -79,9 +79,9 @@ fun networkSendCommand() = commandTree("nsend") {
         surfServerArgument("server") {
             surfServerArgument("targetServer") {
                 anyExecutor { executor, args ->
-                    val source: CommonSurfServer by args
-                    val target: CommonSurfServer by args
-                    handleMultipleSend(executor, source.getPlayers(), target, source.name)
+                    val server: CommonSurfServer by args
+                    val targetServer: CommonSurfServer by args
+                    handleMultipleSend(executor, server.getPlayers(), targetServer, server.name)
                 }
             }
         }
@@ -90,11 +90,11 @@ fun networkSendCommand() = commandTree("nsend") {
     literalArgument("all") {
         surfServerArgument("targetServer") {
             anyExecutor { executor, args ->
-                val target: CommonSurfServer by args
+                val targetServer: CommonSurfServer by args
                 handleMultipleSend(
                     executor,
                     surfCoreApi.getOnlinePlayers(),
-                    target,
+                    targetServer,
                     "global"
                 )
             }
@@ -104,13 +104,13 @@ fun networkSendCommand() = commandTree("nsend") {
     literalArgument("current") {
         surfServerArgument("targetServer") {
             anyExecutor { executor, args ->
-                val target: CommonSurfServer by args
+                val targetServer: CommonSurfServer by args
                 val current = SurfServer.current()
 
                 handleMultipleSend(
                     executor,
                     current.getPlayers(),
-                    target,
+                    targetServer,
                     current.name
                 )
             }

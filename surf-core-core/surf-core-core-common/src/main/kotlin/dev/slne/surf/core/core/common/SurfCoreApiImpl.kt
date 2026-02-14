@@ -44,6 +44,10 @@ abstract class SurfCoreApiImpl : SurfCoreApi {
         return surfServerService.getServerByName(name)
     }
 
+    override fun getProxyServerByName(name: String): SurfProxyServer? {
+        return surfServerService.getProxyServerByName(name)
+    }
+
     override fun getServerByCategory(category: String): ObjectSet<SurfServer> {
         return surfServerService.getServerByCategory(category)
     }

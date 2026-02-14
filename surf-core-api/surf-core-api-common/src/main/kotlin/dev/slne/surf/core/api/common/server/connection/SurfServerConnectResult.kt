@@ -14,6 +14,7 @@ data class SurfServerConnectResult(
         CONNECTION_CANCELLED,
         CONNECTION_IN_PROGRESS,
         SERVER_DISCONNECTED,
+        UNKNOWN_ERROR,
         SUCCESS;
     }
 

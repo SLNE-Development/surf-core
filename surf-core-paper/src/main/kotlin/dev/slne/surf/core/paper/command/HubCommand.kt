@@ -30,7 +30,7 @@ fun hubCommand() = commandTree("hub") {
         }
 
         plugin.launch {
-            val result = surfCoreApi.sendPlayerAwaiting(player.surfPlayer)
+            val result = surfCoreApi.sendPlayerAwaiting(player.surfPlayer, server)
 
             if (result.isSuccessful()) {
                 player.sendText {

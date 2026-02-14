@@ -2,7 +2,7 @@ package dev.slne.surf.core.paper.command
 
 import com.github.shynixn.mccoroutine.folia.launch
 import dev.jorel.commandapi.kotlindsl.*
-import dev.slne.surf.core.api.common.server.CommonSurfServer
+import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.core.api.paper.command.argument.surfBackendServerArgument
 import dev.slne.surf.core.api.paper.util.surfPlayer
@@ -40,7 +40,7 @@ fun surfCoreCommand() = commandTree("core") {
         surfBackendServerArgument("backend") {
             playerExecutor { player, args ->
                 val surfPlayer = player.surfPlayer
-                val backend: CommonSurfServer by args
+                val backend: SurfServer by args
 
                 player.sendText {
                     appendInfoPrefix()
@@ -48,7 +48,7 @@ fun surfCoreCommand() = commandTree("core") {
                 }
 
                 plugin.launch {
-                    val result = surfCoreApi.sendPlayerAwaiting(surfPlayer)
+                    val result = surfCoreApi.sendPlayerAwaiting(surfPlayer, backend)
 
                     if (result.isSuccessful()) {
                         player.sendText {

@@ -5,7 +5,6 @@ import com.velocitypowered.api.event.Continuation
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.proxy.ProxyPreShutdownEvent
 import dev.slne.surf.core.api.common.server.SurfProxyServer
-import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.core.api.velocity.util.surfPlayer
 import dev.slne.surf.core.core.common.server.surfServerService
 import dev.slne.surf.core.velocity.plugin
@@ -42,7 +41,6 @@ object VelocityServerListener {
                             }
 
                             try {
-                                surfCoreApi.sendPlayerAwaiting(player.surfPlayer)
                                 target.pullPlayers(player.surfPlayer)
                             } catch (e: Exception) {
                                 plugin.logger.error(

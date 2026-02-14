@@ -42,6 +42,10 @@ abstract class SurfCoreApiImpl : SurfCoreApi {
         return surfServerService.getServerByCategory(category)
     }
 
+    override fun getServerWithLeastPlayers(category: String): SurfServer? {
+        return surfServerService.getServerByCategory(category).minByOrNull { it.getPlayerCount() }
+    }
+
     override fun getServers(): ObjectSet<SurfServer> {
         return surfServerService.servers
     }

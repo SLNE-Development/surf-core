@@ -38,6 +38,7 @@ class PaperMain : SuspendingJavaPlugin() {
         networkBroadcastCommand()
         networkSendCommand()
         networkServerMaxPlayersCommand()
+        hubCommand()
 
         PlayerConnectListener.register()
 

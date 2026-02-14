@@ -41,10 +41,10 @@ fun hubCommand() = commandTree("hub") {
                 player.sendText {
                     appendErrorPrefix()
                     error("Es gab ein Problem beim Senden zum Hub")
-                    
+
                     result.velocityMessage.let {
                         if (it != null) {
-                            error(":")
+                            error(": ")
                             append(it)
                         } else {
                             error(".")

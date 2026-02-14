@@ -20,5 +20,15 @@ data class VelocityCoreConfig(
         "dev03.castcrafter.de",
         "dev04.castcrafter.de",
         "dev05.castcrafter.de"
+    ),
+    val connectionAddress: SurfServerConnectionAddressConfig = SurfServerConnectionAddressConfig(
+        "localhost",
+        25565
     )
-)
+) {
+    @ConfigSerializable
+    data class SurfServerConnectionAddressConfig(
+        val host: String = "localhost",
+        val port: Int = 25565
+    )
+}

@@ -12,11 +12,12 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SurfServer(
     val name: String,
+    val displayName: String,
     val category: String,
     val state: SurfServerState,
     val type: SurfServerType,
     val maxPlayers: Int,
-    val connectionAddress: SerializableInetSocketAddress
+    val externalConnectionAddress: SerializableInetSocketAddress?
 ) {
     fun getPlayers(): ObjectSet<SurfPlayer> = if (type == SurfServerType.PROXY) {
         surfCoreApi.getOnlinePlayers().filter { it.currentProxy?.name == name }.toObjectSet()
@@ -29,6 +30,10 @@ data class SurfServer(
     fun sendPlayers(otherServer: SurfServer) = getPlayers().forEach { it.send(otherServer) }
     fun pullPlayers(otherServer: SurfServer) = otherServer.getPlayers().forEach { it.send(this) }
     fun pullPlayers(vararg players: SurfPlayer) = players.forEach { it.send(this) }
+
+
+    fun isProxy() = type == SurfServerType.PROXY
+    fun isBackend() = type == SurfServerType.SERVER
 
     companion object {
         /**

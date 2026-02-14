@@ -19,6 +19,8 @@ data class SurfPlayer(
     var currentProxy: CommonSurfServer? = null,
     var lastKnownIpAddress: @Contextual InetAddress? = null
 ) {
+
+    val username get() = lastKnownName ?: "#Unbekannt"
     fun isOnline() = surfCoreApi.getOnlinePlayers().any { it.uuid == uuid }
     fun send(server: CommonSurfServer) = surfCoreApi.sendPlayer(this, server)
 

@@ -20,8 +20,8 @@ object VelocityServerListener {
     fun onPreShutdown(event: ProxyPreShutdownEvent, continuation: Continuation) {
         val currentProxy = SurfProxyServer.current()
 
-        val targetProxies = surfServerService.servers
-            .filter { it.isProxy() && it.name != currentProxy.name }
+        val targetProxies = surfServerService.proxyServers
+            .filter { it.name != currentProxy.name }
             .sortedBy { it.getPlayerCount() }
 
         plugin.pluginContainer.launch {

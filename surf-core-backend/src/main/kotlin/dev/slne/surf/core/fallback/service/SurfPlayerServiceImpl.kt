@@ -11,13 +11,13 @@ import java.util.*
 
 @AutoService(SurfPlayerService::class)
 class SurfPlayerServiceImpl : SurfPlayerService, Services.Fallback {
-    val globalPlayers = redisApi.createSyncMap<UUID, SurfPlayer>("surf-core:players-new")
+    val globalPlayers = redisApi.createSyncMap<UUID, SurfPlayer>("surf-core:surf-players")
     override val players get() = globalPlayers.snapshot().values.toObjectSet()
 
     override fun findPlayerByName(name: String) =
         players.firstOrNull { it.lastKnownName.equals(name, ignoreCase = true) }
 
-    override fun findPlayerByUuid(uuid: UUID) = globalPlayers.get(uuid)
+    override fun findPlayerByUuid(uuid: UUID) = globalPlayers[uuid]
     override fun init() {
     }
 

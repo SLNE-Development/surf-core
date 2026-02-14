@@ -5,7 +5,9 @@ import dev.slne.surf.core.api.common.server.state.SurfServerState
 import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.surfapi.core.api.util.toObjectSet
 import it.unimi.dsi.fastutil.objects.ObjectSet
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class SurfServer(
     override val name: String,
     override val displayName: String,

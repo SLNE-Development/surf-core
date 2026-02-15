@@ -4,7 +4,7 @@ import com.github.shynixn.mccoroutine.velocity.launch
 import com.velocitypowered.api.event.Continuation
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.proxy.ProxyPreShutdownEvent
-import dev.slne.surf.core.api.common.server.SurfServer
+import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.connection.SurfProxyServerConnectionResult
 import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.core.api.velocity.util.surfPlayer
@@ -25,7 +25,7 @@ object VelocityServerListener {
 
     @Subscribe(priority = Short.MIN_VALUE)
     fun onPreShutdown(event: ProxyPreShutdownEvent, continuation: Continuation) {
-        val currentProxy = SurfServer.current()
+        val currentProxy = SurfProxyServer.current()
 
         val targetProxies = surfServerService.proxyServers
             .filter { it.name != currentProxy.name }

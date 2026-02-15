@@ -106,7 +106,7 @@ object VelocityServerListener {
                     )
                 }
 
-                plugin.logger.info("=====================================")
+                plugin.logger.info("*" + "-".repeat(20) + "End Shutdown Report " + "-".repeat(20) + "*")
                 plugin.logger.info("All redirect attempts completed. Proxy can safely shut down now.")
 
             } catch (e: Exception) {

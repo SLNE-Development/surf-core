@@ -16,6 +16,9 @@ import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.core.paper.plugin
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 import it.unimi.dsi.fastutil.objects.ObjectSet
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import net.kyori.adventure.audience.Audience
 
 fun networkSendCommand() = commandTree("nsend") {
@@ -146,8 +149,12 @@ private fun handleMultipleSend(
     when (target) {
         is SurfProxyServer -> {
             plugin.launch {
-                val results = players.map { player ->
-                    player to surfCoreApi.sendPlayerAwaiting(player, target)
+                val results = coroutineScope {
+                    players.map { player ->
+                        async {
+                            player to surfCoreApi.sendPlayerAwaiting(player, target)
+                        }
+                    }.awaitAll()
                 }
 
                 val failed = results.filterNot { it.second.isSuccessful() }
@@ -195,8 +202,12 @@ private fun handleMultipleSend(
 
         is SurfServer -> {
             plugin.launch {
-                val results = players.map { player ->
-                    player to surfCoreApi.sendPlayerAwaiting(player, target)
+                val results = coroutineScope {
+                    players.map { player ->
+                        async {
+                            player to surfCoreApi.sendPlayerAwaiting(player, target)
+                        }
+                    }.awaitAll()
                 }
 
                 val failed = results.filterNot { it.second.isSuccessful() }
@@ -243,3 +254,4 @@ private fun handleMultipleSend(
         }
     }
 }
+

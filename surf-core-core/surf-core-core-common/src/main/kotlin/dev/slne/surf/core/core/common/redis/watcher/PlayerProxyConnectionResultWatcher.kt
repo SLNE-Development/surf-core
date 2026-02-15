@@ -43,8 +43,6 @@ object PlayerProxyConnectionResultWatcher {
             return pendingRequests.get(playerUuid) { CompletableDeferred() }
         }
 
-        cleanUp(playerUuid)
-
         return CompletableDeferred(
             SurfProxyServerConnectionResult(
                 SurfProxyServerConnectionResult.Status.ALREADY_TRANSFERRING

@@ -12,7 +12,7 @@ import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 
 class SurfServerArgument(nodeName: String) :
     CustomArgument<CommonSurfServer, String>(StringArgument(nodeName), { info ->
-        surfCoreApi.getServerByName(info.input)
+        surfCoreApi.getCommonServerByName(info.input)
             ?: throw CustomArgumentException.fromAdventureComponent(
                 buildText {
                     appendErrorPrefix()
@@ -22,7 +22,7 @@ class SurfServerArgument(nodeName: String) :
     init {
         this.replaceSuggestions(
             ArgumentSuggestions.stringCollection {
-                surfCoreApi.getServers().map { it.name }
+                surfCoreApi.getCommonServers().map { it.name }
             }
         )
     }

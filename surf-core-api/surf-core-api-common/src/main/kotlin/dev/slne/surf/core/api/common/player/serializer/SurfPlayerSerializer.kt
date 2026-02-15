@@ -27,6 +27,7 @@ object SurfPlayerSerializer : KSerializer<SurfPlayer> {
         element<String?>("currentServer", isOptional = true)
         element<String?>("currentProxy", isOptional = true)
         element<String?>("lastKnownIpAddress", isOptional = true)
+        element<Boolean>("transferred")
     }
 
     override fun serialize(encoder: Encoder, value: SurfPlayer) {
@@ -69,6 +70,7 @@ object SurfPlayerSerializer : KSerializer<SurfPlayer> {
             String.serializer(),
             value.lastKnownIpAddress?.hostAddress
         )
+        composite.encodeBooleanElement(descriptor, 7, value.transferred)
 
         composite.endStructure(descriptor)
     }
@@ -83,6 +85,7 @@ object SurfPlayerSerializer : KSerializer<SurfPlayer> {
         var currentServer: SurfServer? = null
         var currentProxy: SurfProxyServer? = null
         var lastKnownIpAddress: InetAddress? = null
+        var transferred: Boolean = false
 
         loop@ while (true) {
             when (val index = dec.decodeElementIndex(descriptor)) {
@@ -108,6 +111,8 @@ object SurfPlayerSerializer : KSerializer<SurfPlayer> {
                     dec.decodeNullableSerializableElement(descriptor, 6, String.serializer())
                         ?.let(InetAddress::getByName)
 
+                7 -> transferred = dec.decodeBooleanElement(descriptor, 7)
+
                 CompositeDecoder.DECODE_DONE -> break@loop
                 else -> error("Unknown index $index")
             }
@@ -122,7 +127,8 @@ object SurfPlayerSerializer : KSerializer<SurfPlayer> {
             lastSeen = lastSeen,
             currentServer = currentServer,
             currentProxy = currentProxy,
-            lastKnownIpAddress = lastKnownIpAddress
+            lastKnownIpAddress = lastKnownIpAddress,
+            transferred = transferred
         )
     }
 }

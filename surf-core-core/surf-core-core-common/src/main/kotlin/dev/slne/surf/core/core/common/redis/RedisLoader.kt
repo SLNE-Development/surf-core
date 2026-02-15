@@ -1,6 +1,7 @@
 package dev.slne.surf.core.core.common.redis
 
 import dev.slne.surf.core.core.common.event.LocalSurfEventBusListener
+import dev.slne.surf.core.core.common.redis.listener.SendPlayerToProxyListener
 import dev.slne.surf.core.core.common.redis.listener.SendPlayerToServerListener
 import dev.slne.surf.redis.RedisApi
 
@@ -24,6 +25,7 @@ class RedisLoader {
     fun connect() {
         redisApi.subscribeToEvents(LocalSurfEventBusListener)
         withListener(SendPlayerToServerListener)
+        withListener(SendPlayerToProxyListener)
         redisApi.freezeAndConnect()
     }
 

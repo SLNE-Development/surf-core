@@ -16,6 +16,7 @@ import dev.slne.surf.core.core.common.player.history.surfPlayerNameHistoryServic
 import dev.slne.surf.core.core.common.player.history.surfPlayerTextureHistoryService
 import dev.slne.surf.core.core.common.player.surfPlayerService
 import dev.slne.surf.core.core.common.server.surfServerService
+import dev.slne.surf.core.velocity.auth.AuthenticationListener
 import dev.slne.surf.core.velocity.plugin
 import java.net.InetAddress
 import java.time.OffsetDateTime
@@ -83,6 +84,7 @@ object ConnectionListener {
             currentServer = surfServerService.getServerByName(initialServer)
             currentProxy = SurfProxyServer.current()
             lastKnownIpAddress = inetAddress
+            transferred = AuthenticationListener.transfers.remove(playerUuid)
         }
 
         surfPlayerService.cachePlayer(player)

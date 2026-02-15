@@ -31,7 +31,23 @@ fun networkServerCommand() = commandTree("nserver") {
 
             when (val commonServer = server) {
                 is SurfProxyServer -> {
-                    surfPlayer.send(commonServer)
+                    plugin.launch {
+                        val status = surfCoreApi.sendPlayerAwaiting(surfPlayer, commonServer)
+
+                        if (status.isSuccessful()) {
+                            player.sendText {
+                                appendSuccessPrefix()
+                                success("Du wurdest erfolgreich zum Server ")
+                                variableValue(server.name)
+                                success(" gesendet!")
+                            }
+                        } else {
+                            player.sendText {
+                                appendErrorPrefix()
+                                error("Du konntest nicht zum Server verbunden werden: ${status.status}")
+                            }
+                        }
+                    }
                 }
 
                 is SurfServer -> {

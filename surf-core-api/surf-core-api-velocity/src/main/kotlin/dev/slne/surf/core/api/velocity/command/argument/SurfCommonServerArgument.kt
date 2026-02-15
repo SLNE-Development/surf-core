@@ -27,15 +27,16 @@ open class SurfServerArgument(nodeName: String) :
         cmdCtx: CommandContext<Source>,
         key: String,
         previousArgs: CommandArguments,
-    ): CommonSurfServer = surfCoreApi.getServerByName(StringArgumentType.getString(cmdCtx, key))
-        ?: throw SimpleCommandExceptionType(
-            VelocityBrigadierMessage.tooltip(
-                buildText {
-                    appendErrorPrefix()
-                    error("Der Server wurde nicht gefunden.")
-                }
-            )
-        ).create()
+    ): CommonSurfServer =
+        surfCoreApi.getCommonServerByName(StringArgumentType.getString(cmdCtx, key))
+            ?: throw SimpleCommandExceptionType(
+                VelocityBrigadierMessage.tooltip(
+                    buildText {
+                        appendErrorPrefix()
+                        error("Der Server wurde nicht gefunden.")
+                    }
+                )
+            ).create()
 }
 
 inline fun CommandTree.surfServerArgument(

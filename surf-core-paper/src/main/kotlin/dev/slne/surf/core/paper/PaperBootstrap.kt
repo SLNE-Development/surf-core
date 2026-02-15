@@ -26,6 +26,10 @@ class PaperBootstrap : PluginBootstrap {
 
         surfServerConfigHolder = SurfServerConfigHolder(context.dataDirectory)
 
+        if (surfServerConfig.serverName.isUnknown() || surfServerConfig.serverDisplayName.isUnknown() || surfServerConfig.serverCategory.isUnknown()) {
+            error("Failed to load server config, please check your config file and make sure all fields are filled correctly!")
+        }
+
         val server = SurfServer(
             name = surfServerConfig.serverName,
             displayName = surfServerConfig.serverDisplayName,
@@ -42,5 +46,8 @@ class PaperBootstrap : PluginBootstrap {
         lateinit var surfServerConfigHolder: SurfServerConfigHolder
     }
 }
+
+fun String.isUnknown() =
+    this.equals("unknown", ignoreCase = true) || this.isBlank() || this.isEmpty()
 
 val surfServerConfig get() = PaperBootstrap.surfServerConfigHolder.config

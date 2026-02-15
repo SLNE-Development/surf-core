@@ -15,10 +15,13 @@ import dev.slne.surf.core.velocity.velocityCoreConfigManager
 import dev.slne.surf.surfapi.core.api.messages.CommonComponents
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
+import dev.slne.surf.surfapi.core.api.util.mutableObjectSetOf
 import dev.slne.surf.surfapi.core.api.util.random
+import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
 object AuthenticationListener {
+    val transfers = mutableObjectSetOf<UUID>()
 
     @Subscribe
     fun onLogin(event: LoginEvent, continuation: Continuation) {
@@ -58,6 +61,8 @@ object AuthenticationListener {
             continuation.resume()
             return
         }
+
+        transfers.add(event.player.uniqueId)
 
         authentificationService.continuations[event.player.uniqueId] = continuation
         event.player.requestCookie(authentificationService.key)

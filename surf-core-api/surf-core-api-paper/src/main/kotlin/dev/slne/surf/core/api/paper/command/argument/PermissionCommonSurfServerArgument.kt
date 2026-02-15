@@ -12,7 +12,7 @@ import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 
 class PermissionSurfServerArgument(nodeName: String) :
     CustomArgument<CommonSurfServer, String>(StringArgument(nodeName), { info ->
-        surfCoreApi.getServerByName(info.input)
+        surfCoreApi.getCommonServerByName(info.input)
             ?.takeIf {
                 info.sender.hasPermission("surf.core.command.networkserver.${it.name}") || info.sender.hasPermission(
                     "surf.core.command.networkserver.*"
@@ -27,7 +27,7 @@ class PermissionSurfServerArgument(nodeName: String) :
     init {
         this.replaceSuggestions(
             ArgumentSuggestions.stringCollection { sender ->
-                surfCoreApi.getServers().map { it.name }
+                surfCoreApi.getCommonServers().map { it.name }
                     .filter {
                         sender.sender.hasPermission("surf.core.command.networkserver.$it") || sender.sender.hasPermission(
                             "surf.core.command.networkserver.*"

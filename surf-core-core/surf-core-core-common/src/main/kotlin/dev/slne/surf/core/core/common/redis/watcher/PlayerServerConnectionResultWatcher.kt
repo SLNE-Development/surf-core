@@ -1,4 +1,4 @@
-package dev.slne.surf.core.core.common.redis
+package dev.slne.surf.core.core.common.redis.watcher
 
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.sksamuel.aedile.core.expireAfterWrite
@@ -8,12 +8,17 @@ import kotlinx.coroutines.Deferred
 import java.util.*
 import kotlin.time.Duration.Companion.minutes
 
-object PlayerConnectionResultWatcher {
+object PlayerServerConnectionResultWatcher {
     private val pendingRequests = Caffeine.newBuilder()
         .expireAfterWrite(10.minutes)
         .evictionListener<UUID, CompletableDeferred<SurfServerConnectResult>> { uuid, deferred, cause ->
             if (cause.wasEvicted() && deferred != null && !deferred.isCompleted) {
-                deferred.complete(SurfServerConnectResult(SurfServerConnectResult.Status.UNKNOWN_ERROR, null))
+                deferred.complete(
+                    SurfServerConnectResult(
+                        SurfServerConnectResult.Status.UNKNOWN_ERROR,
+                        null
+                    )
+                )
             }
         }
         .build<UUID, CompletableDeferred<SurfServerConnectResult>>()

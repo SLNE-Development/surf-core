@@ -10,6 +10,7 @@ data class SurfProxyServerConnectionResult(
         ERR_UNKNOWN,
         ALREADY_CONNECTED,
         ALREADY_TRANSFERRING,
+        SERVER_NOT_FOUND,
         SUCCESS;
     }
 

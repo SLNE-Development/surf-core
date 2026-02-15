@@ -15,7 +15,7 @@ import kotlin.time.Duration.Companion.seconds
 
 object PlayerProxyConnectionResultWatcher {
     private val pendingRequests = Caffeine.newBuilder()
-        .expireAfterWrite(10.seconds)
+        .expireAfterWrite(20.seconds)
         .evictionListener<UUID, CompletableDeferred<SurfProxyServerConnectionResult>> { uuid, deferred, cause ->
             if (cause.wasEvicted() && deferred != null && !deferred.isCompleted) {
                 deferred.complete(

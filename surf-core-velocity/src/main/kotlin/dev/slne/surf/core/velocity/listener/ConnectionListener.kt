@@ -84,7 +84,7 @@ object ConnectionListener {
             currentServer = surfServerService.getServerByName(initialServer)
             currentProxy = SurfProxyServer.current()
             lastKnownIpAddress = inetAddress
-            transferred = AuthenticationListener.transfers.contains(playerUuid)
+            transferred = AuthenticationListener.transfers.remove(playerUuid)
         }
 
         surfPlayerService.cachePlayer(player)

@@ -63,7 +63,7 @@ object PlayerConnectListener : Listener {
             event.connection.audience.uuidOrNull()?.let { surfPlayerService.findPlayerByUuid(it) }
 
         if (surfPlayer == null) {
-            plugin.logger.severe("Failed to player data for player with UUID ${event.connection.audience.uuidOrNull()}. The player will be disconnected.")
+            plugin.logger.severe("Failed to load player data for player with UUID ${event.connection.audience.uuidOrNull()}. The player will be disconnected.")
             event.connection.disconnect(buildDisconnectComponent())
         }
     }

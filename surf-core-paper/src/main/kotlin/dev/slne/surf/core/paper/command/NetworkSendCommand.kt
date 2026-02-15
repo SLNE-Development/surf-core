@@ -30,15 +30,26 @@ fun networkSendCommand() = commandTree("nsend") {
 
                     when (val commonServer = server) {
                         is SurfProxyServer -> {
-                            player.send(commonServer)
+                            plugin.launch {
+                                val result = surfCoreApi.sendPlayerAwaiting(player, commonServer)
 
-                            executor.sendText {
-                                appendSuccessPrefix()
-                                success("Der Spieler ")
-                                variableValue(player.username)
-                                success(" wurde zum Proxy ")
-                                variableValue(commonServer.name)
-                                success(" gesendet.")
+                                if (result.isSuccessful()) {
+                                    executor.sendText {
+                                        appendSuccessPrefix()
+                                        success("Der Spieler ")
+                                        variableValue(player.username)
+                                        success(" wurde erfolgreich zum Proxy ")
+                                        variableValue(commonServer.name)
+                                        success(" gesendet.")
+                                    }
+                                } else {
+                                    executor.sendText {
+                                        appendErrorPrefix()
+                                        error("Der Spieler ")
+                                        variableValue(player.username)
+                                        error(" konnte nicht gesendet werden: ${result.status}")
+                                    }
+                                }
                             }
                         }
 
@@ -134,14 +145,51 @@ private fun handleMultipleSend(
 
     when (target) {
         is SurfProxyServer -> {
-            players.forEach { it.send(target) }
+            plugin.launch {
+                val results = players.map { player ->
+                    player to surfCoreApi.sendPlayerAwaiting(player, target)
+                }
 
-            executor.sendText {
-                appendSuccessPrefix()
-                variableValue(players.size)
-                success(" Spieler wurden zum Proxy ")
-                variableValue(target.name)
-                success(" gesendet.")
+                val failed = results.filterNot { it.second.isSuccessful() }
+
+                if (failed.isEmpty()) {
+                    executor.sendText {
+                        appendSuccessPrefix()
+                        variableValue(results.size)
+                        success(" Spieler wurden erfolgreich von ")
+                        variableValue(sourceName)
+                        success(" zu ")
+                        variableValue(target.name)
+                        success(" gesendet.")
+                    }
+                    return@launch
+                }
+
+                val grouped = failed.groupBy {
+                    it.second.status.toString()
+                }
+
+                executor.sendText {
+                    appendErrorPrefix()
+                    error("Es konnten ")
+                    variableValue(failed.size)
+                    error(" von ")
+                    variableValue(results.size)
+                    error(" Spielern nicht gesendet werden:")
+
+                    grouped.forEach { (reason, entries) ->
+                        appendNewInfoPrefixedLine()
+                        spacer(" - ")
+                        error("$reason: ")
+
+                        entries.forEachIndexed { index, entry ->
+                            variableValue(entry.first.username)
+                            if (index < entries.lastIndex) {
+                                error(", ")
+                            }
+                        }
+                    }
+                }
             }
         }
 

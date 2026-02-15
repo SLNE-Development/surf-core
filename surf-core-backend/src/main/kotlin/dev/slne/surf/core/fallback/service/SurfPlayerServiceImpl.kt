@@ -36,7 +36,8 @@ class SurfPlayerServiceImpl : SurfPlayerService, Services.Fallback {
             uuid = uuid,
             lastKnownName = null,
             firstSeen = null,
-            lastSeen = null
+            lastSeen = null,
+            transferred = false
         )
 
     override suspend fun savePlayer(player: SurfPlayer) = surfPlayerRepository.savePlayer(player)

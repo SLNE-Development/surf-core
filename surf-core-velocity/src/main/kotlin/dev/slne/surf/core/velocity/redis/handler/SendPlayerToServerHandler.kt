@@ -3,8 +3,8 @@ package dev.slne.surf.core.velocity.redis.handler
 import com.github.shynixn.mccoroutine.velocity.launch
 import com.velocitypowered.api.proxy.ConnectionRequestBuilder
 import dev.slne.surf.core.api.common.server.connection.SurfServerConnectResult
-import dev.slne.surf.core.core.common.redis.SendPlayerToServerRequest
 import dev.slne.surf.core.core.common.redis.redisApi
+import dev.slne.surf.core.core.common.redis.request.SendPlayerToServerRequest
 import dev.slne.surf.core.velocity.plugin
 import dev.slne.surf.redis.request.HandleRedisRequest
 import dev.slne.surf.redis.request.RequestContext

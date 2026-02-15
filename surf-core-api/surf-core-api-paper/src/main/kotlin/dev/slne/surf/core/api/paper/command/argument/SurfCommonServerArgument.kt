@@ -10,10 +10,9 @@ import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 
-class PermissionSurfServerArgument(nodeName: String) :
+class SurfServerArgument(nodeName: String) :
     CustomArgument<CommonSurfServer, String>(StringArgument(nodeName), { info ->
-        surfCoreApi.getServerByName(info.input)
-            ?.takeIf { info.sender.hasPermission("surf.core.command.networkserver.${it.name}") }
+        surfCoreApi.getCommonServerByName(info.input)
             ?: throw CustomArgumentException.fromAdventureComponent(
                 buildText {
                     appendErrorPrefix()
@@ -22,33 +21,32 @@ class PermissionSurfServerArgument(nodeName: String) :
     }) {
     init {
         this.replaceSuggestions(
-            ArgumentSuggestions.stringCollection { sender ->
-                surfCoreApi.getServers().map { it.name }
-                    .filter { sender.sender.hasPermission("surf.core.command.networkserver.$it") }
+            ArgumentSuggestions.stringCollection {
+                surfCoreApi.getCommonServers().map { it.name }
             }
         )
     }
 }
 
-inline fun CommandTree.permissionSurfServerArgument(
+inline fun CommandTree.surfServerArgument(
     nodeName: String,
     optional: Boolean = false,
     block: Argument<*>.() -> Unit = {}
 ): CommandTree = then(
-    PermissionSurfServerArgument(nodeName).setOptional(optional).apply(block)
+    SurfServerArgument(nodeName).setOptional(optional).apply(block)
 )
 
-inline fun Argument<*>.permissionSurfServerArgument(
+inline fun Argument<*>.surfServerArgument(
     nodeName: String,
     optional: Boolean = false,
     block: Argument<*>.() -> Unit = {}
 ): Argument<*> = then(
-    PermissionSurfServerArgument(nodeName).setOptional(optional).apply(block)
+    SurfServerArgument(nodeName).setOptional(optional).apply(block)
 )
 
-inline fun CommandAPICommand.permissionSurfServerArgument(
+inline fun CommandAPICommand.surfServerArgument(
     nodeName: String,
     optional: Boolean = false,
     block: Argument<*>.() -> Unit = {}
 ): CommandAPICommand =
-    withArguments(PermissionSurfServerArgument(nodeName).setOptional(optional).apply(block))
+    withArguments(SurfServerArgument(nodeName).setOptional(optional).apply(block))

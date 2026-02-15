@@ -43,6 +43,7 @@ class SurfPlayerRepository {
         firstSeen = row[SurfPlayerTable.firstSeen],
         lastSeen = row[SurfPlayerTable.lastSeen],
         currentServer = null,
-        currentProxy = null
+        currentProxy = null,
+        transferred = false
     )
 }

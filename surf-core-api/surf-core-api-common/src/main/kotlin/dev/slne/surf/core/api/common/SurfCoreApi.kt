@@ -5,6 +5,7 @@ import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
+import dev.slne.surf.core.api.common.server.connection.SurfProxyServerConnectionResult
 import dev.slne.surf.core.api.common.server.connection.SurfServerConnectResult
 import dev.slne.surf.surfapi.core.api.util.requiredService
 import it.unimi.dsi.fastutil.objects.ObjectSet
@@ -26,11 +27,13 @@ interface SurfCoreApi {
     fun getCurrentProxy(): SurfProxyServer
 
     fun getServerByName(name: String): SurfServer?
+    fun getCommonServerByName(name: String): CommonSurfServer?
     fun getServerByCategory(category: String): ObjectSet<SurfServer>
     fun getServerWithLeastPlayers(category: String): SurfServer?
     fun getProxyServerByName(name: String): SurfProxyServer?
     fun getServers(): ObjectSet<SurfServer>
     fun getProxies(): ObjectSet<SurfProxyServer>
+    fun getCommonServers(): ObjectSet<CommonSurfServer>
 
     fun registerListener(listener: Any)
     fun fireEvent(event: SurfEvent)
@@ -46,6 +49,11 @@ interface SurfCoreApi {
         surfPlayer: SurfPlayer,
         surfServer: SurfServer
     ): SurfServerConnectResult
+
+    suspend fun sendPlayerAwaiting(
+        surfPlayer: SurfPlayer,
+        surfProxyServer: SurfProxyServer
+    ): SurfProxyServerConnectionResult
 
     /**
      * Sends a text message to the given player via the cross-server messaging system.

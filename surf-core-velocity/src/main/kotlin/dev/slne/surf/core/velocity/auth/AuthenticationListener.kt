@@ -82,6 +82,10 @@ object AuthenticationListener {
         val player = event.player
         val lastServerName = authentificationService.lastServerMap.remove(player.uniqueId) ?: return
 
+        if (event.player.handshakeIntent != HandshakeIntent.TRANSFER) {
+            return
+        }
+
         plugin.proxy.getServer(lastServerName).getOrNull()?.let {
             event.setInitialServer(it)
         }

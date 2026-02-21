@@ -17,6 +17,8 @@ object PermissionRegistry : PermissionRegistry() {
     val COMMAND_NETWORK_SERVER_MAX_PLAYERS = create("$BASE_COMMAND.nservermaxplayers")
     val COMMAND_HUB = create("$BASE_COMMAND.hub")
 
+    val BYPASS_MAX_PLAYERS = create("$BASE.bypassmaxplayers")
+
     val COMMAND_INFO = create("$BASE_COMMAND.info")
     val COMMAND_INFO_PLAYER = create("$BASE_COMMAND.info.player")
     val COMMAND_INFO_SERVER = create("$BASE_COMMAND.info.server")

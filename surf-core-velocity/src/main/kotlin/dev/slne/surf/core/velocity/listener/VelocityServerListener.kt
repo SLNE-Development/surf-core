@@ -7,6 +7,7 @@ import com.velocitypowered.api.event.proxy.ProxyPreShutdownEvent
 import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.connection.SurfProxyServerConnectionResult
 import dev.slne.surf.core.api.common.surfCoreApi
+import dev.slne.surf.core.api.common.util.sendText
 import dev.slne.surf.core.api.velocity.util.surfPlayer
 import dev.slne.surf.core.core.common.server.surfServerService
 import dev.slne.surf.core.velocity.plugin
@@ -17,6 +18,7 @@ import it.unimi.dsi.fastutil.objects.ObjectSet
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.supervisorScope
+import net.kyori.adventure.text.format.TextDecoration
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -26,6 +28,15 @@ object VelocityServerListener {
     @Subscribe(priority = Short.MIN_VALUE)
     fun onPreShutdown(event: ProxyPreShutdownEvent, continuation: Continuation) {
         val currentProxy = SurfProxyServer.current()
+
+        surfCoreApi.getOnlinePlayers().forEach {
+            it.sendText {
+                appendInfoPrefix()
+                error("SYSTEM-NEUSTART", TextDecoration.BOLD)
+                spacer(": ")
+                spacer("Derzeit werden Hintergrundsysteme neugestartet. Bitte habt Verständnis, sollten in diesem Zeitraum Probleme auftreten!")
+            }
+        }
 
         val targetProxies = surfServerService.proxyServers
             .filter { it.name != currentProxy.name }

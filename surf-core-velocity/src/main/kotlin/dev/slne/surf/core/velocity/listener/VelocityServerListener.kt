@@ -33,7 +33,7 @@ object VelocityServerListener {
             it.sendText {
                 appendInfoPrefix()
                 error("SYSTEM-NEUSTART", TextDecoration.BOLD)
-                spacer(":")
+                spacer(": ")
                 spacer("Derzeit werden Hintergrundsysteme neugestartet. Bitte habt Verständnis, sollten in diesem Zeitraum Probleme auftreten!")
             }
         }

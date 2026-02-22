@@ -4,7 +4,7 @@ import com.github.shynixn.mccoroutine.velocity.launch
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.connection.DisconnectEvent
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent
-import com.velocitypowered.api.event.player.ServerPreConnectEvent
+import com.velocitypowered.api.event.player.ServerConnectedEvent
 import com.velocitypowered.api.util.GameProfile
 import dev.slne.surf.core.api.common.event.SurfPlayerConnectEvent
 import dev.slne.surf.core.api.common.event.SurfPlayerDisconnectEvent
@@ -43,13 +43,13 @@ object ConnectionListener {
         }
     }
 
-    @Subscribe(priority = Short.MIN_VALUE)
-    fun onConnected(event: ServerPreConnectEvent) {
+    @Subscribe
+    fun onConnected(event: ServerConnectedEvent) {
         handleSwitch(
             event.player.uniqueId,
             event.player.username,
-            event.previousServer?.serverInfo?.name ?: return,
-            event.result.server.getOrNull()?.serverInfo?.name ?: return
+            event.previousServer.getOrNull()?.serverInfo?.name ?: return,
+            event.server.serverInfo.name
         )
     }
 

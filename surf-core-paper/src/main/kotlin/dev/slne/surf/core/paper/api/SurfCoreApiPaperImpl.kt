@@ -31,12 +31,12 @@ class SurfCoreApiPaperImpl : SurfCoreApiImpl(), Services.Fallback {
         }
     }
 
-    override fun logError(playerUUid: UUID, message: String): String {
+    override fun logError(playerUuid: UUID, message: String): String {
         val code = surfCoreErrorLoggingService.generateCode()
 
         plugin.launch {
             surfCoreErrorLoggingService.logError(
-                playerUUid,
+                playerUuid,
                 code,
                 message,
                 SurfServer.current().name

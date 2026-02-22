@@ -52,8 +52,7 @@ interface SurfCoreApi {
 
     suspend fun logErrorAwaiting(playerUuid: UUID, message: String, server: String): SurfCoreError
     fun generateCode(): String
-
-    fun sendPlayer(player: SurfPlayer, server: SurfServer)
+    
     fun sendPlayer(player: SurfPlayer, server: CommonSurfServer)
 
     /**

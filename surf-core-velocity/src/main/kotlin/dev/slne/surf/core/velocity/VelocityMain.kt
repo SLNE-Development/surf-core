@@ -52,7 +52,6 @@ class VelocityMain @Inject constructor(
     init {
         suspendingPluginContainer.initialize(this)
 
-        // Install global error handler early
         GlobalErrorHandler.install()
 
         instance = this
@@ -60,13 +59,11 @@ class VelocityMain @Inject constructor(
         redisLoader.load()
         surfPlayerService.init()
         surfServerService.init()
-        authentificationService.init()
+        authenticationService.init()
         redisLoader.withListener(VelocityRedisListener)
         redisLoader.withRequestResponseHandler(SendPlayerToProxyHandler)
         redisLoader.withRequestResponseHandler(SendPlayerToServerHandler)
         redisLoader.connect()
-        authenticationService.init()
-        redisLoader.connect(VelocitySurfPlayerRedisListener)
 
         val server = SurfProxyServer(
             name = surfServerConfig.serverName,

@@ -72,8 +72,8 @@ object AuthenticationListener {
         event.player.requestCookie(authenticationService.key)
         transfers.add(event.player.uniqueId)
 
-        authentificationService.continuations[event.player.uniqueId] = continuation
-        event.player.requestCookie(authentificationService.key)
+        authenticationService.continuations[event.player.uniqueId] = continuation
+        event.player.requestCookie(authenticationService.key)
     }
 
     @Subscribe

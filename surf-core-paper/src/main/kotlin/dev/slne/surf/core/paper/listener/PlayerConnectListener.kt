@@ -1,8 +1,8 @@
 package dev.slne.surf.core.paper.listener
 
-import dev.slne.surf.core.api.common.surfCoreApi
 import com.github.shynixn.mccoroutine.folia.launch
 import dev.slne.surf.core.api.common.server.connection.SurfProxyServerConnectionResult
+import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.core.api.paper.util.surfPlayer
 import dev.slne.surf.core.core.common.player.surfPlayerService
 import dev.slne.surf.core.core.common.redis.redisApi
@@ -11,15 +11,13 @@ import dev.slne.surf.core.core.common.redis.watcher.PlayerProxyConnectionResultW
 import dev.slne.surf.core.core.common.util.formatMillis
 import dev.slne.surf.core.core.common.util.renderErrorCodeDisconnectMessage
 import dev.slne.surf.core.paper.permission.PermissionRegistry
-import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
-import dev.slne.surf.surfapi.core.api.messages.adventure.clickCopiesToClipboard
-import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 import dev.slne.surf.core.paper.plugin
 import dev.slne.surf.surfapi.bukkit.api.command.util.idOrThrow
 import dev.slne.surf.surfapi.core.api.messages.adventure.*
 import io.papermc.paper.event.connection.configuration.AsyncPlayerConnectionConfigureEvent
 import io.papermc.paper.event.player.PlayerClientLoadedWorldEvent
 import io.papermc.paper.event.player.PlayerServerFullCheckEvent
+import kotlinx.coroutines.runBlocking
 import net.luckperms.api.LuckPermsProvider
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -80,7 +78,15 @@ object PlayerConnectListener : Listener {
 
         if (surfPlayer == null) {
             plugin.logger.severe("Failed to load player data for player with UUID ${event.connection.audience.uuidOrNull()}. The player will be disconnected.")
-            event.connection.disconnect(buildDisconnectComponent())
+
+            runBlocking {
+                val code = surfCoreApi.logError(
+                    event.connection.audience.uuid(),
+                    "Failed to load player data on AsyncPlayerPreLoginEvent"
+                )
+
+                event.connection.disconnect(buildDisconnectComponent(code))
+            }
         }
     }
 
@@ -114,14 +120,6 @@ object PlayerConnectListener : Listener {
 
         plugin.launch {
             PlayerProxyConnectionResultWatcher.cleanUp(player.uuid)
-            val code = surfCoreApi.logError(
-                event.uniqueId,
-                "Failed to load player data on AsyncPlayerPreLoginEvent"
-            )
-            event.disallow(
-                AsyncPlayerPreLoginEvent.Result.KICK_OTHER,
-                buildDisconnectComponent(code)
-            )
         }
     }
 

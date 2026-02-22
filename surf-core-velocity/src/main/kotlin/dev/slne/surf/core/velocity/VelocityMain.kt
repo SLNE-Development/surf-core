@@ -13,9 +13,10 @@ import com.velocitypowered.api.proxy.ProxyServer
 import dev.slne.surf.core.api.common.event.SurfServerOnlineEvent
 import dev.slne.surf.core.api.common.event.SurfServerStartEvent
 import dev.slne.surf.core.api.common.event.SurfServerStoppingEvent
-import dev.slne.surf.core.api.common.server.SurfServer
+import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.state.SurfServerState
-import dev.slne.surf.core.api.common.server.type.SurfServerType
+import dev.slne.surf.core.api.common.surfCoreApi
+import dev.slne.surf.core.api.common.util.sendText
 import dev.slne.surf.core.core.common.config.SurfServerConfigHolder
 import dev.slne.surf.core.core.common.database.databaseLoader
 import dev.slne.surf.core.core.common.error.GlobalErrorHandler
@@ -29,9 +30,13 @@ import dev.slne.surf.core.velocity.config.VelocityCoreConfigManager
 import dev.slne.surf.core.velocity.listener.ConnectionListener
 import dev.slne.surf.core.velocity.listener.MCCoroutineExceptionListener
 import dev.slne.surf.core.velocity.listener.VelocityServerListener
-import dev.slne.surf.core.velocity.redis.listener.VelocitySurfPlayerRedisListener
+import dev.slne.surf.core.velocity.redis.handler.SendPlayerToProxyHandler
+import dev.slne.surf.core.velocity.redis.handler.SendPlayerToServerHandler
+import dev.slne.surf.core.velocity.redis.listener.VelocityRedisListener
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 import kotlinx.coroutines.runBlocking
+import net.kyori.adventure.text.format.TextDecoration
+import org.slf4j.Logger
 import java.net.InetSocketAddress
 import java.nio.file.Path
 
@@ -41,11 +46,12 @@ class VelocityMain @Inject constructor(
     val eventManager: EventManager,
     @param:DataDirectory val dataPath: Path,
     val pluginContainer: PluginContainer,
+    val logger: Logger,
     suspendingPluginContainer: SuspendingPluginContainer
 ) {
     init {
         suspendingPluginContainer.initialize(this)
-        
+
         // Install global error handler early
         GlobalErrorHandler.install()
 
@@ -54,18 +60,23 @@ class VelocityMain @Inject constructor(
         redisLoader.load()
         surfPlayerService.init()
         surfServerService.init()
+        authentificationService.init()
+        redisLoader.withListener(VelocityRedisListener)
+        redisLoader.withRequestResponseHandler(SendPlayerToProxyHandler)
+        redisLoader.withRequestResponseHandler(SendPlayerToServerHandler)
+        redisLoader.connect()
         authenticationService.init()
         redisLoader.connect(VelocitySurfPlayerRedisListener)
 
-        val server = SurfServer(
+        val server = SurfProxyServer(
             name = surfServerConfig.serverName,
+            displayName = surfServerConfig.serverDisplayName,
             category = surfServerConfig.serverCategory,
             state = SurfServerState.STARTING,
-            type = SurfServerType.PROXY,
             maxPlayers = plugin.proxy.configuration.showMaxPlayers,
-            connectionAddress = InetSocketAddress(
-                surfServerConfig.connectionAddress.host,
-                surfServerConfig.connectionAddress.port
+            address = InetSocketAddress(
+                velocityCoreConfigManager.config.connectionAddress.host,
+                velocityCoreConfigManager.config.connectionAddress.port
             )
         )
 
@@ -85,15 +96,24 @@ class VelocityMain @Inject constructor(
         eventManager.register(this, VelocityServerListener)
         eventManager.register(this, MCCoroutineExceptionListener)
 
-        surfServerService.changeState(SurfServer.current(), SurfServerState.RUNNING)
+        surfServerService.changeState(SurfProxyServer.current(), SurfServerState.RUNNING)
     }
 
     @Subscribe
     fun onProxyShutdown(event: ProxyShutdownEvent) {
         surfEventBus.fire(SurfServerStoppingEvent(surfServerConfig.serverName))
 
-        surfServerService.changeState(SurfServer.current(), SurfServerState.STOPPING)
-        surfServerService.removeServer(SurfServer.current())
+        surfCoreApi.getOnlinePlayers().forEach {
+            it.sendText {
+                appendInfoPrefix()
+                error("SYSTEM-NEUSTART", TextDecoration.BOLD)
+                spacer(":")
+                spacer("Derzeit werden Hintergrundsysteme neugestartet. Bitte habt Verständnis, sollten in diesem Zeitraum Probleme auftreten!")
+            }
+        }
+
+        surfServerService.changeState(SurfProxyServer.current(), SurfServerState.STOPPING)
+        surfServerService.removeServer(SurfProxyServer.current())
 
         proxy.allPlayers.forEach {
             it.disconnect(buildText {

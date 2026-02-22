@@ -8,13 +8,15 @@ import com.velocitypowered.api.event.player.ServerPreConnectEvent
 import com.velocitypowered.api.util.GameProfile
 import dev.slne.surf.core.api.common.event.SurfPlayerConnectEvent
 import dev.slne.surf.core.api.common.event.SurfPlayerDisconnectEvent
-import dev.slne.surf.core.api.common.server.SurfServer
+import dev.slne.surf.core.api.common.server.CommonSurfServer
+import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.core.common.event.surfEventBus
 import dev.slne.surf.core.core.common.player.history.surfPlayerIpAddressHistoryService
 import dev.slne.surf.core.core.common.player.history.surfPlayerNameHistoryService
 import dev.slne.surf.core.core.common.player.history.surfPlayerTextureHistoryService
 import dev.slne.surf.core.core.common.player.surfPlayerService
 import dev.slne.surf.core.core.common.server.surfServerService
+import dev.slne.surf.core.velocity.auth.AuthenticationListener
 import dev.slne.surf.core.velocity.plugin
 import java.net.InetAddress
 import java.time.OffsetDateTime
@@ -56,7 +58,7 @@ object ConnectionListener {
         handleDisconnect(
             event.player.uniqueId,
             event.player.username,
-            event.loginStatus == DisconnectEvent.LoginStatus.SUCCESSFUL_LOGIN
+            event.loginStatus
         )
     }
 
@@ -80,8 +82,9 @@ object ConnectionListener {
             lastSeen = OffsetDateTime.now()
             lastKnownName = playerName
             currentServer = surfServerService.getServerByName(initialServer)
-            currentProxy = SurfServer.current()
+            currentProxy = SurfProxyServer.current()
             lastKnownIpAddress = inetAddress
+            transferred = AuthenticationListener.transfers.remove(playerUuid)
         }
 
         surfPlayerService.cachePlayer(player)
@@ -119,7 +122,7 @@ object ConnectionListener {
         println("[connection update] $playerName was redirected from '$fromServer' to '$toServer'")
 
 
-        val server = SurfServer[toServer] ?: error("SurfServer '$toServer' not found")
+        val server = CommonSurfServer[toServer] ?: error("SurfServer '$toServer' not found")
         val player =
             surfPlayerService.players.firstOrNull { it.uuid == playerUuid }
                 ?.copy(currentServer = server)
@@ -131,12 +134,12 @@ object ConnectionListener {
     private suspend fun handleDisconnect(
         playerUuid: UUID,
         playerName: String,
-        successfullyLogin: Boolean
+        successfullyLogin: DisconnectEvent.LoginStatus
     ) {
-        if (successfullyLogin) {
+        if (successfullyLogin == DisconnectEvent.LoginStatus.SUCCESSFUL_LOGIN) {
             println("[connection closed] $playerName disconnected")
         } else {
-            println("[connection closed] $playerName tried to connect")
+            println("[connection closed] $playerName tried to connect: ${successfullyLogin.name}")
         }
 
 

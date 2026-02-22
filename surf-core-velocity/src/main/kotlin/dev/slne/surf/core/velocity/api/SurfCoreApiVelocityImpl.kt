@@ -4,12 +4,16 @@ import com.github.shynixn.mccoroutine.velocity.launch
 import com.google.auto.service.AutoService
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.player.SurfPlayer
+import dev.slne.surf.core.api.common.server.CommonSurfServer
+import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
-import dev.slne.surf.core.api.common.server.type.SurfServerType
+import dev.slne.surf.core.api.common.server.connection.SurfServerConnectResult
 import dev.slne.surf.core.core.common.SurfCoreApiImpl
 import dev.slne.surf.core.core.common.player.surfCoreErrorLoggingService
 import dev.slne.surf.core.velocity.plugin
+import dev.slne.surf.core.velocity.redis.handler.convertResult
 import dev.slne.surf.core.velocity.surfServerConfig
+import kotlinx.coroutines.future.await
 import net.kyori.adventure.util.Services
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
@@ -18,6 +22,8 @@ import kotlin.jvm.optionals.getOrNull
 class SurfCoreApiVelocityImpl : SurfCoreApiImpl(), Services.Fallback {
     override fun getCurrentServerName() = surfServerConfig.serverName
     override fun getCurrentServerCategory() = surfServerConfig.serverCategory
+    override fun getCurrentServerDisplayName() = surfServerConfig.serverDisplayName
+
 
     override fun logError(playerUuid: UUID, code: String, message: String) {
         plugin.pluginContainer.launch {
@@ -47,21 +53,47 @@ class SurfCoreApiVelocityImpl : SurfCoreApiImpl(), Services.Fallback {
 
     override fun sendPlayer(
         player: SurfPlayer,
-        server: SurfServer
+        server: CommonSurfServer
     ) {
-        when (server.type) {
-            SurfServerType.PROXY -> {
+        when (server) {
+            is SurfProxyServer -> {
                 plugin.proxy.getPlayer(player.uuid).getOrNull()?.transferToHost(
-                    server.connectionAddress
+                    server.address
                 )
             }
 
-            SurfServerType.SERVER -> {
+            is SurfServer -> {
                 val velocityServer = plugin.proxy.getServer(server.name).getOrNull()
                     ?: error("SurfServer ${server.name} not found on proxy")
                 plugin.proxy.getPlayer(player.uuid).getOrNull()
                     ?.createConnectionRequest(velocityServer)?.fireAndForget()
             }
+        }
+    }
+
+    override suspend fun sendPlayerAwaiting(
+        surfPlayer: SurfPlayer,
+        surfServer: SurfServer
+    ): SurfServerConnectResult {
+        // try fast-path first
+        val player = plugin.proxy.getPlayer(surfPlayer.uuid).getOrNull()
+        if (player == null) {
+            // slow-path
+            return super.sendPlayerAwaiting(surfPlayer, surfServer)
+        } else {
+            // player is on this proxy
+            val velocityServer = plugin.proxy.getServer(surfServer.name).getOrNull()
+                ?: return SurfServerConnectResult(
+                    SurfServerConnectResult.Status.SERVER_NOT_FOUND,
+                    null
+                )
+
+            val result = player.createConnectionRequest(velocityServer)
+                .connect()
+                .await()
+                .convertResult()
+
+            return result
         }
     }
 }

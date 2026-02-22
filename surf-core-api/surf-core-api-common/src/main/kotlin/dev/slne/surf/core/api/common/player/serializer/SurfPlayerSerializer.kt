@@ -1,6 +1,7 @@
 package dev.slne.surf.core.api.common.player.serializer
 
 import dev.slne.surf.core.api.common.player.SurfPlayer
+import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.surfapi.core.api.serializer.java.datetime.datetime.offset.OffsetDateTimeSerializer
@@ -26,6 +27,7 @@ object SurfPlayerSerializer : KSerializer<SurfPlayer> {
         element<String?>("currentServer", isOptional = true)
         element<String?>("currentProxy", isOptional = true)
         element<String?>("lastKnownIpAddress", isOptional = true)
+        element<Boolean>("transferred")
     }
 
     override fun serialize(encoder: Encoder, value: SurfPlayer) {
@@ -68,6 +70,7 @@ object SurfPlayerSerializer : KSerializer<SurfPlayer> {
             String.serializer(),
             value.lastKnownIpAddress?.hostAddress
         )
+        composite.encodeBooleanElement(descriptor, 7, value.transferred)
 
         composite.endStructure(descriptor)
     }
@@ -80,8 +83,9 @@ object SurfPlayerSerializer : KSerializer<SurfPlayer> {
         var firstSeen: OffsetDateTime? = null
         var lastSeen: OffsetDateTime? = null
         var currentServer: SurfServer? = null
-        var currentProxy: SurfServer? = null
+        var currentProxy: SurfProxyServer? = null
         var lastKnownIpAddress: InetAddress? = null
+        var transferred: Boolean = false
 
         loop@ while (true) {
             when (val index = dec.decodeElementIndex(descriptor)) {
@@ -101,11 +105,13 @@ object SurfPlayerSerializer : KSerializer<SurfPlayer> {
 
                 5 -> currentProxy =
                     dec.decodeNullableSerializableElement(descriptor, 5, String.serializer())
-                        ?.let(surfCoreApi::getServerByName)
+                        ?.let(surfCoreApi::getProxyServerByName)
 
                 6 -> lastKnownIpAddress =
                     dec.decodeNullableSerializableElement(descriptor, 6, String.serializer())
                         ?.let(InetAddress::getByName)
+
+                7 -> transferred = dec.decodeBooleanElement(descriptor, 7)
 
                 CompositeDecoder.DECODE_DONE -> break@loop
                 else -> error("Unknown index $index")
@@ -121,7 +127,8 @@ object SurfPlayerSerializer : KSerializer<SurfPlayer> {
             lastSeen = lastSeen,
             currentServer = currentServer,
             currentProxy = currentProxy,
-            lastKnownIpAddress = lastKnownIpAddress
+            lastKnownIpAddress = lastKnownIpAddress,
+            transferred = transferred
         )
     }
 }

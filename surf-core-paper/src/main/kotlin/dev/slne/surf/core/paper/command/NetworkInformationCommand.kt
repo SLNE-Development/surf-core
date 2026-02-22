@@ -5,7 +5,7 @@ import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.jorel.commandapi.kotlindsl.getValue
 import dev.jorel.commandapi.kotlindsl.literalArgument
 import dev.slne.surf.core.api.common.player.SurfPlayer
-import dev.slne.surf.core.api.common.server.SurfServer
+import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.paper.command.argument.surfPlayerArgument
 import dev.slne.surf.core.api.paper.command.argument.surfServerArgument
 import dev.slne.surf.core.core.common.player.surfPlayerService
@@ -85,54 +85,32 @@ fun networkInformationCommand() = commandTree("ninfo") {
 
     literalArgument("server") {
         withPermission(PermissionRegistry.COMMAND_INFO_SERVER)
-        surfServerArgument("surfServer") {
+        surfServerArgument("commonSurfServer") {
             anyExecutor { executor, args ->
-                val surfServer: SurfServer by args
+                val commonSurfServer: CommonSurfServer by args
 
                 executor.sendText {
                     appendNewline()
                     darkSpacer("» | ")
-                    variableValue(surfServer.name)
+                    variableValue(commonSurfServer.name)
 
                     appendNewline()
                     darkSpacer("» | ")
 
                     appendNewline()
                     darkSpacer("» | ")
-                    variableKey("Kategorie:")
-                    appendNewline()
-                    darkSpacer("» | ")
-                    variableValue(surfServer.category)
+                    variableKey("Kategorie: ")
+                    variableValue(commonSurfServer.category)
 
                     appendNewline()
                     darkSpacer("» | ")
+                    variableKey("Status: ")
+                    variableValue(commonSurfServer.state.toString())
 
                     appendNewline()
                     darkSpacer("» | ")
-                    variableKey("Status:")
-                    appendNewline()
-                    darkSpacer("» | ")
-                    variableValue(surfServer.state.toString())
-
-                    appendNewline()
-                    darkSpacer("» | ")
-
-                    appendNewline()
-                    darkSpacer("» | ")
-                    variableKey("Connection Address:")
-                    appendNewline()
-                    darkSpacer("» | ")
-                    variableValue(surfServer.connectionAddress.toString())
-
-                    appendNewline()
-                    darkSpacer("» | ")
-
-                    appendNewline()
-                    darkSpacer("» | ")
-                    variableKey("Spieler:")
-                    appendNewline()
-                    darkSpacer("» | ")
-                    variableValue(surfServer.getPlayerCount())
+                    variableKey("Spieler: ")
+                    variableValue("${commonSurfServer.getPlayerCount()}/${commonSurfServer.maxPlayers}")
                 }
             }
         }

@@ -9,14 +9,14 @@ import dev.jorel.commandapi.CommandTree
 import dev.jorel.commandapi.arguments.Argument
 import dev.jorel.commandapi.arguments.CommandAPIArgumentType
 import dev.jorel.commandapi.executors.CommandArguments
-import dev.slne.surf.core.api.common.server.SurfServer
+import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 
-open class SurfServerArgument(nodeName: String) :
-    Argument<SurfServer>(nodeName, StringArgumentType.string()) {
-    override fun getPrimitiveType(): Class<SurfServer> {
-        return SurfServer::class.java
+open class SurfProxyServerArgument(nodeName: String) :
+    Argument<SurfProxyServer>(nodeName, StringArgumentType.string()) {
+    override fun getPrimitiveType(): Class<SurfProxyServer> {
+        return SurfProxyServer::class.java
     }
 
     override fun getArgumentType(): CommandAPIArgumentType? {
@@ -27,36 +27,37 @@ open class SurfServerArgument(nodeName: String) :
         cmdCtx: CommandContext<Source>,
         key: String,
         previousArgs: CommandArguments,
-    ): SurfServer = surfCoreApi.getServerByName(StringArgumentType.getString(cmdCtx, key))
+    ): SurfProxyServer = surfCoreApi.getProxyServerByName(StringArgumentType.getString(cmdCtx, key))
+        .takeIf { it?.isProxy() == true }
         ?: throw SimpleCommandExceptionType(
             VelocityBrigadierMessage.tooltip(
                 buildText {
                     appendErrorPrefix()
-                    error("Der Server wurde nicht gefunden.")
+                    error("Der Proxy Server wurde nicht gefunden.")
                 }
             )
         ).create()
 }
 
-inline fun CommandTree.surfServerArgument(
+inline fun CommandTree.surfProxyServerArgument(
     nodeName: String,
     optional: Boolean = false,
     block: Argument<*>.() -> Unit = {}
 ): CommandTree = then(
-    SurfServerArgument(nodeName).setOptional(optional).apply(block)
+    SurfProxyServerArgument(nodeName).setOptional(optional).apply(block)
 )
 
-inline fun Argument<*>.surfServerArgument(
+inline fun Argument<*>.surfProxyServerArgument(
     nodeName: String,
     optional: Boolean = false,
     block: Argument<*>.() -> Unit = {}
 ): Argument<*> = then(
-    SurfServerArgument(nodeName).setOptional(optional).apply(block)
+    SurfProxyServerArgument(nodeName).setOptional(optional).apply(block)
 )
 
-inline fun CommandAPICommand.surfServerArgument(
+inline fun CommandAPICommand.surfProxyServerArgument(
     nodeName: String,
     optional: Boolean = false,
     block: Argument<*>.() -> Unit = {}
 ): CommandAPICommand =
-    withArguments(SurfServerArgument(nodeName).setOptional(optional).apply(block))
+    withArguments(SurfProxyServerArgument(nodeName).setOptional(optional).apply(block))

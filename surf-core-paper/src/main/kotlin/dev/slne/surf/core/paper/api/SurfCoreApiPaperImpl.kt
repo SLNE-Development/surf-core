@@ -4,8 +4,9 @@ import com.github.shynixn.mccoroutine.folia.launch
 import com.google.auto.service.AutoService
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.player.SurfPlayer
+import dev.slne.surf.core.api.common.server.CommonSurfServer
+import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
-import dev.slne.surf.core.api.common.server.type.SurfServerType
 import dev.slne.surf.core.api.paper.util.bukkitPlayer
 import dev.slne.surf.core.core.common.SurfCoreApiImpl
 import dev.slne.surf.core.core.common.player.surfCoreErrorLoggingService
@@ -45,19 +46,21 @@ class SurfCoreApiPaperImpl : SurfCoreApiImpl(), Services.Fallback {
         return code
     }
 
+    override fun getCurrentServerDisplayName() = surfServerConfig.serverDisplayName
+
     override fun sendPlayer(
         player: SurfPlayer,
-        server: SurfServer
+        server: CommonSurfServer
     ) {
-        when (server.type) {
-            SurfServerType.PROXY -> {
+        when (server) {
+            is SurfProxyServer -> {
                 player.bukkitPlayer?.transfer(
-                    server.connectionAddress.hostName,
-                    server.connectionAddress.port
+                    server.address.hostName ?: "",
+                    server.address.port
                 )
             }
 
-            SurfServerType.SERVER -> {
+            is SurfServer -> {
                 player.bukkitPlayer?.let {
                     surfBukkitApi.sendPlayerToServer(it, server.name)
                 }

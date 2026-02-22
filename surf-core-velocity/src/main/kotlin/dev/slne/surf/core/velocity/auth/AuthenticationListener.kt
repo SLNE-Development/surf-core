@@ -17,10 +17,13 @@ import dev.slne.surf.core.velocity.plugin
 import dev.slne.surf.core.velocity.velocityCoreConfigManager
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
+import dev.slne.surf.surfapi.core.api.util.mutableObjectSetOf
 import dev.slne.surf.surfapi.core.api.util.random
+import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
 object AuthenticationListener {
+    val transfers = mutableObjectSetOf<UUID>()
 
     @Subscribe
     fun onLogin(event: LoginEvent, continuation: Continuation) {
@@ -67,6 +70,10 @@ object AuthenticationListener {
 
         authenticationService.continuations[event.player.uniqueId] = continuation
         event.player.requestCookie(authenticationService.key)
+        transfers.add(event.player.uniqueId)
+
+        authentificationService.continuations[event.player.uniqueId] = continuation
+        event.player.requestCookie(authentificationService.key)
     }
 
     @Subscribe
@@ -82,6 +89,10 @@ object AuthenticationListener {
     fun onInitialServer(event: PlayerChooseInitialServerEvent) {
         val player = event.player
         val lastServerName = authenticationService.lastServerMap.remove(player.uniqueId) ?: return
+
+        if (event.player.handshakeIntent != HandshakeIntent.TRANSFER) {
+            return
+        }
 
         plugin.proxy.getServer(lastServerName).getOrNull()?.let {
             event.setInitialServer(it)

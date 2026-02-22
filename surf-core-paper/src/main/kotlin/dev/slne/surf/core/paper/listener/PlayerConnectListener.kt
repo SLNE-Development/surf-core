@@ -10,15 +10,22 @@ import dev.slne.surf.core.core.common.redis.watcher.PlayerProxyConnectionResultW
 import dev.slne.surf.core.core.common.util.formatMillis
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.core.paper.plugin
+import dev.slne.surf.surfapi.bukkit.api.command.util.idOrThrow
 import dev.slne.surf.surfapi.core.api.messages.adventure.*
 import io.papermc.paper.event.connection.configuration.AsyncPlayerConnectionConfigureEvent
 import io.papermc.paper.event.player.PlayerClientLoadedWorldEvent
+import io.papermc.paper.event.player.PlayerServerFullCheckEvent
+import net.luckperms.api.LuckPermsProvider
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerKickEvent
 
 object PlayerConnectListener : Listener {
+    private val luckperms by lazy {
+        LuckPermsProvider.get()
+    }
+
     @EventHandler
     fun onPlayerClientLoaded(event: PlayerClientLoadedWorldEvent) {
         val player = event.player
@@ -65,6 +72,19 @@ object PlayerConnectListener : Listener {
         if (surfPlayer == null) {
             plugin.logger.severe("Failed to load player data for player with UUID ${event.connection.audience.uuidOrNull()}. The player will be disconnected.")
             event.connection.disconnect(buildDisconnectComponent())
+        }
+    }
+
+    @EventHandler
+    fun onPlayerServerFullCheckEvent(event: PlayerServerFullCheckEvent) {
+        val uuid = event.playerProfile.idOrThrow()
+        val user = luckperms.userManager.getUser(uuid) ?: return
+        val hasBypass = user.cachedData.permissionData.checkPermission(
+            PermissionRegistry.BYPASS_MAX_PLAYERS
+        ).asBoolean()
+
+        if (hasBypass) {
+            event.allow(true)
         }
     }
 

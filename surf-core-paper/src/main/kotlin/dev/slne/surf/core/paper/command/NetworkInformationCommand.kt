@@ -85,7 +85,7 @@ fun networkInformationCommand() = commandTree("ninfo") {
 
     literalArgument("server") {
         withPermission(PermissionRegistry.COMMAND_INFO_SERVER)
-        surfServerArgument("surfServer") {
+        surfServerArgument("commonSurfServer") {
             anyExecutor { executor, args ->
                 val commonSurfServer: CommonSurfServer by args
 

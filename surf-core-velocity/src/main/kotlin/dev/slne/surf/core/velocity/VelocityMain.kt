@@ -15,6 +15,8 @@ import dev.slne.surf.core.api.common.event.SurfServerStartEvent
 import dev.slne.surf.core.api.common.event.SurfServerStoppingEvent
 import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.state.SurfServerState
+import dev.slne.surf.core.api.common.surfCoreApi
+import dev.slne.surf.core.api.common.util.sendText
 import dev.slne.surf.core.core.common.config.SurfServerConfigHolder
 import dev.slne.surf.core.core.common.database.databaseLoader
 import dev.slne.surf.core.core.common.event.surfEventBus
@@ -31,6 +33,7 @@ import dev.slne.surf.core.velocity.redis.handler.SendPlayerToServerHandler
 import dev.slne.surf.core.velocity.redis.listener.VelocityRedisListener
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 import kotlinx.coroutines.runBlocking
+import net.kyori.adventure.text.format.TextDecoration
 import org.slf4j.Logger
 import java.net.InetSocketAddress
 import java.nio.file.Path
@@ -91,6 +94,15 @@ class VelocityMain @Inject constructor(
     @Subscribe
     fun onProxyShutdown(event: ProxyShutdownEvent) {
         surfEventBus.fire(SurfServerStoppingEvent(surfServerConfig.serverName))
+
+        surfCoreApi.getOnlinePlayers().forEach {
+            it.sendText {
+                appendInfoPrefix()
+                error("SYSTEM-NEUSTART", TextDecoration.BOLD)
+                spacer(":")
+                spacer("Derzeit werden Hintergrundsysteme neugestartet. Bitte habt Verständnis, sollten in diesem Zeitraum Probleme auftreten!")
+            }
+        }
 
         surfServerService.changeState(SurfProxyServer.current(), SurfServerState.STOPPING)
         surfServerService.removeServer(SurfProxyServer.current())

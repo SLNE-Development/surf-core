@@ -8,8 +8,8 @@ import com.velocitypowered.api.event.player.ServerConnectedEvent
 import com.velocitypowered.api.util.GameProfile
 import dev.slne.surf.core.api.common.event.SurfPlayerConnectEvent
 import dev.slne.surf.core.api.common.event.SurfPlayerDisconnectEvent
-import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.common.server.SurfProxyServer
+import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.core.common.event.surfEventBus
 import dev.slne.surf.core.core.common.player.history.surfPlayerIpAddressHistoryService
 import dev.slne.surf.core.core.common.player.history.surfPlayerNameHistoryService
@@ -122,7 +122,7 @@ object ConnectionListener {
         println("[connection update] $playerName was redirected from '$fromServer' to '$toServer'")
 
 
-        val server = CommonSurfServer[toServer] ?: error("SurfServer '$toServer' not found")
+        val server = SurfServer[toServer] ?: error("SurfServer '$toServer' not found")
         val player =
             surfPlayerService.players.firstOrNull { it.uuid == playerUuid }
                 ?.copy(currentServer = server)

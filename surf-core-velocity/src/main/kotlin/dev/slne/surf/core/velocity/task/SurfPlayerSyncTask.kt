@@ -1,5 +1,6 @@
 package dev.slne.surf.core.velocity.task
 
+import com.github.shynixn.mccoroutine.velocity.launch
 import com.velocitypowered.api.scheduler.ScheduledTask
 import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
@@ -28,20 +29,24 @@ class SurfPlayerSyncTask {
     }
 
     private fun syncPlayers() {
-        val onlinePlayers = proxy.allPlayers.mapNotNull { velocityPlayer ->
-            val surfPlayer = surfPlayerService.findPlayerByUuid(velocityPlayer.uniqueId)
-                ?: return@mapNotNull null
-            val currentServerName = velocityPlayer.currentServer.getOrNull()?.serverInfo?.name
-            val currentServer = currentServerName?.let { SurfServer[it] }
-            surfPlayer.copy(currentServer = currentServer)
+        plugin.pluginContainer.launch {
+            val onlinePlayers = proxy.allPlayers.map { velocityPlayer ->
+                val surfPlayer = surfPlayerService.findPlayerByUuid(velocityPlayer.uniqueId)
+                    ?: surfPlayerService.getOrLoadOrCreatePlayerByUuid(velocityPlayer.uniqueId).also {
+                        it.currentProxy = SurfProxyServer.current()
+                    }
+                val currentServerName = velocityPlayer.currentServer.getOrNull()?.serverInfo?.name
+                val currentServer = currentServerName?.let { SurfServer[it] }
+                surfPlayer.copy(currentServer = currentServer)
+            }
+
+            val onlineUuids = onlinePlayers.map { it.uuid }.toHashSet()
+
+            SurfProxyServer.current().getPlayers()
+                .filter { it.uuid !in onlineUuids }
+                .forEach { surfPlayerService.invalidatePlayer(it.uuid) }
+
+            onlinePlayers.forEach { surfPlayerService.cachePlayer(it) }
         }
-
-        val onlineUuids = onlinePlayers.map { it.uuid }
-
-        SurfProxyServer.current().getPlayers()
-            .filter { it.uuid !in onlineUuids }
-            .forEach { surfPlayerService.invalidatePlayer(it.uuid) }
-
-        onlinePlayers.forEach { surfPlayerService.cachePlayer(it) }
     }
 }

@@ -47,12 +47,10 @@ class SurfPlayerSyncTask {
                 .filter { it.uuid !in onlineUuids }
                 .forEach {
                     surfPlayerService.invalidatePlayer(it.uuid)
-                    plugin.logger.warn("Found invalid player ${it.uuid} (${it.username}), invalidating cache")
+                    plugin.logger.info("Found invalid player ${it.uuid} (${it.username}), invalidating cache")
                 }
 
             onlinePlayers.forEach { surfPlayerService.cachePlayer(it) }
-
-            plugin.logger.info("Synchronized ${onlinePlayers.size} online players")
         }
     }
 }

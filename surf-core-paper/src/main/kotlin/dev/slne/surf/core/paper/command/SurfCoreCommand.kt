@@ -9,6 +9,8 @@ import dev.slne.surf.core.api.paper.command.argument.surfBackendServerArgument
 import dev.slne.surf.core.api.paper.command.argument.surfProxyServerArgument
 import dev.slne.surf.core.api.paper.util.surfPlayer
 import dev.slne.surf.core.core.common.player.surfPlayerService
+import dev.slne.surf.core.core.common.redis.event.SurfPlayerResyncRedisEvent
+import dev.slne.surf.core.core.common.redis.redisApi
 import dev.slne.surf.core.paper.PaperBootstrap
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.core.paper.plugin
@@ -34,6 +36,13 @@ fun surfCoreCommand() = commandTree("core") {
             executor.sendText {
                 appendSuccessPrefix()
                 success("Die Spieler-Caches wurden geleert.")
+            }
+
+            redisApi.publishEvent(SurfPlayerResyncRedisEvent)
+
+            executor.sendText {
+                appendInfoPrefix()
+                info("Die Spieler werden nun auf allen Servern neu synchronisiert.")
             }
         }
     }

@@ -25,6 +25,8 @@ data class SurfPlayer(
     val username get() = lastKnownName ?: "#Unbekannt"
     fun isOnline() = surfCoreApi.getOnlinePlayers().any { it.uuid == uuid }
     fun send(server: CommonSurfServer) = surfCoreApi.sendPlayer(this, server)
+    suspend fun sendAwaiting(server: SurfServer) = surfCoreApi.sendPlayerAwaiting(this, server)
+    suspend fun sendAwaiting(proxy: SurfProxyServer) = surfCoreApi.sendPlayerAwaiting(this, proxy)
 
     override fun toString(): String {
         return "SurfPlayer(uuid=$uuid, lastKnownName=$lastKnownName, firstSeen=$firstSeen, lastSeen=$lastSeen, currentServer=${currentServer?.name}, currentProxy=${currentProxy?.name}, lastKnownIpAddress=$lastKnownIpAddress)"

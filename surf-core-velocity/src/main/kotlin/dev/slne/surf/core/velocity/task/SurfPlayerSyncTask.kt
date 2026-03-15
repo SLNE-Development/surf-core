@@ -28,7 +28,7 @@ class SurfPlayerSyncTask {
         task = null
     }
 
-    private fun syncPlayers() {
+    fun syncPlayers() {
         plugin.pluginContainer.launch {
             val onlinePlayers = proxy.allPlayers.map { velocityPlayer ->
                 val surfPlayer = surfPlayerService.findPlayerByUuid(velocityPlayer.uniqueId)

@@ -20,5 +20,7 @@ data class SurfServer(
 
     companion object {
         fun current() = surfCoreApi.getCurrentServer()
+
+        operator fun get(name: String) = surfCoreApi.getServerByName(name)
     }
 }

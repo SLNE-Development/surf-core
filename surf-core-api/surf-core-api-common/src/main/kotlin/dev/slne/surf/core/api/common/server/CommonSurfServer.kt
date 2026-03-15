@@ -29,6 +29,6 @@ sealed interface CommonSurfServer {
     fun isBackend() = this is SurfServer
 
     companion object {
-        operator fun get(name: String) = surfCoreApi.getServerByName(name)
+        operator fun get(name: String) = surfCoreApi.getCommonServerByName(name)
     }
 }

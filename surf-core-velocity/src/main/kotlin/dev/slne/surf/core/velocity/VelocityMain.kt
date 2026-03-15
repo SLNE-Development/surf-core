@@ -31,6 +31,7 @@ import dev.slne.surf.core.velocity.listener.VelocityServerListener
 import dev.slne.surf.core.velocity.redis.handler.SendPlayerToProxyHandler
 import dev.slne.surf.core.velocity.redis.handler.SendPlayerToServerHandler
 import dev.slne.surf.core.velocity.redis.listener.VelocityRedisListener
+import dev.slne.surf.core.velocity.task.surfPlayerSyncTask
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 import kotlinx.coroutines.runBlocking
 import net.kyori.adventure.text.format.TextDecoration
@@ -89,10 +90,14 @@ class VelocityMain @Inject constructor(
         eventManager.register(this, VelocityServerListener)
 
         surfServerService.changeState(SurfProxyServer.current(), SurfServerState.RUNNING)
+
+        surfPlayerSyncTask.start()
     }
 
     @Subscribe
     fun onProxyShutdown(event: ProxyShutdownEvent) {
+        surfPlayerSyncTask.stop()
+
         surfEventBus.fire(SurfServerStoppingEvent(surfServerConfig.serverName))
 
         surfCoreApi.getOnlinePlayers().forEach {

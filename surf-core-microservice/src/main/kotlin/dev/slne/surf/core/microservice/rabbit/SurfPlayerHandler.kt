@@ -11,15 +11,15 @@ import kotlinx.coroutines.launch
 
 object SurfPlayerHandler {
     @RabbitHandler
-    fun handleSavePlayerRequest(request: SaveSurfPlayerRequestPacket) = with(request) {
-        launch {
+    fun handleSavePlayerRequest(request: SaveSurfPlayerRequestPacket) {
+        request.launch {
             SurfPlayerRepository.savePlayer(
-                uuid = uuid,
-                name = name,
-                firstSeen = firstSeen,
-                lastSeen = lastSeen,
-                latestServer = latestServer,
-                latestProxy = latestProxy
+                uuid = request.uuid,
+                name = request.name,
+                firstSeen = request.firstSeen,
+                lastSeen = request.lastSeen,
+                latestServer = request.latestServer,
+                latestProxy = request.latestProxy
             )
 
             request.respond(SaveSurfPlayerResponsePacket())

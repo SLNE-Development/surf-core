@@ -8,9 +8,7 @@ import dev.slne.surf.core.core.common.redis.event.SurfPlayerTeleportRequestRedis
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 import org.bukkit.entity.Player
 
-val teleportManager = TeleportManager()
-
-class TeleportManager {
+object TeleportManager {
     suspend fun teleport(player: Player, target: SurfPlayer) {
         val targetServer =
             target.currentServer ?: return
@@ -18,17 +16,18 @@ class TeleportManager {
 
         if (player.surfPlayer.currentServer != targetServer) {
             surfPlayer.sendAwaiting(targetServer)
+
             CoreInstance.redisApi.publishEvent(
                 SurfPlayerTeleportRequestRedisEvent(
                     surfPlayer,
                     target
                 )
             )
+            
             return
         }
 
-        val bukkitTarget =
-            target.bukkitPlayer ?: return
+        val bukkitTarget = target.bukkitPlayer ?: return
 
         player.teleportAsync(bukkitTarget.location).thenRun {
             player.sendText {

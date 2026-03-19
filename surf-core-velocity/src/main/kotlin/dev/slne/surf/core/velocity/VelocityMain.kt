@@ -17,11 +17,10 @@ import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.state.SurfServerState
 import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.core.api.common.util.sendText
+import dev.slne.surf.core.client.CoreClientInstance
 import dev.slne.surf.core.core.common.config.SurfServerConfigHolder
-import dev.slne.surf.core.core.common.database.databaseLoader
 import dev.slne.surf.core.core.common.event.surfEventBus
 import dev.slne.surf.core.core.common.player.surfPlayerService
-import dev.slne.surf.core.core.common.redis.redisLoader
 import dev.slne.surf.core.core.common.server.surfServerService
 import dev.slne.surf.core.velocity.auth.AuthenticationListener
 import dev.slne.surf.core.velocity.auth.authentificationService
@@ -51,16 +50,21 @@ class VelocityMain @Inject constructor(
     init {
         suspendingPluginContainer.initialize(this)
 
+        runBlocking {
+            CoreClientInstance.onLoad()
+        }
+
         instance = this
         surfServerConfigHolder = SurfServerConfigHolder(dataPath)
-        redisLoader.load()
+
         surfPlayerService.init()
         surfServerService.init()
         authentificationService.init()
-        redisLoader.withListener(VelocityRedisListener)
-        redisLoader.withRequestResponseHandler(SendPlayerToProxyHandler)
-        redisLoader.withRequestResponseHandler(SendPlayerToServerHandler)
-        redisLoader.connect()
+
+        CoreClientInstance.withListener(VelocityRedisListener)
+        CoreClientInstance.withRequestResponseHandler(SendPlayerToProxyHandler)
+        CoreClientInstance.withRequestResponseHandler(SendPlayerToServerHandler)
+        CoreClientInstance.connectRedis()
 
         val server = SurfProxyServer(
             name = surfServerConfig.serverName,
@@ -81,7 +85,7 @@ class VelocityMain @Inject constructor(
     @Subscribe
     fun onProxyInitialize(event: ProxyInitializeEvent) {
         runBlocking {
-            databaseLoader.connect(dataPath)
+            CoreClientInstance.onEnable()
         }
 
         surfEventBus.fire(SurfServerOnlineEvent(surfServerConfig.serverName))
@@ -124,8 +128,9 @@ class VelocityMain @Inject constructor(
             })
         }
 
-        redisLoader.disconnect()
-        databaseLoader.disconnect()
+        runBlocking {
+            CoreClientInstance.onDisable()
+        }
     }
 
     companion object {

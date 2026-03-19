@@ -3,10 +3,10 @@ package dev.slne.surf.core.paper.listener
 import com.github.shynixn.mccoroutine.folia.launch
 import dev.slne.surf.core.api.common.server.connection.SurfProxyServerConnectionResult
 import dev.slne.surf.core.api.paper.util.surfPlayer
+import dev.slne.surf.core.client.redis.watcher.PlayerProxyConnectionResultWatcher
 import dev.slne.surf.core.core.common.player.surfPlayerService
 import dev.slne.surf.core.core.common.redis.redisApi
 import dev.slne.surf.core.core.common.redis.request.SendPlayerToProxyRequest
-import dev.slne.surf.core.core.common.redis.watcher.PlayerProxyConnectionResultWatcher
 import dev.slne.surf.core.core.common.util.formatMillis
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.core.paper.plugin

@@ -1,10 +1,10 @@
-package dev.slne.surf.core.fallback.table
+package dev.slne.surf.core.microservice.database.tables
 
 import dev.slne.surf.database.columns.nativeUuid
 import dev.slne.surf.database.columns.time.offsetDateTime
 import dev.slne.surf.database.table.AuditableLongIdTable
 
-object SurfPlayerTable : AuditableLongIdTable("surf_players") {
+object SurfPlayersTable : AuditableLongIdTable("surf_players") {
     val uuid = nativeUuid("uuid").uniqueIndex()
     val name = varchar("name", 16).nullable()
     val firstSeen = offsetDateTime("first_seen").nullable()

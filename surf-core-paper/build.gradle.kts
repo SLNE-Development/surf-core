@@ -20,8 +20,6 @@ surfPaperPluginApi {
 }
 
 dependencies {
-    api(project(":surf-core-core:surf-core-core-paper"))
-    runtimeOnly(project(":surf-core-backend"))
-
+    api(projects.surfCoreCore.surfCoreCorePaper)
     compileOnly("net.luckperms:api:5.4")
 }

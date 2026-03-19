@@ -21,6 +21,7 @@ val plugin get() = JavaPlugin.getPlugin(PaperMain::class.java)
 class PaperMain : SuspendingJavaPlugin() {
     override suspend fun onLoadAsync() {
         ClientLoader.onLoad()
+        ClientLoader.connectRedis()
 
         surfEventBus.registerListener(SurfServerEventListener)
     }

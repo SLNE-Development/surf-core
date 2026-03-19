@@ -11,11 +11,11 @@ import dev.slne.surf.core.api.common.event.SurfPlayerDisconnectEvent
 import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.core.common.event.surfEventBus
-import dev.slne.surf.core.core.common.player.history.surfPlayerIpAddressHistoryService
-import dev.slne.surf.core.core.common.player.history.surfPlayerNameHistoryService
-import dev.slne.surf.core.core.common.player.history.surfPlayerTextureHistoryService
-import dev.slne.surf.core.core.common.player.surfPlayerService
-import dev.slne.surf.core.core.common.server.surfServerService
+import dev.slne.surf.core.core.common.player.SurfPlayerService
+import dev.slne.surf.core.core.common.player.history.SurfPlayerIpAddressHistoryService
+import dev.slne.surf.core.core.common.player.history.SurfPlayerNameHistoryService
+import dev.slne.surf.core.core.common.player.history.SurfPlayerTextureHistoryService
+import dev.slne.surf.core.core.common.server.SurfServerService
 import dev.slne.surf.core.velocity.auth.AuthenticationListener
 import dev.slne.surf.core.velocity.plugin
 import java.net.InetAddress
@@ -72,7 +72,7 @@ object ConnectionListener {
     ) {
         println("[new connection] $playerName ($remoteAddress) connected to '$initialServer'")
 
-        val player = surfPlayerService.getOrLoadOrCreatePlayerByUuid(
+        val player = SurfPlayerService.getOrLoadOrCreatePlayerByUuid(
             playerUuid
         ).apply {
             if (firstSeen == null) {
@@ -81,13 +81,13 @@ object ConnectionListener {
 
             lastSeen = OffsetDateTime.now()
             lastKnownName = playerName
-            currentServer = surfServerService.getServerByName(initialServer)
+            currentServer = SurfServerService.getServerByName(initialServer)
             currentProxy = SurfProxyServer.current()
             lastKnownIpAddress = inetAddress
             transferred = AuthenticationListener.transfers.remove(playerUuid)
         }
 
-        surfPlayerService.cachePlayer(player)
+        SurfPlayerService.cachePlayer(player)
 
         surfEventBus.fire(
             SurfPlayerConnectEvent(
@@ -98,18 +98,14 @@ object ConnectionListener {
         val playerTexture = gameProfile.properties.find { it.name == "textures" }?.value
         val playerSignature = gameProfile.properties.find { it.name == "textures" }?.signature
 
-        surfPlayerService.savePlayer(player)
+        SurfPlayerService.savePlayer(player)
 
-        surfPlayerIpAddressHistoryService.handleNewIpAddress(player)
-        surfPlayerNameHistoryService.handleNewName(player)
+        SurfPlayerIpAddressHistoryService.handleNewIpAddress(player)
+        SurfPlayerNameHistoryService.handleNewName(player)
 
 
         if (playerTexture != null && playerSignature != null) {
-            surfPlayerTextureHistoryService.handleNewTexture(
-                player,
-                playerTexture,
-                playerSignature
-            )
+            SurfPlayerTextureHistoryService.handleNewTexture(player, playerTexture, playerSignature)
         }
     }
 
@@ -123,12 +119,11 @@ object ConnectionListener {
 
 
         val server = SurfServer[toServer] ?: error("SurfServer '$toServer' not found")
-        val player =
-            surfPlayerService.players.firstOrNull { it.uuid == playerUuid }
-                ?.copy(currentServer = server)
-                ?: error("Player $playerName is not cached")
+        val player = SurfPlayerService.players.firstOrNull { it.uuid == playerUuid }
+            ?.copy(currentServer = server)
+            ?: error("Player $playerName is not cached")
 
-        surfPlayerService.cachePlayer(player)
+        SurfPlayerService.cachePlayer(player)
     }
 
     private suspend fun handleDisconnect(
@@ -143,7 +138,7 @@ object ConnectionListener {
         }
 
 
-        val player = surfPlayerService.findPlayerByUuid(playerUuid) ?: return
+        val player = SurfPlayerService.findPlayerByUuid(playerUuid) ?: return
 
         surfEventBus.fire(
             SurfPlayerDisconnectEvent(
@@ -151,9 +146,9 @@ object ConnectionListener {
             )
         )
 
-        surfPlayerService.invalidatePlayer(player.uuid)
+        SurfPlayerService.invalidatePlayer(player.uuid)
 
-        surfPlayerService.savePlayer(player.apply {
+        SurfPlayerService.savePlayer(player.apply {
             lastSeen = OffsetDateTime.now()
         })
     }

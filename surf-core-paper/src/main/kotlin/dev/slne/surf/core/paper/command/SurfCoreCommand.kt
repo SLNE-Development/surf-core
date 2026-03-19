@@ -2,15 +2,15 @@ package dev.slne.surf.core.paper.command
 
 import com.github.shynixn.mccoroutine.folia.launch
 import dev.jorel.commandapi.kotlindsl.*
+import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
-import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.core.api.paper.command.argument.surfBackendServerArgument
 import dev.slne.surf.core.api.paper.command.argument.surfProxyServerArgument
 import dev.slne.surf.core.api.paper.util.surfPlayer
-import dev.slne.surf.core.core.common.player.surfPlayerService
+import dev.slne.surf.core.core.CoreInstance
+import dev.slne.surf.core.core.common.player.SurfPlayerService
 import dev.slne.surf.core.core.common.redis.event.SurfPlayerResyncRedisEvent
-import dev.slne.surf.core.core.common.redis.redisApi
 import dev.slne.surf.core.paper.PaperBootstrap
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.core.paper.plugin
@@ -31,14 +31,14 @@ fun surfCoreCommand() = commandTree("core") {
 
     literalArgument("clearinternalplayercache") {
         anyExecutor { executor, _ ->
-            surfPlayerService.clearPlayers()
+            SurfPlayerService.clearPlayers()
 
             executor.sendText {
                 appendSuccessPrefix()
                 success("Die Spieler-Caches wurden geleert.")
             }
 
-            redisApi.publishEvent(SurfPlayerResyncRedisEvent)
+            CoreInstance.redisApi.publishEvent(SurfPlayerResyncRedisEvent)
 
             executor.sendText {
                 appendInfoPrefix()
@@ -60,7 +60,7 @@ fun surfCoreCommand() = commandTree("core") {
                     }
 
                     plugin.launch {
-                        val result = surfCoreApi.sendPlayerAwaiting(surfPlayer, backend)
+                        val result = SurfCoreApi.sendPlayerAwaiting(surfPlayer, backend)
 
                         if (result.isSuccessful()) {
                             player.sendText {
@@ -92,7 +92,7 @@ fun surfCoreCommand() = commandTree("core") {
                     }
 
                     plugin.launch {
-                        val result = surfCoreApi.sendPlayerAwaiting(surfPlayer, proxy)
+                        val result = SurfCoreApi.sendPlayerAwaiting(surfPlayer, proxy)
 
                         if (result.isSuccessful()) {
                             player.sendText {

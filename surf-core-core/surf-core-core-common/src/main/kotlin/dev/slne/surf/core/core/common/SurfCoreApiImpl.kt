@@ -8,15 +8,15 @@ import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.common.server.connection.SurfProxyServerConnectionResult
 import dev.slne.surf.core.api.common.server.connection.SurfServerConnectResult
+import dev.slne.surf.core.core.CoreInstance
 import dev.slne.surf.core.core.common.event.surfEventBus
-import dev.slne.surf.core.core.common.player.surfPlayerService
+import dev.slne.surf.core.core.common.player.SurfPlayerService
 import dev.slne.surf.core.core.common.redis.event.SurfPlayerMessageRedisEvent
-import dev.slne.surf.core.core.common.redis.redisApi
 import dev.slne.surf.core.core.common.redis.request.SendPlayerToProxyRequest
 import dev.slne.surf.core.core.common.redis.request.SendPlayerToServerRequest
 import dev.slne.surf.core.core.common.redis.watcher.PlayerProxyConnectionResultWatcher
 import dev.slne.surf.core.core.common.redis.watcher.PlayerServerConnectionResultWatcher
-import dev.slne.surf.core.core.common.server.surfServerService
+import dev.slne.surf.core.core.common.server.SurfServerService
 import dev.slne.surf.redis.request.RequestTimeoutException
 import dev.slne.surf.surfapi.core.api.util.mutableObjectSetOf
 import it.unimi.dsi.fastutil.objects.ObjectSet
@@ -27,67 +27,67 @@ import kotlin.reflect.KClass
 import kotlin.time.Duration.Companion.seconds
 
 abstract class SurfCoreApiImpl : SurfCoreApi {
-    override fun getOnlinePlayers(): ObjectSet<SurfPlayer> = surfPlayerService.players
+    override fun getOnlinePlayers(): ObjectSet<SurfPlayer> = SurfPlayerService.players
 
-    override fun getPlayer(name: String) = surfPlayerService.findPlayerByName(name)
+    override fun getPlayer(name: String) = SurfPlayerService.findPlayerByName(name)
 
-    override fun getPlayer(uuid: UUID) = surfPlayerService.findPlayerByUuid(uuid)
+    override fun getPlayer(uuid: UUID) = SurfPlayerService.findPlayerByUuid(uuid)
 
     override suspend fun getOfflinePlayer(name: String) =
-        surfPlayerService.getOrLoadPlayerByName(name)
+        SurfPlayerService.getOrLoadPlayerByName(name)
 
     override suspend fun getOfflinePlayer(uuid: UUID) =
-        surfPlayerService.getOrLoadPlayerByUuid(uuid)
+        SurfPlayerService.getOrLoadPlayerByUuid(uuid)
 
     override fun getCurrentServer(): SurfServer {
-        return surfServerService.getServerByName(getCurrentServerName())
+        return SurfServerService.getServerByName(getCurrentServerName())
             ?: error("Current server ${getCurrentServerName()} not found! Are you sure you're running on a backend server?")
     }
 
     override fun getCurrentProxy(): SurfProxyServer {
-        return surfServerService.getProxyServerByName(getCurrentServerName())
+        return SurfServerService.getProxyServerByName(getCurrentServerName())
             ?: error("Current proxy ${getCurrentServerName()} not found! Are you sure you're running on a proxy server?")
     }
 
     override fun getServerByName(name: String): SurfServer? {
-        return surfServerService.getServerByName(name)
+        return SurfServerService.getServerByName(name)
     }
 
     override fun getCommonServerByName(name: String): CommonSurfServer? {
-        return surfServerService.getServerByName(name) ?: surfServerService.getProxyServerByName(
+        return SurfServerService.getServerByName(name) ?: SurfServerService.getProxyServerByName(
             name
         )
     }
 
     override fun getCommonServers(): ObjectSet<CommonSurfServer> {
         val commonServers = mutableObjectSetOf<CommonSurfServer>()
-        commonServers.addAll(surfServerService.servers)
-        commonServers.addAll(surfServerService.proxyServers)
+        commonServers.addAll(SurfServerService.servers)
+        commonServers.addAll(SurfServerService.proxyServers)
         return commonServers
     }
 
     override fun getProxyServerByName(name: String): SurfProxyServer? {
-        return surfServerService.getProxyServerByName(name)
+        return SurfServerService.getProxyServerByName(name)
     }
 
     override fun getServerByCategory(category: String): ObjectSet<SurfServer> {
-        return surfServerService.getServerByCategory(category)
+        return SurfServerService.getServerByCategory(category)
     }
 
     override fun getServerWithLeastPlayers(category: String): SurfServer? {
-        return surfServerService.getServerByCategory(category).minByOrNull { it.getPlayerCount() }
+        return SurfServerService.getServerByCategory(category).minByOrNull { it.getPlayerCount() }
     }
 
     override fun getServers(): ObjectSet<SurfServer> {
-        return surfServerService.servers
+        return SurfServerService.servers
     }
 
     override fun getProxies(): ObjectSet<SurfProxyServer> {
-        return surfServerService.proxyServers
+        return SurfServerService.proxyServers
     }
 
     override fun sendText(player: SurfPlayer, text: Component) {
-        redisApi.publishEvent(SurfPlayerMessageRedisEvent(player.uuid, text))
+        CoreInstance.redisApi.publishEvent(SurfPlayerMessageRedisEvent(player.uuid, text))
     }
 
     override fun subscribe(eventClass: KClass<out SurfEvent>, handler: (SurfEvent) -> Unit) {

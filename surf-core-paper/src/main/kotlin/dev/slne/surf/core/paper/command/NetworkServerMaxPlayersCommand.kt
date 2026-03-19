@@ -6,8 +6,8 @@ import dev.jorel.commandapi.kotlindsl.getValue
 import dev.jorel.commandapi.kotlindsl.integerArgument
 import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.paper.command.argument.surfBackendServerArgument
+import dev.slne.surf.core.core.CoreInstance
 import dev.slne.surf.core.core.common.redis.event.SurfServerChangeMaxPlayersRedisEvent
-import dev.slne.surf.core.core.common.redis.redisApi
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 
@@ -20,7 +20,12 @@ fun networkServerMaxPlayersCommand() = commandTree("nmaxplayers") {
                 val backend: CommonSurfServer by args
                 val maxPlayers: Int by args
 
-                redisApi.publishEvent(SurfServerChangeMaxPlayersRedisEvent(backend, maxPlayers))
+                CoreInstance.redisApi.publishEvent(
+                    SurfServerChangeMaxPlayersRedisEvent(
+                        backend,
+                        maxPlayers
+                    )
+                )
 
                 sender.sendText {
                     appendSuccessPrefix()

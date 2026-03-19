@@ -4,10 +4,10 @@ import com.github.shynixn.mccoroutine.folia.launch
 import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.jorel.commandapi.kotlindsl.getValue
 import dev.jorel.commandapi.kotlindsl.playerExecutor
+import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
-import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.core.api.paper.command.argument.permissionSurfServerArgument
 import dev.slne.surf.core.api.paper.util.toSurfPlayer
 import dev.slne.surf.core.paper.permission.PermissionRegistry
@@ -32,7 +32,7 @@ fun networkServerCommand() = commandTree("nserver") {
             when (val commonServer = server) {
                 is SurfProxyServer -> {
                     plugin.launch {
-                        val status = surfCoreApi.sendPlayerAwaiting(surfPlayer, commonServer)
+                        val status = SurfCoreApi.sendPlayerAwaiting(surfPlayer, commonServer)
 
                         if (status.isSuccessful()) {
                             player.sendText {
@@ -52,7 +52,7 @@ fun networkServerCommand() = commandTree("nserver") {
 
                 is SurfServer -> {
                     plugin.launch {
-                        val status = surfCoreApi.sendPlayerAwaiting(surfPlayer, commonServer)
+                        val status = SurfCoreApi.sendPlayerAwaiting(surfPlayer, commonServer)
 
                         if (status.isSuccessful()) {
                             player.sendText {

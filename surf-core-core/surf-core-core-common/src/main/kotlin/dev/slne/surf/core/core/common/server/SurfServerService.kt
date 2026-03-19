@@ -6,12 +6,13 @@ import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.common.server.state.SurfServerState
 import dev.slne.surf.surfapi.core.api.util.requiredService
 import it.unimi.dsi.fastutil.objects.ObjectSet
+import org.jetbrains.annotations.UnmodifiableView
 
-val surfServerService = requiredService<SurfServerService>()
+private val service = requiredService<SurfServerService>()
 
 interface SurfServerService {
-    val servers: ObjectSet<SurfServer>
-    val proxyServers: ObjectSet<SurfProxyServer>
+    val servers: @UnmodifiableView ObjectSet<SurfServer>
+    val proxyServers: @UnmodifiableView ObjectSet<SurfProxyServer>
 
     fun addServer(server: CommonSurfServer)
     fun removeServer(server: CommonSurfServer)
@@ -22,5 +23,7 @@ interface SurfServerService {
     fun getProxyServerByName(name: String): SurfProxyServer?
     fun getProxyServerByCategory(category: String): ObjectSet<SurfProxyServer>
 
-    fun init()
+    companion object : SurfServerService by service {
+        val INSTANCE get() = service
+    }
 }

@@ -13,7 +13,7 @@ import net.kyori.adventure.text.Component
 import java.util.*
 import kotlin.reflect.KClass
 
-val surfCoreApi = requiredService<SurfCoreApi>()
+private val api = requiredService<SurfCoreApi>()
 
 interface SurfCoreApi {
     fun getOnlinePlayers(): ObjectSet<SurfPlayer>
@@ -69,4 +69,8 @@ interface SurfCoreApi {
 
     suspend fun getOfflinePlayer(name: String): SurfPlayer?
     suspend fun getOfflinePlayer(uuid: UUID): SurfPlayer?
+
+    companion object : SurfCoreApi by api {
+        val INSTANCE get() = api
+    }
 }

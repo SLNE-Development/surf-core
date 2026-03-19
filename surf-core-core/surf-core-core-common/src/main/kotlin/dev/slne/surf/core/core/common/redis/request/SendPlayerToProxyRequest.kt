@@ -3,7 +3,7 @@ package dev.slne.surf.core.core.common.redis.request
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.connection.SurfProxyServerConnectionResult
-import dev.slne.surf.core.core.common.redis.redisApi
+import dev.slne.surf.core.core.CoreInstance
 import dev.slne.surf.redis.event.RedisEvent
 import dev.slne.surf.redis.request.RedisRequest
 import dev.slne.surf.redis.request.RedisResponse
@@ -30,7 +30,7 @@ object SendPlayerToProxyRequest {
     ) : RedisEvent()
 
     suspend fun createRequest(player: SurfPlayer, server: SurfProxyServer, requestId: UUID) =
-        redisApi.sendRequest<Acknowledged>(
+        CoreInstance.redisApi.sendRequest<Acknowledged>(
             Request(player, server, requestId),
             10.seconds.inWholeMilliseconds
         )

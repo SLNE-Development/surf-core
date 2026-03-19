@@ -4,7 +4,7 @@ import com.github.shynixn.mccoroutine.velocity.launch
 import com.velocitypowered.api.scheduler.ScheduledTask
 import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
-import dev.slne.surf.core.core.common.player.surfPlayerService
+import dev.slne.surf.core.core.common.player.SurfPlayerService
 import dev.slne.surf.core.velocity.plugin
 import dev.slne.surf.core.velocity.proxy
 import java.util.concurrent.TimeUnit
@@ -31,8 +31,8 @@ class SurfPlayerSyncTask {
     fun syncPlayers() {
         plugin.pluginContainer.launch {
             val onlinePlayers = proxy.allPlayers.map { velocityPlayer ->
-                val surfPlayer = surfPlayerService.findPlayerByUuid(velocityPlayer.uniqueId)
-                    ?: surfPlayerService.getOrLoadOrCreatePlayerByUuid(velocityPlayer.uniqueId)
+                val surfPlayer = SurfPlayerService.findPlayerByUuid(velocityPlayer.uniqueId)
+                    ?: SurfPlayerService.getOrLoadOrCreatePlayerByUuid(velocityPlayer.uniqueId)
                         .also {
                             it.currentProxy = SurfProxyServer.current()
                         }
@@ -46,11 +46,11 @@ class SurfPlayerSyncTask {
             SurfProxyServer.current().getPlayers()
                 .filter { it.uuid !in onlineUuids }
                 .forEach {
-                    surfPlayerService.invalidatePlayer(it.uuid)
+                    SurfPlayerService.invalidatePlayer(it.uuid)
                     plugin.logger.info("Found invalid player ${it.uuid} (${it.username}), invalidating cache")
                 }
 
-            onlinePlayers.forEach { surfPlayerService.cachePlayer(it) }
+            onlinePlayers.forEach { SurfPlayerService.cachePlayer(it) }
         }
     }
 }

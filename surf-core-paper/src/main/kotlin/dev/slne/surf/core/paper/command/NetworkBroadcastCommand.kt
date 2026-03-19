@@ -4,7 +4,7 @@ import dev.jorel.commandapi.kotlindsl.anyExecutor
 import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.jorel.commandapi.kotlindsl.getValue
 import dev.jorel.commandapi.kotlindsl.greedyStringArgument
-import dev.slne.surf.core.api.common.surfCoreApi
+import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.util.sendText
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
@@ -16,7 +16,7 @@ fun networkBroadcastCommand() = commandTree("nbroadcast") {
         anyExecutor { executor, args ->
             val message: String by args
 
-            surfCoreApi.getOnlinePlayers().forEach {
+            SurfCoreApi.getOnlinePlayers().forEach {
                 it.sendText {
                     appendInfoPrefix()
                     append(MiniMessage.miniMessage().deserialize(message))
@@ -26,7 +26,7 @@ fun networkBroadcastCommand() = commandTree("nbroadcast") {
             executor.sendText {
                 appendSuccessPrefix()
                 success("Die Nachricht wurde an ")
-                variableValue(surfCoreApi.getOnlinePlayers().size)
+                variableValue(SurfCoreApi.getOnlinePlayers().size)
                 success(" Spieler gesendet.")
             }
         }

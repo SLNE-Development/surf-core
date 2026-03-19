@@ -9,8 +9,8 @@ import dev.jorel.commandapi.CommandTree
 import dev.jorel.commandapi.arguments.Argument
 import dev.jorel.commandapi.arguments.CommandAPIArgumentType
 import dev.jorel.commandapi.executors.CommandArguments
+import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.player.SurfPlayer
-import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 
 open class SurfPlayerArgument(nodeName: String) :
@@ -27,7 +27,7 @@ open class SurfPlayerArgument(nodeName: String) :
         cmdCtx: CommandContext<Source>,
         key: String,
         previousArgs: CommandArguments,
-    ): SurfPlayer = surfCoreApi.getPlayer(StringArgumentType.getString(cmdCtx, key))
+    ): SurfPlayer = SurfCoreApi.getPlayer(StringArgumentType.getString(cmdCtx, key))
         ?: throw SimpleCommandExceptionType(
             VelocityBrigadierMessage.tooltip(
                 buildText {

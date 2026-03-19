@@ -1,18 +1,17 @@
-package dev.slne.surf.core.fallback.service
+package dev.slne.surf.core.client.player.history
 
 import com.google.auto.service.AutoService
 import com.google.gson.JsonParser
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.player.history.texture.TextureHistory
-import dev.slne.surf.core.api.common.player.history.texture.TextureHistoryEntry
+import dev.slne.surf.core.client.ClientLoader
 import dev.slne.surf.core.core.common.player.history.SurfPlayerTextureHistoryService
-import dev.slne.surf.core.fallback.repository.surfPlayerTextureHistoryRepository
-import net.kyori.adventure.util.Services
-import java.time.OffsetDateTime
+import dev.slne.surf.core.core.common.rabbit.packet.player.history.texture.SaveTextureHistoryRequestPacket
+import dev.slne.surf.core.core.common.rabbit.packet.player.history.texture.TextureHistoryRequestPacket
 import java.util.*
 
 @AutoService(SurfPlayerTextureHistoryService::class)
-class SurfPlayerTextureHistoryServiceImpl : SurfPlayerTextureHistoryService, Services.Fallback {
+class SurfPlayerTextureHistoryServiceImpl : SurfPlayerTextureHistoryService {
     override suspend fun handleNewTexture(
         surfPlayer: SurfPlayer,
         texture: String,
@@ -25,12 +24,12 @@ class SurfPlayerTextureHistoryServiceImpl : SurfPlayerTextureHistoryService, Ser
             return
         }
 
-        surfPlayerTextureHistoryRepository.addTextureToHistory(
-            surfPlayer.uuid, TextureHistoryEntry(
+        ClientLoader.rabbitApi.sendRequest(
+            SaveTextureHistoryRequestPacket(
+                uuid = surfPlayer.uuid,
                 texture = texture,
                 signature = signature,
-                lastSeen = OffsetDateTime.now(),
-                hash = skinHash
+                skinHash = skinHash
             )
         )
     }
@@ -42,10 +41,11 @@ class SurfPlayerTextureHistoryServiceImpl : SurfPlayerTextureHistoryService, Ser
             .asJsonObject["SKIN"]
             .asJsonObject["url"]
             .asString
+
         return url.substringAfterLast("/")
     }
 
-
-    override suspend fun getTextureHistory(uuid: UUID): TextureHistory =
-        surfPlayerTextureHistoryRepository.getTextureHistory(uuid)
+    override suspend fun getTextureHistory(uuid: UUID): TextureHistory {
+        return ClientLoader.rabbitApi.sendRequest(TextureHistoryRequestPacket(uuid)).history
+    }
 }

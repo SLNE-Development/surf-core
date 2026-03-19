@@ -6,13 +6,13 @@ import dev.jorel.commandapi.arguments.Argument
 import dev.jorel.commandapi.arguments.ArgumentSuggestions
 import dev.jorel.commandapi.arguments.CustomArgument
 import dev.jorel.commandapi.arguments.StringArgument
+import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.player.SurfPlayer
-import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 
 class SurfPlayerArgument(nodeName: String) :
     CustomArgument<SurfPlayer, String>(StringArgument(nodeName), { info ->
-        surfCoreApi.getPlayer(info.input) ?: throw CustomArgumentException.fromAdventureComponent(
+        SurfCoreApi.getPlayer(info.input) ?: throw CustomArgumentException.fromAdventureComponent(
             buildText {
                 appendErrorPrefix()
                 error("Der Spieler wurde nicht gefunden.")
@@ -21,7 +21,7 @@ class SurfPlayerArgument(nodeName: String) :
     init {
         this.replaceSuggestions(
             ArgumentSuggestions.stringCollection {
-                surfCoreApi.getOnlinePlayers().mapNotNull { it.lastKnownName }
+                SurfCoreApi.getOnlinePlayers().mapNotNull { it.lastKnownName }
             }
         )
     }

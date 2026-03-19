@@ -1,7 +1,7 @@
 package dev.slne.surf.core.paper.task
 
 import dev.slne.surf.core.api.common.server.SurfServer
-import dev.slne.surf.core.core.common.server.surfServerService
+import dev.slne.surf.core.core.common.server.SurfServerService
 import dev.slne.surf.core.paper.plugin
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import org.bukkit.Bukkit
@@ -20,7 +20,7 @@ class SurfServerInformationSyncTask {
             if (currentMaxPlayers != latestMaxPlayers) {
                 latestMaxPlayers = currentMaxPlayers
 
-                surfServerService.addServer(
+                SurfServerService.addServer(
                     SurfServer.current().copy(
                         maxPlayers = currentMaxPlayers
                     )

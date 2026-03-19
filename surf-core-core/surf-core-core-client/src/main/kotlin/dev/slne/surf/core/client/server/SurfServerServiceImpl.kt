@@ -1,36 +1,35 @@
-package dev.slne.surf.core.fallback.service
+package dev.slne.surf.core.client.server
 
 import com.google.auto.service.AutoService
 import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.common.server.state.SurfServerState
-import dev.slne.surf.core.core.common.redis.redisApi
+import dev.slne.surf.core.client.ClientLoader.redisApi
 import dev.slne.surf.core.core.common.server.SurfServerService
 import dev.slne.surf.surfapi.core.api.util.toObjectSet
 import it.unimi.dsi.fastutil.objects.ObjectSet
-import net.kyori.adventure.util.Services
 
 @AutoService(SurfServerService::class)
-class SurfServerServiceImpl : SurfServerService, Services.Fallback {
-    val globalServers = redisApi.createSyncMap<String, SurfServer>("surf-core:surf-servers")
-    val globalProxies =
+class SurfServerServiceImpl : SurfServerService {
+    private val _servers = redisApi.createSyncMap<String, SurfServer>("surf-core:surf-servers")
+    private val _proxies =
         redisApi.createSyncMap<String, SurfProxyServer>("surf-core:surf-server-proxies")
 
-    override val servers get() = globalServers.snapshot().values.toObjectSet()
-    override val proxyServers: ObjectSet<SurfProxyServer> get() = globalProxies.snapshot().values.toObjectSet()
+    override val servers get() = _servers.snapshot().values.toObjectSet()
+    override val proxyServers: ObjectSet<SurfProxyServer> get() = _proxies.snapshot().values.toObjectSet()
 
     override fun addServer(server: CommonSurfServer) {
         when (server) {
-            is SurfProxyServer -> globalProxies.put(server.name, server)
-            is SurfServer -> globalServers.put(server.name, server)
+            is SurfProxyServer -> _proxies.put(server.name, server)
+            is SurfServer -> _servers.put(server.name, server)
         }
     }
 
     override fun removeServer(server: CommonSurfServer) {
         when (server) {
-            is SurfProxyServer -> globalProxies.remove(server.name)
-            is SurfServer -> globalServers.remove(server.name)
+            is SurfProxyServer -> _proxies.remove(server.name)
+            is SurfServer -> _servers.remove(server.name)
         }
     }
 
@@ -39,8 +38,8 @@ class SurfServerServiceImpl : SurfServerService, Services.Fallback {
         state: SurfServerState
     ) {
         val server = when (commonSurfServer) {
-            is SurfProxyServer -> globalProxies[commonSurfServer.name]
-            is SurfServer -> globalServers[commonSurfServer.name]
+            is SurfProxyServer -> _proxies[commonSurfServer.name]
+            is SurfServer -> _servers[commonSurfServer.name]
             else -> error("Unknown server type: ${commonSurfServer::class}")
         } ?: error("Server ${commonSurfServer.name} not found")
 
@@ -51,8 +50,8 @@ class SurfServerServiceImpl : SurfServerService, Services.Fallback {
         }
 
         when (updatedServer) {
-            is SurfProxyServer -> globalProxies.put(updatedServer.name, updatedServer)
-            is SurfServer -> globalServers.put(updatedServer.name, updatedServer)
+            is SurfProxyServer -> _proxies.put(updatedServer.name, updatedServer)
+            is SurfServer -> _servers.put(updatedServer.name, updatedServer)
         }
     }
 
@@ -71,6 +70,4 @@ class SurfServerServiceImpl : SurfServerService, Services.Fallback {
     override fun getProxyServerByCategory(category: String): ObjectSet<SurfProxyServer> {
         return proxyServers.filter { it.category == category }.toObjectSet()
     }
-
-    override fun init() {}
 }

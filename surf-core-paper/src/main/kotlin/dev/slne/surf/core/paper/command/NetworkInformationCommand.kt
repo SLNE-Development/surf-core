@@ -8,8 +8,8 @@ import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.paper.command.argument.surfPlayerArgument
 import dev.slne.surf.core.api.paper.command.argument.surfServerArgument
-import dev.slne.surf.core.core.common.player.surfPlayerService
-import dev.slne.surf.core.core.common.server.surfServerService
+import dev.slne.surf.core.core.common.player.SurfPlayerService
+import dev.slne.surf.core.core.common.server.SurfServerService
 import dev.slne.surf.core.core.common.util.formatDateTime
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
@@ -21,9 +21,9 @@ fun networkInformationCommand() = commandTree("ninfo") {
         sender.sendText {
             appendInfoPrefix()
             info("Derzeit sind ")
-            variableValue(surfPlayerService.players.size)
+            variableValue(SurfPlayerService.players.size)
             info(" Spieler verteilt auf ")
-            variableValue(surfServerService.servers.size)
+            variableValue(SurfServerService.servers.size)
             info(" Server online.")
         }
     }

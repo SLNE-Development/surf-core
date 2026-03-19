@@ -1,9 +1,9 @@
 package dev.slne.surf.core.api.common.player.serializer
 
+import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
-import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.surfapi.core.api.serializer.java.datetime.datetime.offset.OffsetDateTimeSerializer
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
@@ -101,11 +101,11 @@ object SurfPlayerSerializer : KSerializer<SurfPlayer> {
 
                 4 -> currentServer =
                     dec.decodeNullableSerializableElement(descriptor, 4, String.serializer())
-                        ?.let(surfCoreApi::getServerByName)
+                        ?.let(SurfCoreApi::getServerByName)
 
                 5 -> currentProxy =
                     dec.decodeNullableSerializableElement(descriptor, 5, String.serializer())
-                        ?.let(surfCoreApi::getProxyServerByName)
+                        ?.let(SurfCoreApi::getProxyServerByName)
 
                 6 -> lastKnownIpAddress =
                     dec.decodeNullableSerializableElement(descriptor, 6, String.serializer())

@@ -3,10 +3,10 @@ package dev.slne.surf.core.paper.listener
 import com.github.shynixn.mccoroutine.folia.launch
 import dev.slne.surf.core.api.common.server.connection.SurfProxyServerConnectionResult
 import dev.slne.surf.core.api.paper.util.surfPlayer
-import dev.slne.surf.core.client.redis.watcher.PlayerProxyConnectionResultWatcher
-import dev.slne.surf.core.core.common.player.surfPlayerService
-import dev.slne.surf.core.core.common.redis.redisApi
+import dev.slne.surf.core.core.CoreInstance
+import dev.slne.surf.core.core.common.player.SurfPlayerService
 import dev.slne.surf.core.core.common.redis.request.SendPlayerToProxyRequest
+import dev.slne.surf.core.core.common.redis.watcher.PlayerProxyConnectionResultWatcher
 import dev.slne.surf.core.core.common.util.formatMillis
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.core.paper.plugin
@@ -29,7 +29,7 @@ object PlayerConnectListener : Listener {
     @EventHandler
     fun onPlayerClientLoaded(event: PlayerClientLoadedWorldEvent) {
         val player = event.player
-        val surfPlayer = surfPlayerService.findPlayerByUuid(player.uniqueId)
+        val surfPlayer = SurfPlayerService.findPlayerByUuid(player.uniqueId)
 
         if (surfPlayer == null) {
             player.kick(buildDisconnectComponent(), PlayerKickEvent.Cause.UNKNOWN)
@@ -67,7 +67,7 @@ object PlayerConnectListener : Listener {
     @EventHandler
     fun onPlayerConnect(event: AsyncPlayerConnectionConfigureEvent) {
         val surfPlayer =
-            event.connection.audience.uuidOrNull()?.let { surfPlayerService.findPlayerByUuid(it) }
+            event.connection.audience.uuidOrNull()?.let { SurfPlayerService.findPlayerByUuid(it) }
 
         if (surfPlayer == null) {
             plugin.logger.severe("Failed to load player data for player with UUID ${event.connection.audience.uuidOrNull()}. The player will be disconnected.")
@@ -96,7 +96,7 @@ object PlayerConnectListener : Listener {
             return
         }
 
-        redisApi.publishEvent(
+        CoreInstance.redisApi.publishEvent(
             SendPlayerToProxyRequest.Response(
                 player.uuid,
                 SurfProxyServerConnectionResult(SurfProxyServerConnectionResult.Status.SUCCESS)

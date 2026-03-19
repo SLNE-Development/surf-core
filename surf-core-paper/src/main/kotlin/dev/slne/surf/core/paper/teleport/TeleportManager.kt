@@ -3,8 +3,8 @@ package dev.slne.surf.core.paper.teleport
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.paper.util.bukkitPlayer
 import dev.slne.surf.core.api.paper.util.surfPlayer
+import dev.slne.surf.core.core.CoreInstance
 import dev.slne.surf.core.core.common.redis.event.SurfPlayerTeleportRequestRedisEvent
-import dev.slne.surf.core.core.common.redis.redisApi
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 import org.bukkit.entity.Player
 
@@ -18,7 +18,12 @@ class TeleportManager {
 
         if (player.surfPlayer.currentServer != targetServer) {
             surfPlayer.sendAwaiting(targetServer)
-            redisApi.publishEvent(SurfPlayerTeleportRequestRedisEvent(surfPlayer, target))
+            CoreInstance.redisApi.publishEvent(
+                SurfPlayerTeleportRequestRedisEvent(
+                    surfPlayer,
+                    target
+                )
+            )
             return
         }
 

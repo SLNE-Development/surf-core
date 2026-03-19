@@ -1,18 +1,26 @@
 package dev.slne.surf.core.velocity.auth
 
 import com.velocitypowered.api.event.Continuation
-import dev.slne.surf.core.core.common.redis.redisApi
+import dev.slne.surf.core.core.CoreInstance
 import dev.slne.surf.surfapi.core.api.messages.adventure.key
 import dev.slne.surf.surfapi.core.api.util.mutableObject2ObjectMapOf
 import java.security.MessageDigest
 import java.util.*
 import kotlin.time.Duration.Companion.seconds
 
-val authentificationService = AuthentificationService()
+val authenticationService = AuthenticationService()
 
-class AuthentificationService {
-    val authMap = redisApi.createSyncMap<UUID, ByteArray>("surf-core:authentification", 5.seconds)
-    val lastServerMap = redisApi.createSyncMap<UUID, String>("surf-core:last-server", 5.seconds)
+class AuthenticationService {
+    val authMap = CoreInstance.redisApi.createSyncMap<UUID, ByteArray>(
+        "surf-core:authentification",
+        5.seconds
+    )
+
+    val lastServerMap = CoreInstance.redisApi.createSyncMap<UUID, String>(
+        "surf-core:last-server",
+        5.seconds
+    )
+    
     val continuations = mutableObject2ObjectMapOf<UUID, Continuation>()
     val key = key("surf-core", "transfer-authentification")
 

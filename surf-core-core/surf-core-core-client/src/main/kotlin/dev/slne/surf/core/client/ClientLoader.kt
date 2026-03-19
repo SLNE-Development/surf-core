@@ -8,9 +8,13 @@ import dev.slne.surf.core.core.common.redis.listener.SendPlayerToServerListener
 import dev.slne.surf.rabbitmq.api.ClientRabbitMQApi
 import dev.slne.surf.redis.RedisApi
 
-object CoreClientInstance {
-    private val redisApi = RedisApi.create("surf-core")
-    private val rabbitApi = ClientRabbitMQApi.create(1, "surf-core")
+object ClientLoader {
+    val redisApi = RedisApi.create("surf-core")
+    val rabbitApi = ClientRabbitMQApi.create(1, "surf-core")
+
+    suspend fun onBootstrap() {
+
+    }
 
     suspend fun onLoad() {
         // Rabbit
@@ -33,7 +37,7 @@ object CoreClientInstance {
         redisApi.disconnect()
         rabbitApi.disconnect()
     }
-    
+
     fun withRequestResponseHandler(handler: Any) {
         redisApi.registerRequestHandler(handler)
     }

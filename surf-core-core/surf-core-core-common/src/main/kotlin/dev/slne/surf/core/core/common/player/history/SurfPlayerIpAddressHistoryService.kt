@@ -5,9 +5,13 @@ import dev.slne.surf.core.api.common.player.history.ip.IpAddressHistory
 import dev.slne.surf.surfapi.core.api.util.requiredService
 import java.util.*
 
-val surfPlayerIpAddressHistoryService = requiredService<SurfPlayerIpAddressHistoryService>()
+private val service = requiredService<SurfPlayerIpAddressHistoryService>()
 
 interface SurfPlayerIpAddressHistoryService {
     suspend fun handleNewIpAddress(surfPlayer: SurfPlayer)
     suspend fun getIpAddressHistory(uuid: UUID): IpAddressHistory
+
+    companion object : SurfPlayerIpAddressHistoryService by service {
+        val INSTANCE get() = service
+    }
 }

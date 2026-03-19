@@ -3,7 +3,7 @@ package dev.slne.surf.core.paper
 import dev.slne.surf.core.api.common.event.SurfServerStartEvent
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.common.server.state.SurfServerState
-import dev.slne.surf.core.client.ClientLoader
+import dev.slne.surf.core.client.ClientCoreInstance
 import dev.slne.surf.core.core.CoreInstance
 import dev.slne.surf.core.core.common.config.SurfServerConfigHolder
 import dev.slne.surf.core.core.common.event.surfEventBus
@@ -17,12 +17,15 @@ import kotlinx.coroutines.runBlocking
 @Suppress("UnstableApiUsage")
 class PaperBootstrap : PluginBootstrap {
     override fun bootstrap(context: BootstrapContext) {
+        PaperBootstrap.context = context
         runBlocking {
-            ClientLoader.onBootstrap()
+            ClientCoreInstance.clientLoader.onBootstrap()
+            ClientCoreInstance.clientLoader.onLoad()
         }
 
         CoreInstance.redisApi.subscribeToEvents(TeleportRedisListener)
-        ClientLoader.withListener(PaperRedisListener)
+        ClientCoreInstance.clientLoader.withListener(PaperRedisListener)
+        ClientCoreInstance.clientLoader.connectRedis()
 
         surfServerConfigHolder = SurfServerConfigHolder(context.dataDirectory)
 
@@ -43,6 +46,7 @@ class PaperBootstrap : PluginBootstrap {
     }
 
     companion object {
+        lateinit var context: BootstrapContext
         lateinit var surfServerConfigHolder: SurfServerConfigHolder
     }
 }

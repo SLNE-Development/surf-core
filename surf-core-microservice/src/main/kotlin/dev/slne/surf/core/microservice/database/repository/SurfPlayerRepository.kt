@@ -8,6 +8,7 @@ import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.selectAll
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.transactions.suspendTransaction
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.upsert
 import kotlinx.coroutines.flow.firstOrNull
+import java.time.OffsetDateTime
 import java.util.*
 
 object SurfPlayerRepository {
@@ -28,15 +29,20 @@ object SurfPlayerRepository {
     }
 
     suspend fun savePlayer(
-        player: SurfPlayer
+        uuid: UUID,
+        name: String?,
+        firstSeen: OffsetDateTime?,
+        lastSeen: OffsetDateTime?,
+        latestServer: String?,
+        latestProxy: String?,
     ) = suspendTransaction {
         SurfPlayersTable.upsert {
-            it[uuid] = player.uuid
-            it[name] = player.lastKnownName
-            it[firstSeen] = player.firstSeen
-            it[lastSeen] = player.lastSeen
-            it[latestServer] = player.currentServer?.name
-            it[latestProxy] = player.currentProxy?.name
+            it[this.uuid] = uuid
+            it[this.name] = name
+            it[this.firstSeen] = firstSeen
+            it[this.lastSeen] = lastSeen
+            it[this.latestServer] = latestServer
+            it[this.latestProxy] = latestProxy
         }
         Unit
     }

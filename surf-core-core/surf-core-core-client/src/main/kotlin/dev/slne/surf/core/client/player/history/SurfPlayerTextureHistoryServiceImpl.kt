@@ -4,7 +4,7 @@ import com.google.auto.service.AutoService
 import com.google.gson.JsonParser
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.player.history.texture.TextureHistory
-import dev.slne.surf.core.client.ClientLoader
+import dev.slne.surf.core.client.ClientCoreInstance
 import dev.slne.surf.core.core.common.player.history.SurfPlayerTextureHistoryService
 import dev.slne.surf.core.core.common.rabbit.packet.player.history.texture.SaveTextureHistoryRequestPacket
 import dev.slne.surf.core.core.common.rabbit.packet.player.history.texture.TextureHistoryRequestPacket
@@ -24,7 +24,7 @@ class SurfPlayerTextureHistoryServiceImpl : SurfPlayerTextureHistoryService {
             return
         }
 
-        ClientLoader.rabbitApi.sendRequest(
+        ClientCoreInstance.rabbitApi.sendRequest(
             SaveTextureHistoryRequestPacket(
                 uuid = surfPlayer.uuid,
                 texture = texture,
@@ -46,6 +46,6 @@ class SurfPlayerTextureHistoryServiceImpl : SurfPlayerTextureHistoryService {
     }
 
     override suspend fun getTextureHistory(uuid: UUID): TextureHistory {
-        return ClientLoader.rabbitApi.sendRequest(TextureHistoryRequestPacket(uuid)).history
+        return ClientCoreInstance.rabbitApi.sendRequest(TextureHistoryRequestPacket(uuid)).history
     }
 }

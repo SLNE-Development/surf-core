@@ -1,10 +1,16 @@
 package dev.slne.surf.core.client
 
-import com.google.auto.service.AutoService
 import dev.slne.surf.core.core.CoreInstance
+import dev.slne.surf.rabbitmq.api.ClientRabbitMQApi
 import dev.slne.surf.redis.RedisApi
 
-@AutoService(CoreInstance::class)
-class ClientCoreInstance : CoreInstance {
-    override val redisApi: RedisApi get() = ClientLoader.redisApi
+interface ClientCoreInstance : CoreInstance {
+    val clientLoader: ClientLoader
+
+    override val rabbitApi: ClientRabbitMQApi get() = clientLoader.rabbitApi
+    override val redisApi: RedisApi get() = clientLoader.redisApi
+
+    companion object : ClientCoreInstance by CoreInstance.INSTANCE as ClientCoreInstance {
+        val INSTANCE get() = CoreInstance.INSTANCE as ClientCoreInstance
+    }
 }

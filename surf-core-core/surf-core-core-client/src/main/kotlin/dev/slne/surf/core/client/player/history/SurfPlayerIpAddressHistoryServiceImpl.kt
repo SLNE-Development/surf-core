@@ -3,7 +3,7 @@ package dev.slne.surf.core.client.player.history
 import com.google.auto.service.AutoService
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.player.history.ip.IpAddressHistory
-import dev.slne.surf.core.client.ClientLoader
+import dev.slne.surf.core.client.ClientCoreInstance
 import dev.slne.surf.core.core.common.player.history.SurfPlayerIpAddressHistoryService
 import dev.slne.surf.core.core.common.rabbit.packet.player.history.ip.IpAddressHistoryRequestPacket
 import dev.slne.surf.core.core.common.rabbit.packet.player.history.ip.SaveIpAddressHistoryRequestPacket
@@ -19,7 +19,7 @@ class SurfPlayerIpAddressHistoryServiceImpl : SurfPlayerIpAddressHistoryService 
             return
         }
 
-        ClientLoader.rabbitApi.sendRequest(
+        ClientCoreInstance.rabbitApi.sendRequest(
             SaveIpAddressHistoryRequestPacket(
                 surfPlayer.uuid,
                 currentIpAddress
@@ -28,6 +28,6 @@ class SurfPlayerIpAddressHistoryServiceImpl : SurfPlayerIpAddressHistoryService 
     }
 
     override suspend fun getIpAddressHistory(uuid: UUID): IpAddressHistory {
-        return ClientLoader.rabbitApi.sendRequest(IpAddressHistoryRequestPacket(uuid)).history
+        return ClientCoreInstance.rabbitApi.sendRequest(IpAddressHistoryRequestPacket(uuid)).history
     }
 }

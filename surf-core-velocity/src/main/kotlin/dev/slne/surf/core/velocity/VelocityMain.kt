@@ -17,7 +17,7 @@ import dev.slne.surf.core.api.common.event.SurfServerStoppingEvent
 import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.state.SurfServerState
 import dev.slne.surf.core.api.common.util.sendText
-import dev.slne.surf.core.client.ClientLoader
+import dev.slne.surf.core.client.ClientCoreInstance
 import dev.slne.surf.core.core.common.config.SurfServerConfigHolder
 import dev.slne.surf.core.core.common.event.surfEventBus
 import dev.slne.surf.core.core.common.server.SurfServerService
@@ -49,20 +49,20 @@ class VelocityMain @Inject constructor(
     init {
         suspendingPluginContainer.initialize(this)
 
-        runBlocking {
-            ClientLoader.onBootstrap()
-            ClientLoader.onLoad()
-        }
-
         instance = this
         surfServerConfigHolder = SurfServerConfigHolder(dataPath)
 
+        runBlocking {
+            ClientCoreInstance.clientLoader.onBootstrap()
+            ClientCoreInstance.clientLoader.onLoad()
+        }
+
         authenticationService.init()
 
-        ClientLoader.withListener(VelocityRedisListener)
-        ClientLoader.withRequestResponseHandler(SendPlayerToProxyHandler)
-        ClientLoader.withRequestResponseHandler(SendPlayerToServerHandler)
-        ClientLoader.connectRedis()
+        ClientCoreInstance.clientLoader.withListener(VelocityRedisListener)
+        ClientCoreInstance.clientLoader.withRequestResponseHandler(SendPlayerToProxyHandler)
+        ClientCoreInstance.clientLoader.withRequestResponseHandler(SendPlayerToServerHandler)
+        ClientCoreInstance.clientLoader.connectRedis()
 
         val server = SurfProxyServer(
             name = surfServerConfig.serverName,
@@ -83,7 +83,7 @@ class VelocityMain @Inject constructor(
     @Subscribe
     fun onProxyInitialize(event: ProxyInitializeEvent) {
         runBlocking {
-            ClientLoader.onEnable()
+            ClientCoreInstance.clientLoader.onEnable()
         }
 
         surfEventBus.fire(SurfServerOnlineEvent(surfServerConfig.serverName))
@@ -127,7 +127,7 @@ class VelocityMain @Inject constructor(
         }
 
         runBlocking {
-            ClientLoader.onDisable()
+            ClientCoreInstance.clientLoader.onDisable()
         }
     }
 

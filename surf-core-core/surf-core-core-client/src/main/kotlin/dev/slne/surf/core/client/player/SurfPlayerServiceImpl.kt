@@ -2,7 +2,8 @@ package dev.slne.surf.core.client.player
 
 import com.google.auto.service.AutoService
 import dev.slne.surf.core.api.common.player.SurfPlayer
-import dev.slne.surf.core.client.ClientLoader
+import dev.slne.surf.core.client.ClientCoreInstance
+import dev.slne.surf.core.core.CoreInstance
 import dev.slne.surf.core.core.common.player.SurfPlayerService
 import dev.slne.surf.core.core.common.rabbit.packet.player.load.LoadPlayerByNameRequestPacket
 import dev.slne.surf.core.core.common.rabbit.packet.player.load.LoadPlayerByUuidRequestPacket
@@ -13,7 +14,7 @@ import java.util.*
 @AutoService(SurfPlayerService::class)
 class SurfPlayerServiceImpl : SurfPlayerService {
     private val _players =
-        ClientLoader.redisApi.createSyncMap<UUID, SurfPlayer>("surf-core:surf-players")
+        CoreInstance.redisApi.createSyncMap<UUID, SurfPlayer>("surf-core:surf-players")
     override val players get() = _players.snapshot().values.toObjectSet()
 
     override fun findPlayerByName(name: String) =
@@ -22,11 +23,11 @@ class SurfPlayerServiceImpl : SurfPlayerService {
     override fun findPlayerByUuid(uuid: UUID) = _players[uuid]
 
     override suspend fun loadPlayerByName(name: String): SurfPlayer? {
-        return ClientLoader.rabbitApi.sendRequest(LoadPlayerByNameRequestPacket(name)).player
+        return ClientCoreInstance.rabbitApi.sendRequest(LoadPlayerByNameRequestPacket(name)).player
     }
 
     override suspend fun loadPlayerByUuid(uuid: UUID): SurfPlayer? {
-        return ClientLoader.rabbitApi.sendRequest(LoadPlayerByUuidRequestPacket(uuid)).player
+        return ClientCoreInstance.rabbitApi.sendRequest(LoadPlayerByUuidRequestPacket(uuid)).player
     }
 
     override suspend fun getOrLoadPlayerByName(name: String) =
@@ -45,7 +46,16 @@ class SurfPlayerServiceImpl : SurfPlayerService {
         )
 
     override suspend fun savePlayer(player: SurfPlayer) {
-        ClientLoader.rabbitApi.sendRequest(SaveSurfPlayerRequestPacket(player))
+        ClientCoreInstance.rabbitApi.sendRequest(
+            SaveSurfPlayerRequestPacket(
+                uuid = player.uuid,
+                name = player.lastKnownName,
+                firstSeen = player.firstSeen,
+                lastSeen = player.lastSeen,
+                latestServer = player.currentServer?.name,
+                latestProxy = player.currentProxy?.name
+            )
+        )
     }
 
     override fun clearPlayers() {

@@ -5,16 +5,17 @@ import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.common.server.state.SurfServerState
-import dev.slne.surf.core.client.ClientLoader.redisApi
+import dev.slne.surf.core.client.ClientCoreInstance
 import dev.slne.surf.core.core.common.server.SurfServerService
 import dev.slne.surf.surfapi.core.api.util.toObjectSet
 import it.unimi.dsi.fastutil.objects.ObjectSet
 
 @AutoService(SurfServerService::class)
 class SurfServerServiceImpl : SurfServerService {
-    private val _servers = redisApi.createSyncMap<String, SurfServer>("surf-core:surf-servers")
+    private val _servers =
+        ClientCoreInstance.redisApi.createSyncMap<String, SurfServer>("surf-core:surf-servers")
     private val _proxies =
-        redisApi.createSyncMap<String, SurfProxyServer>("surf-core:surf-server-proxies")
+        ClientCoreInstance.redisApi.createSyncMap<String, SurfProxyServer>("surf-core:surf-server-proxies")
 
     override val servers get() = _servers.snapshot().values.toObjectSet()
     override val proxyServers: ObjectSet<SurfProxyServer> get() = _proxies.snapshot().values.toObjectSet()

@@ -14,8 +14,13 @@ surfPaperPluginApi {
 
     authors.add("red")
 
+    bootstrapDependencies {
+        registerRequired("surf-rabbitmq-paper")
+    }
+
     serverDependencies {
         registerRequired("LuckPerms")
+        registerRequired("surf-rabbitmq-paper")
     }
 }
 

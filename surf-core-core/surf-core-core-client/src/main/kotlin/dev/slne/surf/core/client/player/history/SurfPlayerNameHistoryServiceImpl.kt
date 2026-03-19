@@ -3,7 +3,7 @@ package dev.slne.surf.core.client.player.history
 import com.google.auto.service.AutoService
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.player.history.name.NameHistory
-import dev.slne.surf.core.client.ClientLoader
+import dev.slne.surf.core.client.ClientCoreInstance
 import dev.slne.surf.core.core.common.player.history.SurfPlayerNameHistoryService
 import dev.slne.surf.core.core.common.rabbit.packet.player.history.name.NameHistoryRequestPacket
 import dev.slne.surf.core.core.common.rabbit.packet.player.history.name.SaveNameHistoryRequestPacket
@@ -19,7 +19,7 @@ class SurfPlayerNameHistoryServiceImpl : SurfPlayerNameHistoryService {
             return
         }
 
-        ClientLoader.rabbitApi.sendRequest(
+        ClientCoreInstance.rabbitApi.sendRequest(
             SaveNameHistoryRequestPacket(
                 surfPlayer.uuid,
                 currentName
@@ -28,6 +28,6 @@ class SurfPlayerNameHistoryServiceImpl : SurfPlayerNameHistoryService {
     }
 
     override suspend fun getNameHistory(uuid: UUID): NameHistory {
-        return ClientLoader.rabbitApi.sendRequest(NameHistoryRequestPacket(uuid)).history
+        return ClientCoreInstance.rabbitApi.sendRequest(NameHistoryRequestPacket(uuid)).history
     }
 }

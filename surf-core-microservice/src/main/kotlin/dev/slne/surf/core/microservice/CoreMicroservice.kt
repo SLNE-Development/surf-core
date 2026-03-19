@@ -8,6 +8,7 @@ import dev.slne.surf.core.microservice.database.tables.SurfPlayersTable
 import dev.slne.surf.core.microservice.rabbit.IpAddressHistoryHandler
 import dev.slne.surf.core.microservice.rabbit.NameHistoryHandler
 import dev.slne.surf.core.microservice.rabbit.SkinHistoryHandler
+import dev.slne.surf.core.microservice.rabbit.SurfPlayerHandler
 import dev.slne.surf.database.DatabaseApi
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.SchemaUtils
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.transactions.suspendTransaction
@@ -33,6 +34,7 @@ class CoreMicroservice : Microservice() {
         rabbitApi.registerRequestHandler(IpAddressHistoryHandler)
         rabbitApi.registerRequestHandler(NameHistoryHandler)
         rabbitApi.registerRequestHandler(SkinHistoryHandler)
+        rabbitApi.registerRequestHandler(SurfPlayerHandler)
 
         rabbitApi.freezeAndConnect()
     }

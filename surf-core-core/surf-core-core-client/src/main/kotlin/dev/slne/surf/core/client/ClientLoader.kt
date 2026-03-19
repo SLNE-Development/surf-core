@@ -3,19 +3,25 @@
 package dev.slne.surf.core.client
 
 import dev.slne.surf.core.core.common.event.LocalSurfEventBusListener
+import dev.slne.surf.core.core.common.player.SurfPlayerService
 import dev.slne.surf.core.core.common.redis.listener.SendPlayerToProxyListener
 import dev.slne.surf.core.core.common.redis.listener.SendPlayerToServerListener
+import dev.slne.surf.core.core.common.server.SurfServerService
 import dev.slne.surf.rabbitmq.api.ClientRabbitMQApi
 import dev.slne.surf.redis.RedisApi
+import java.nio.file.Path
 
-object ClientLoader {
+class ClientLoader(
+    dataPath: Path
+) {
     val redisApi = RedisApi.create("surf-core")
-    val rabbitApi = ClientRabbitMQApi.create(1, "surf-core")
+    val rabbitApi = ClientRabbitMQApi.create(1, "surf-core", dataPath)
 
     suspend fun onBootstrap() {
 
     }
 
+    @Suppress("UnusedExpression")
     suspend fun onLoad() {
         // Rabbit
         rabbitApi.freezeAndConnect()
@@ -24,6 +30,10 @@ object ClientLoader {
         redisApi.subscribeToEvents(LocalSurfEventBusListener)
         withListener(SendPlayerToServerListener)
         withListener(SendPlayerToProxyListener)
+
+        // Initialize Redis Maps
+        SurfPlayerService
+        SurfServerService
     }
 
     fun connectRedis() {

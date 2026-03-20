@@ -1,6 +1,7 @@
 package dev.slne.surf.core.velocity
 
 import com.github.shynixn.mccoroutine.velocity.SuspendingPluginContainer
+import com.github.shynixn.mccoroutine.velocity.registerSuspend
 import com.google.inject.Inject
 import com.velocitypowered.api.event.EventManager
 import com.velocitypowered.api.event.Subscribe
@@ -87,9 +88,9 @@ class VelocityMain @Inject constructor(
         }
 
         surfEventBus.fire(SurfServerOnlineEvent(surfServerConfig.serverName))
-        eventManager.register(this, ConnectionListener)
         eventManager.register(this, AuthenticationListener)
         eventManager.register(this, VelocityServerListener)
+        eventManager.registerSuspend(this, ConnectionListener)
 
         SurfServerService.changeState(SurfProxyServer.current(), SurfServerState.RUNNING)
 

@@ -116,7 +116,7 @@ object PlayerConnectListener : Listener {
         appendNewline(2)
         error("DEINE SPIELERDATEN KONNTEN NICHT GELADEN WERDEN.")
         appendNewline()
-        error("Code: 1921186215185: 1") // surf-core in A1Z26-Cipher + Error Code 1
+        error("Internal Server error. Data Transmitter or holder my be down?")
         appendNewline(3)
         spacer("Beim laden deiner Spielerdaten ist ein interner Fehler aufgetreten.")
         appendNewline()

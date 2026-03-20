@@ -15,7 +15,7 @@ class ClientLoader(
     dataPath: Path
 ) {
     val redisApi = RedisApi.create("surf-core")
-    val rabbitApi = ClientRabbitMQApi.create(1, "surf-core", dataPath)
+    val rabbitApi = ClientRabbitMQApi.create("surf-core", dataPath)
 
     suspend fun onBootstrap() {
 

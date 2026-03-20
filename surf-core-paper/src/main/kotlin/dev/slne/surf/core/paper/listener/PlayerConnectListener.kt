@@ -116,7 +116,7 @@ object PlayerConnectListener : Listener {
         appendNewline(2)
         error("DEINE SPIELERDATEN KONNTEN NICHT GELADEN WERDEN.")
         appendNewline()
-        error("Internal Server error. Data Transmitter or holder my be down?")
+        error("Internal Server error. Data Transmitter or holder may be down?")
         appendNewline(3)
         spacer("Beim laden deiner Spielerdaten ist ein interner Fehler aufgetreten.")
         appendNewline()

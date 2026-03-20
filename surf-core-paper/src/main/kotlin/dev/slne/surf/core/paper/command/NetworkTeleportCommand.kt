@@ -8,7 +8,7 @@ import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.paper.command.argument.surfPlayerArgument
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.core.paper.plugin
-import dev.slne.surf.core.paper.teleport.teleportManager
+import dev.slne.surf.core.paper.teleport.TeleportManager
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 
 fun networkTeleportCommand() = commandTree("ntp") {
@@ -25,7 +25,7 @@ fun networkTeleportCommand() = commandTree("ntp") {
             }
 
             plugin.launch {
-                teleportManager.teleport(player, target)
+                TeleportManager.teleport(player, target)
             }
         }
     }

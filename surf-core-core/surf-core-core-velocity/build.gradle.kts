@@ -3,6 +3,6 @@ plugins {
 }
 
 dependencies {
-    api(project(":surf-core-core:surf-core-core-common"))
-    api(project(":surf-core-api:surf-core-api-velocity"))
+    api(projects.surfCoreCore.surfCoreCoreClient)
+    api(projects.surfCoreApi.surfCoreApiVelocity)
 }

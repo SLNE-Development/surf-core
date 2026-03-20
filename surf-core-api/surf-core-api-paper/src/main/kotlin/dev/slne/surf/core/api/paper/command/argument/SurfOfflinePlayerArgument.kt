@@ -6,8 +6,8 @@ import dev.jorel.commandapi.arguments.Argument
 import dev.jorel.commandapi.arguments.ArgumentSuggestions
 import dev.jorel.commandapi.arguments.CustomArgument
 import dev.jorel.commandapi.arguments.StringArgument
+import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.player.SurfPlayer
-import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.surfapi.core.api.util.logger
 import kotlinx.coroutines.*
 import kotlinx.coroutines.future.asDeferred
@@ -16,13 +16,13 @@ import kotlinx.coroutines.future.future
 class SurfOfflinePlayerArgument(nodeName: String) :
     CustomArgument<Deferred<SurfPlayer?>, String>(StringArgument(nodeName), { info ->
         scope.future {
-            surfCoreApi.getOfflinePlayer(info.input)
+            SurfCoreApi.getOfflinePlayer(info.input)
         }.asDeferred()
     }) {
     init {
         this.replaceSuggestions(
             ArgumentSuggestions.stringCollection {
-                surfCoreApi.getOnlinePlayers().mapNotNull { it.lastKnownName }
+                SurfCoreApi.getOnlinePlayers().mapNotNull { it.lastKnownName }
             }
         )
     }

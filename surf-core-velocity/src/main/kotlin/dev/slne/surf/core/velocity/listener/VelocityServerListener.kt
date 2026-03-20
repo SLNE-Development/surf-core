@@ -4,12 +4,12 @@ import com.github.shynixn.mccoroutine.velocity.launch
 import com.velocitypowered.api.event.Continuation
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.proxy.ProxyPreShutdownEvent
+import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.connection.SurfProxyServerConnectionResult
-import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.core.api.common.util.sendText
 import dev.slne.surf.core.api.velocity.util.surfPlayer
-import dev.slne.surf.core.core.common.server.surfServerService
+import dev.slne.surf.core.core.common.server.SurfServerService
 import dev.slne.surf.core.velocity.plugin
 import dev.slne.surf.surfapi.core.api.messages.adventure.appendNewline
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
@@ -29,7 +29,7 @@ object VelocityServerListener {
     fun onPreShutdown(event: ProxyPreShutdownEvent, continuation: Continuation) {
         val currentProxy = SurfProxyServer.current()
 
-        surfCoreApi.getOnlinePlayers().forEach {
+        SurfCoreApi.getOnlinePlayers().forEach {
             it.sendText {
                 appendInfoPrefix()
                 error("SYSTEM-NEUSTART", TextDecoration.BOLD)
@@ -38,7 +38,7 @@ object VelocityServerListener {
             }
         }
 
-        val targetProxies = surfServerService.proxyServers
+        val targetProxies = SurfServerService.proxyServers
             .filter { it.name != currentProxy.name }
             .sortedBy { it.getPlayerCount() }
 
@@ -71,7 +71,7 @@ object VelocityServerListener {
 
                             try {
                                 val result =
-                                    surfCoreApi.sendPlayerAwaiting(player.surfPlayer, target)
+                                    SurfCoreApi.sendPlayerAwaiting(player.surfPlayer, target)
 
                                 if (result.status == SurfProxyServerConnectionResult.Status.SUCCESS) {
                                     successCount.incrementAndGet()

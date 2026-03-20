@@ -3,7 +3,7 @@ package dev.slne.surf.core.paper.command
 import com.github.shynixn.mccoroutine.folia.launch
 import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.jorel.commandapi.kotlindsl.playerExecutor
-import dev.slne.surf.core.api.common.surfCoreApi
+import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.paper.util.surfPlayer
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.core.paper.plugin
@@ -19,7 +19,7 @@ fun hubCommand() = commandTree("hub") {
             info("Du wirst zum Hub gesendet...")
         }
 
-        val server = surfCoreApi.getServerWithLeastPlayers("lobby")
+        val server = SurfCoreApi.getServerWithLeastPlayers("lobby")
 
         if (server == null) {
             player.sendText {
@@ -30,7 +30,7 @@ fun hubCommand() = commandTree("hub") {
         }
 
         plugin.launch {
-            val result = surfCoreApi.sendPlayerAwaiting(player.surfPlayer, server)
+            val result = SurfCoreApi.sendPlayerAwaiting(player.surfPlayer, server)
 
             if (result.isSuccessful()) {
                 player.sendText {

@@ -1,8 +1,8 @@
 package dev.slne.surf.core.api.common.server
 
+import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.server.state.SurfServerState
-import dev.slne.surf.core.api.common.surfCoreApi
 import it.unimi.dsi.fastutil.objects.ObjectSet
 import kotlinx.serialization.Serializable
 import org.jetbrains.annotations.ApiStatus
@@ -29,6 +29,6 @@ sealed interface CommonSurfServer {
     fun isBackend() = this is SurfServer
 
     companion object {
-        operator fun get(name: String) = surfCoreApi.getCommonServerByName(name)
+        operator fun get(name: String) = SurfCoreApi.getCommonServerByName(name)
     }
 }

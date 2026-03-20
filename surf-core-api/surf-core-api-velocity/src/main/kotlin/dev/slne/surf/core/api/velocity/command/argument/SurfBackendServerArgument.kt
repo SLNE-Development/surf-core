@@ -9,8 +9,8 @@ import dev.jorel.commandapi.CommandTree
 import dev.jorel.commandapi.arguments.Argument
 import dev.jorel.commandapi.arguments.CommandAPIArgumentType
 import dev.jorel.commandapi.executors.CommandArguments
+import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.server.CommonSurfServer
-import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 
 open class SurfBackendServerArgument(nodeName: String) :
@@ -27,7 +27,7 @@ open class SurfBackendServerArgument(nodeName: String) :
         cmdCtx: CommandContext<Source>,
         key: String,
         previousArgs: CommandArguments,
-    ): CommonSurfServer = surfCoreApi.getServerByName(StringArgumentType.getString(cmdCtx, key))
+    ): CommonSurfServer = SurfCoreApi.getServerByName(StringArgumentType.getString(cmdCtx, key))
         .takeIf { it?.isBackend() == true }
         ?: throw SimpleCommandExceptionType(
             VelocityBrigadierMessage.tooltip(

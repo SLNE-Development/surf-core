@@ -1,6 +1,7 @@
 package dev.slne.surf.core.velocity
 
 import com.github.shynixn.mccoroutine.velocity.SuspendingPluginContainer
+import com.github.shynixn.mccoroutine.velocity.registerSuspend
 import com.google.inject.Inject
 import com.velocitypowered.api.event.EventManager
 import com.velocitypowered.api.event.Subscribe
@@ -10,21 +11,19 @@ import com.velocitypowered.api.plugin.PluginContainer
 import com.velocitypowered.api.plugin.PluginManager
 import com.velocitypowered.api.plugin.annotation.DataDirectory
 import com.velocitypowered.api.proxy.ProxyServer
+import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.event.SurfServerOnlineEvent
 import dev.slne.surf.core.api.common.event.SurfServerStartEvent
 import dev.slne.surf.core.api.common.event.SurfServerStoppingEvent
 import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.state.SurfServerState
-import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.core.api.common.util.sendText
+import dev.slne.surf.core.client.ClientCoreInstance
 import dev.slne.surf.core.core.common.config.SurfServerConfigHolder
-import dev.slne.surf.core.core.common.database.databaseLoader
 import dev.slne.surf.core.core.common.event.surfEventBus
-import dev.slne.surf.core.core.common.player.surfPlayerService
-import dev.slne.surf.core.core.common.redis.redisLoader
-import dev.slne.surf.core.core.common.server.surfServerService
+import dev.slne.surf.core.core.common.server.SurfServerService
 import dev.slne.surf.core.velocity.auth.AuthenticationListener
-import dev.slne.surf.core.velocity.auth.authentificationService
+import dev.slne.surf.core.velocity.auth.authenticationService
 import dev.slne.surf.core.velocity.config.VelocityCoreConfigManager
 import dev.slne.surf.core.velocity.listener.ConnectionListener
 import dev.slne.surf.core.velocity.listener.VelocityServerListener
@@ -53,14 +52,18 @@ class VelocityMain @Inject constructor(
 
         instance = this
         surfServerConfigHolder = SurfServerConfigHolder(dataPath)
-        redisLoader.load()
-        surfPlayerService.init()
-        surfServerService.init()
-        authentificationService.init()
-        redisLoader.withListener(VelocityRedisListener)
-        redisLoader.withRequestResponseHandler(SendPlayerToProxyHandler)
-        redisLoader.withRequestResponseHandler(SendPlayerToServerHandler)
-        redisLoader.connect()
+
+        runBlocking {
+            ClientCoreInstance.clientLoader.onBootstrap()
+            ClientCoreInstance.clientLoader.onLoad()
+        }
+
+        authenticationService.init()
+
+        ClientCoreInstance.clientLoader.withListener(VelocityRedisListener)
+        ClientCoreInstance.clientLoader.withRequestResponseHandler(SendPlayerToProxyHandler)
+        ClientCoreInstance.clientLoader.withRequestResponseHandler(SendPlayerToServerHandler)
+        ClientCoreInstance.clientLoader.connectRedis()
 
         val server = SurfProxyServer(
             name = surfServerConfig.serverName,
@@ -75,21 +78,21 @@ class VelocityMain @Inject constructor(
         )
 
         surfEventBus.fire(SurfServerStartEvent(surfServerConfig.serverName))
-        surfServerService.addServer(server)
+        SurfServerService.addServer(server)
     }
 
     @Subscribe
     fun onProxyInitialize(event: ProxyInitializeEvent) {
         runBlocking {
-            databaseLoader.connect(dataPath)
+            ClientCoreInstance.clientLoader.onEnable()
         }
 
         surfEventBus.fire(SurfServerOnlineEvent(surfServerConfig.serverName))
-        eventManager.register(this, ConnectionListener)
         eventManager.register(this, AuthenticationListener)
         eventManager.register(this, VelocityServerListener)
+        eventManager.registerSuspend(this, ConnectionListener)
 
-        surfServerService.changeState(SurfProxyServer.current(), SurfServerState.RUNNING)
+        SurfServerService.changeState(SurfProxyServer.current(), SurfServerState.RUNNING)
 
         surfPlayerSyncTask.start()
     }
@@ -100,7 +103,7 @@ class VelocityMain @Inject constructor(
 
         surfEventBus.fire(SurfServerStoppingEvent(surfServerConfig.serverName))
 
-        surfCoreApi.getOnlinePlayers().forEach {
+        SurfCoreApi.getOnlinePlayers().forEach {
             it.sendText {
                 appendInfoPrefix()
                 error("SYSTEM-NEUSTART", TextDecoration.BOLD)
@@ -109,8 +112,8 @@ class VelocityMain @Inject constructor(
             }
         }
 
-        surfServerService.changeState(SurfProxyServer.current(), SurfServerState.STOPPING)
-        surfServerService.removeServer(SurfProxyServer.current())
+        SurfServerService.changeState(SurfProxyServer.current(), SurfServerState.STOPPING)
+        SurfServerService.removeServer(SurfProxyServer.current())
 
         proxy.allPlayers.forEach {
             it.disconnect(buildText {
@@ -124,8 +127,9 @@ class VelocityMain @Inject constructor(
             })
         }
 
-        redisLoader.disconnect()
-        databaseLoader.disconnect()
+        runBlocking {
+            ClientCoreInstance.clientLoader.onDisable()
+        }
     }
 
     companion object {

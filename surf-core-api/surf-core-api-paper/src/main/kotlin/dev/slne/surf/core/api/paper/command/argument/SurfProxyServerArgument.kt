@@ -6,13 +6,13 @@ import dev.jorel.commandapi.arguments.Argument
 import dev.jorel.commandapi.arguments.ArgumentSuggestions
 import dev.jorel.commandapi.arguments.CustomArgument
 import dev.jorel.commandapi.arguments.StringArgument
+import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.server.SurfProxyServer
-import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 
 class SurfProxyServerArgument(nodeName: String) :
     CustomArgument<SurfProxyServer, String>(StringArgument(nodeName), { info ->
-        surfCoreApi.getProxyServerByName(info.input)
+        SurfCoreApi.getProxyServerByName(info.input)
             ?: throw CustomArgumentException.fromAdventureComponent(
                 buildText {
                     appendErrorPrefix()
@@ -22,7 +22,7 @@ class SurfProxyServerArgument(nodeName: String) :
     init {
         this.replaceSuggestions(
             ArgumentSuggestions.stringCollection {
-                surfCoreApi.getProxies().map { it.name }
+                SurfCoreApi.getProxies().map { it.name }
             }
         )
     }

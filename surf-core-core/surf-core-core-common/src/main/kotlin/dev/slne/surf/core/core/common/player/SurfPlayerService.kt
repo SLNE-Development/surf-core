@@ -3,17 +3,16 @@ package dev.slne.surf.core.core.common.player
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.surfapi.core.api.util.requiredService
 import it.unimi.dsi.fastutil.objects.ObjectSet
+import org.jetbrains.annotations.UnmodifiableView
 import java.util.*
 
-val surfPlayerService = requiredService<SurfPlayerService>()
+private val service = requiredService<SurfPlayerService>()
 
 interface SurfPlayerService {
-    val players: ObjectSet<SurfPlayer>
+    val players: @UnmodifiableView ObjectSet<SurfPlayer>
 
     fun findPlayerByName(name: String): SurfPlayer?
     fun findPlayerByUuid(uuid: UUID): SurfPlayer?
-
-    fun init()
 
     suspend fun loadPlayerByName(name: String): SurfPlayer?
     suspend fun loadPlayerByUuid(uuid: UUID): SurfPlayer?
@@ -28,4 +27,8 @@ interface SurfPlayerService {
     fun clearPlayers()
     fun cachePlayer(player: SurfPlayer)
     fun invalidatePlayer(uuid: UUID)
+
+    companion object : SurfPlayerService by service {
+        val INSTANCE get() = service
+    }
 }

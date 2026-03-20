@@ -3,26 +3,29 @@ package dev.slne.surf.core.paper
 import dev.slne.surf.core.api.common.event.SurfServerStartEvent
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.common.server.state.SurfServerState
+import dev.slne.surf.core.client.ClientCoreInstance
+import dev.slne.surf.core.core.CoreInstance
 import dev.slne.surf.core.core.common.config.SurfServerConfigHolder
 import dev.slne.surf.core.core.common.event.surfEventBus
-import dev.slne.surf.core.core.common.player.surfPlayerService
-import dev.slne.surf.core.core.common.redis.redisApi
-import dev.slne.surf.core.core.common.redis.redisLoader
-import dev.slne.surf.core.core.common.server.surfServerService
+import dev.slne.surf.core.core.common.server.SurfServerService
 import dev.slne.surf.core.paper.redis.listener.PaperRedisListener
 import dev.slne.surf.core.paper.teleport.TeleportRedisListener
 import io.papermc.paper.plugin.bootstrap.BootstrapContext
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap
+import kotlinx.coroutines.runBlocking
 
 @Suppress("UnstableApiUsage")
 class PaperBootstrap : PluginBootstrap {
     override fun bootstrap(context: BootstrapContext) {
-        redisLoader.load()
-        redisApi.subscribeToEvents(TeleportRedisListener)
-        surfPlayerService.init()
-        surfServerService.init()
-        redisLoader.withListener(PaperRedisListener)
-        redisLoader.connect()
+        PaperBootstrap.context = context
+        runBlocking {
+            ClientCoreInstance.clientLoader.onBootstrap()
+            ClientCoreInstance.clientLoader.onLoad()
+        }
+
+        CoreInstance.redisApi.subscribeToEvents(TeleportRedisListener)
+        ClientCoreInstance.clientLoader.withListener(PaperRedisListener)
+        ClientCoreInstance.clientLoader.connectRedis()
 
         surfServerConfigHolder = SurfServerConfigHolder(context.dataDirectory)
 
@@ -39,10 +42,11 @@ class PaperBootstrap : PluginBootstrap {
         )
 
         surfEventBus.fire(SurfServerStartEvent(surfServerConfig.serverName))
-        surfServerService.addServer(server)
+        SurfServerService.addServer(server)
     }
 
     companion object {
+        lateinit var context: BootstrapContext
         lateinit var surfServerConfigHolder: SurfServerConfigHolder
     }
 }

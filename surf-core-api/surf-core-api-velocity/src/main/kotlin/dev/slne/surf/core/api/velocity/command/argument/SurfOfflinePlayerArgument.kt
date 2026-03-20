@@ -7,8 +7,8 @@ import dev.jorel.commandapi.CommandTree
 import dev.jorel.commandapi.arguments.Argument
 import dev.jorel.commandapi.arguments.CommandAPIArgumentType
 import dev.jorel.commandapi.executors.CommandArguments
+import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.player.SurfPlayer
-import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.surfapi.core.api.util.logger
 import kotlinx.coroutines.*
 import kotlinx.coroutines.future.asDeferred
@@ -30,7 +30,7 @@ open class SurfOfflinePlayerArgument(nodeName: String) :
         key: String,
         previousArgs: CommandArguments,
     ): Deferred<SurfPlayer?> = scope.future {
-        surfCoreApi.getOfflinePlayer(StringArgumentType.getString(cmdCtx, key))
+        SurfCoreApi.getOfflinePlayer(StringArgumentType.getString(cmdCtx, key))
     }.asDeferred()
 
     companion object {

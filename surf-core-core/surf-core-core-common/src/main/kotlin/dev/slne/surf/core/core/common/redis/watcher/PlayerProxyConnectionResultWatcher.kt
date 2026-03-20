@@ -3,7 +3,7 @@ package dev.slne.surf.core.core.common.redis.watcher
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.sksamuel.aedile.core.expireAfterWrite
 import dev.slne.surf.core.api.common.server.connection.SurfProxyServerConnectionResult
-import dev.slne.surf.core.core.common.redis.redisApi
+import dev.slne.surf.core.core.CoreInstance
 import dev.slne.surf.redis.codec.UUIDCodec
 import dev.slne.surf.redis.libs.redisson.api.RSetCacheReactive
 import kotlinx.coroutines.CompletableDeferred
@@ -28,7 +28,7 @@ object PlayerProxyConnectionResultWatcher {
         .build<UUID, CompletableDeferred<SurfProxyServerConnectionResult>>()
 
     val transferringUuids: RSetCacheReactive<UUID> by lazy {
-        redisApi.redissonReactive.getSetCache<UUID>(
+        CoreInstance.redisApi.redissonReactive.getSetCache(
             "surf-core:transferring-uuids",
             UUIDCodec.INSTANCE
         )
@@ -52,6 +52,7 @@ object PlayerProxyConnectionResultWatcher {
 
     fun complete(playerUuid: UUID, result: SurfProxyServerConnectionResult) {
         val deferred = pendingRequests.asMap().remove(playerUuid)
+        
         deferred?.complete(result)
     }
 }

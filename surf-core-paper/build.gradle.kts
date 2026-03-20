@@ -14,14 +14,17 @@ surfPaperPluginApi {
 
     authors.add("red")
 
+    bootstrapDependencies {
+        registerRequired("surf-rabbitmq-paper")
+    }
+
     serverDependencies {
         registerRequired("LuckPerms")
+        registerRequired("surf-rabbitmq-paper")
     }
 }
 
 dependencies {
-    api(project(":surf-core-core:surf-core-core-paper"))
-    runtimeOnly(project(":surf-core-backend"))
-
+    api(projects.surfCoreCore.surfCoreCorePaper)
     compileOnly("net.luckperms:api:5.4")
 }

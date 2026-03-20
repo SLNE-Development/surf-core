@@ -9,9 +9,12 @@ surfVelocityApi {
 velocityPluginFile {
     main = "dev.slne.surf.core.velocity.VelocityMain"
     authors = listOf("red")
+
+    pluginDependencies {
+        register("surf-rabbitmq-velocity")
+    }
 }
 
 dependencies {
-    api(project(":surf-core-core:surf-core-core-velocity"))
-    runtimeOnly(project(":surf-core-backend"))
+    api(projects.surfCoreCore.surfCoreCoreVelocity)
 }

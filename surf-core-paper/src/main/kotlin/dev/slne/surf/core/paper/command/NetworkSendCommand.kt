@@ -5,11 +5,11 @@ import dev.jorel.commandapi.kotlindsl.anyExecutor
 import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.jorel.commandapi.kotlindsl.getValue
 import dev.jorel.commandapi.kotlindsl.literalArgument
+import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
-import dev.slne.surf.core.api.common.surfCoreApi
 import dev.slne.surf.core.api.paper.command.argument.surfPlayerArgument
 import dev.slne.surf.core.api.paper.command.argument.surfServerArgument
 import dev.slne.surf.core.paper.permission.PermissionRegistry
@@ -34,7 +34,7 @@ fun networkSendCommand() = commandTree("nsend") {
                     when (val commonServer = server) {
                         is SurfProxyServer -> {
                             plugin.launch {
-                                val result = surfCoreApi.sendPlayerAwaiting(player, commonServer)
+                                val result = SurfCoreApi.sendPlayerAwaiting(player, commonServer)
 
                                 if (result.isSuccessful()) {
                                     executor.sendText {
@@ -58,7 +58,7 @@ fun networkSendCommand() = commandTree("nsend") {
 
                         is SurfServer -> {
                             plugin.launch {
-                                val result = surfCoreApi.sendPlayerAwaiting(player, commonServer)
+                                val result = SurfCoreApi.sendPlayerAwaiting(player, commonServer)
 
                                 if (result.isSuccessful()) {
                                     executor.sendText {
@@ -107,7 +107,7 @@ fun networkSendCommand() = commandTree("nsend") {
                 val targetServer: CommonSurfServer by args
                 handleMultipleSend(
                     executor,
-                    surfCoreApi.getOnlinePlayers(),
+                    SurfCoreApi.getOnlinePlayers(),
                     targetServer,
                     "global"
                 )
@@ -152,7 +152,7 @@ private fun handleMultipleSend(
                 val results = coroutineScope {
                     players.map { player ->
                         async {
-                            player to surfCoreApi.sendPlayerAwaiting(player, target)
+                            player to SurfCoreApi.sendPlayerAwaiting(player, target)
                         }
                     }.awaitAll()
                 }
@@ -205,7 +205,7 @@ private fun handleMultipleSend(
                 val results = coroutineScope {
                     players.map { player ->
                         async {
-                            player to surfCoreApi.sendPlayerAwaiting(player, target)
+                            player to SurfCoreApi.sendPlayerAwaiting(player, target)
                         }
                     }.awaitAll()
                 }

@@ -15,6 +15,13 @@ import kotlin.reflect.KClass
 
 private val api = requiredService<SurfCoreApi>()
 
+@Deprecated(
+    message = "Use SurfCoreApi instead.",
+    replaceWith = ReplaceWith("SurfCoreApi"),
+    level = DeprecationLevel.WARNING
+)
+val surfCoreApi: SurfCoreApi = api
+
 interface SurfCoreApi {
     fun getOnlinePlayers(): ObjectSet<SurfPlayer>
     fun getPlayer(name: String): SurfPlayer?

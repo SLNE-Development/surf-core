@@ -200,7 +200,7 @@ object ConnectionListener {
         appendNewline()
         error(message)
         appendNewline(3)
-        spacer("Beim laden deiner Spielerdaten ist ein interner Fehler aufgetreten.")
+        spacer("Beim Laden deiner Spielerdaten ist ein interner Fehler aufgetreten.")
         appendNewline()
         spacer("Sollte das Problem weiterhin bestehen, wende dich bitte an den Support.")
         appendNewline(2)

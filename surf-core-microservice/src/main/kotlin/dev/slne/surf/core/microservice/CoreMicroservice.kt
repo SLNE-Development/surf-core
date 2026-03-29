@@ -18,7 +18,7 @@ import kotlin.io.path.Path
 
 @AutoService(Microservice::class)
 class CoreMicroservice : Microservice() {
-    private val dataPath = Path("config")
+    override val dataPath = Path("config")
     private val databaseApi = DatabaseApi.create(dataPath)
     private val rabbitApi = ServerRabbitMQApi.create("surf-core", dataPath)
 

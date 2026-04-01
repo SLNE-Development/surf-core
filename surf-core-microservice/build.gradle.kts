@@ -11,7 +11,6 @@ dependencies {
 
 surfStandaloneApi {
     withSurfDatabaseR2dbc("1.3.0", "dev.slne.surf.core.libs.database")
-    withSurfRedis("1.0.0-SNAPSHOT", "dev.slne.surf.core.libs.redis")
 }
 
 surfMicroservice {

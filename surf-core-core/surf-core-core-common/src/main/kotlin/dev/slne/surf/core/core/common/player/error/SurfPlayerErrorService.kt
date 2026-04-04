@@ -1,6 +1,6 @@
 package dev.slne.surf.core.core.common.player.error
 
-import dev.slne.surf.api.core.api.util.requiredService
+import dev.slne.surf.api.core.util.requiredService
 import dev.slne.surf.core.api.common.player.error.SurfPlayerError
 import kotlinx.coroutines.CoroutineScope
 import java.time.OffsetDateTime

@@ -1,8 +1,8 @@
 package dev.slne.surf.core.velocity.auth
 
 import com.velocitypowered.api.event.Continuation
-import dev.slne.surf.api.core.api.messages.adventure.key
-import dev.slne.surf.api.core.api.util.mutableObject2ObjectMapOf
+import dev.slne.surf.api.core.messages.adventure.key
+import dev.slne.surf.api.core.util.mutableObject2ObjectMapOf
 import dev.slne.surf.core.core.CoreInstance
 import java.security.MessageDigest
 import java.util.*

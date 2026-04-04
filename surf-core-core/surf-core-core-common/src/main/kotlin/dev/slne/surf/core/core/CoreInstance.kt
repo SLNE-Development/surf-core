@@ -1,6 +1,6 @@
 package dev.slne.surf.core.core
 
-import dev.slne.surf.api.core.api.util.requiredService
+import dev.slne.surf.api.core.util.requiredService
 import dev.slne.surf.rabbitmq.api.RabbitMQApi
 import dev.slne.surf.redis.RedisApi
 

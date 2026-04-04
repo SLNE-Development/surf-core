@@ -1,7 +1,7 @@
 package dev.slne.surf.core.client.server
 
 import com.google.auto.service.AutoService
-import dev.slne.surf.api.core.api.util.toObjectSet
+import dev.slne.surf.api.core.util.toObjectSet
 import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer

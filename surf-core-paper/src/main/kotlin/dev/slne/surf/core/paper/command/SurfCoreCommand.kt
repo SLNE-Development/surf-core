@@ -2,7 +2,7 @@ package dev.slne.surf.core.paper.command
 
 import com.github.shynixn.mccoroutine.folia.launch
 import dev.jorel.commandapi.kotlindsl.*
-import dev.slne.surf.api.core.api.messages.adventure.sendText
+import dev.slne.surf.api.core.messages.adventure.sendText
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer

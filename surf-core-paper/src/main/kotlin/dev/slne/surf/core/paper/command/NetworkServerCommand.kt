@@ -4,7 +4,7 @@ import com.github.shynixn.mccoroutine.folia.launch
 import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.jorel.commandapi.kotlindsl.getValue
 import dev.jorel.commandapi.kotlindsl.playerExecutor
-import dev.slne.surf.api.core.api.messages.adventure.sendText
+import dev.slne.surf.api.core.messages.adventure.sendText
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.common.server.SurfProxyServer

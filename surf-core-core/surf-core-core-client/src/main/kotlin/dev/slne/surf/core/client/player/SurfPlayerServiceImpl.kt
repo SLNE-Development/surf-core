@@ -1,7 +1,7 @@
 package dev.slne.surf.core.client.player
 
 import com.google.auto.service.AutoService
-import dev.slne.surf.api.core.api.util.toObjectSet
+import dev.slne.surf.api.core.util.toObjectSet
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.client.ClientCoreInstance
 import dev.slne.surf.core.core.CoreInstance

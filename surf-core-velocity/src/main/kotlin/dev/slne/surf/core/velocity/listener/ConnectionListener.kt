@@ -10,6 +10,7 @@ import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent
 import com.velocitypowered.api.event.player.ServerConnectedEvent
 import com.velocitypowered.api.proxy.Player
 import com.velocitypowered.api.util.GameProfile
+import dev.slne.surf.api.core.messages.adventure.appendNewline
 import dev.slne.surf.api.core.messages.adventure.buildText
 import dev.slne.surf.core.api.common.event.SurfPlayerConnectEvent
 import dev.slne.surf.core.api.common.event.SurfPlayerDisconnectEvent

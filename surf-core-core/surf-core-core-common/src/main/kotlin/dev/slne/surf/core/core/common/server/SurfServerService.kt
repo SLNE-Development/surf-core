@@ -1,6 +1,6 @@
 package dev.slne.surf.core.core.common.server
 
-import dev.slne.surf.api.core.api.util.requiredService
+import dev.slne.surf.api.core.util.requiredService
 import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer

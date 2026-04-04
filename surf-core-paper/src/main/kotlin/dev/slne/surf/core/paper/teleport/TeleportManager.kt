@@ -1,6 +1,6 @@
 package dev.slne.surf.core.paper.teleport
 
-import dev.slne.surf.api.core.api.messages.adventure.sendText
+import dev.slne.surf.api.core.messages.adventure.sendText
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.paper.util.bukkitPlayer
 import dev.slne.surf.core.api.paper.util.surfPlayer

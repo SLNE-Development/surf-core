@@ -2,8 +2,8 @@ package dev.slne.surf.core.paper.listener
 
 import com.github.shynixn.mccoroutine.folia.launch
 import com.github.shynixn.mccoroutine.folia.scope
-import dev.slne.surf.api.bukkit.api.command.util.idOrThrow
-import dev.slne.surf.api.core.api.messages.adventure.*
+import dev.slne.surf.api.core.messages.adventure.*
+import dev.slne.surf.api.paper.command.util.idOrThrow
 import dev.slne.surf.core.api.common.server.connection.SurfProxyServerConnectionResult
 import dev.slne.surf.core.api.paper.util.surfPlayer
 import dev.slne.surf.core.core.CoreInstance

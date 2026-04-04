@@ -1,6 +1,6 @@
 package dev.slne.surf.core.core.common
 
-import dev.slne.surf.api.core.api.util.mutableObjectSetOf
+import dev.slne.surf.api.core.util.mutableObjectSetOf
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.event.SurfEvent
 import dev.slne.surf.core.api.common.player.SurfPlayer

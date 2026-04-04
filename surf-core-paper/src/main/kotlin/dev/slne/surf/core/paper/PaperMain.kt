@@ -1,7 +1,7 @@
 package dev.slne.surf.core.paper
 
 import com.github.shynixn.mccoroutine.folia.SuspendingJavaPlugin
-import dev.slne.surf.api.bukkit.api.event.register
+import dev.slne.surf.api.paper.event.register
 import dev.slne.surf.core.api.common.event.SurfServerOnlineEvent
 import dev.slne.surf.core.api.common.event.SurfServerStoppingEvent
 import dev.slne.surf.core.api.common.server.SurfServer

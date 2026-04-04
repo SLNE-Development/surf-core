@@ -10,11 +10,11 @@ import com.velocitypowered.api.event.connection.PreTransferEvent
 import com.velocitypowered.api.event.player.CookieReceiveEvent
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent
 import com.velocitypowered.api.network.HandshakeIntent
-import dev.slne.surf.api.core.api.messages.CommonComponents
-import dev.slne.surf.api.core.api.messages.adventure.sendText
-import dev.slne.surf.api.core.api.util.mutableObjectSetOf
-import dev.slne.surf.api.core.api.util.random
+import dev.slne.surf.api.core.messages.CommonComponents
 import dev.slne.surf.api.core.messages.adventure.buildText
+import dev.slne.surf.api.core.messages.adventure.sendText
+import dev.slne.surf.api.core.util.mutableObjectSetOf
+import dev.slne.surf.api.core.util.random
 import dev.slne.surf.core.velocity.plugin
 import dev.slne.surf.core.velocity.velocityCoreConfigManager
 import java.util.*

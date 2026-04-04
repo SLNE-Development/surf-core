@@ -4,7 +4,7 @@ import dev.jorel.commandapi.kotlindsl.anyExecutor
 import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.jorel.commandapi.kotlindsl.getValue
 import dev.jorel.commandapi.kotlindsl.literalArgument
-import dev.slne.surf.api.core.api.messages.adventure.sendText
+import dev.slne.surf.api.core.messages.adventure.sendText
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.paper.command.argument.surfPlayerArgument

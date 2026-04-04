@@ -7,7 +7,7 @@ buildscript {
     }
     dependencies {
         classpath("dev.slne.surf:surf-api-gradle-plugin:26.1+")
-        classpath("dev.slne.surf.microservice:surf-microservice-gradle-plugin:1.21.11+")
+        classpath("dev.slne.surf.microservice:surf-microservice-gradle-plugin:26+")
     }
 }
 

@@ -1,5 +1,7 @@
 package dev.slne.surf.core.paper.permission
 
+import dev.slne.surf.api.paper.permission.PermissionRegistry
+
 object PermissionRegistry : PermissionRegistry() {
     const val BASE = "surf.core"
     const val BASE_COMMAND = "$BASE.command"

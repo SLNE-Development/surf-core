@@ -4,8 +4,9 @@ import com.github.shynixn.mccoroutine.velocity.launch
 import com.velocitypowered.api.event.Continuation
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.proxy.ProxyPreShutdownEvent
-import dev.slne.surf.api.core.api.util.mutableObjectSetOf
+import dev.slne.surf.api.core.messages.adventure.appendNewline
 import dev.slne.surf.api.core.messages.adventure.buildText
+import dev.slne.surf.api.core.util.mutableObjectSetOf
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.connection.SurfProxyServerConnectionResult

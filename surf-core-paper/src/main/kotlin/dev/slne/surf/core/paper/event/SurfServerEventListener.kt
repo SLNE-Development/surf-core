@@ -1,9 +1,9 @@
 package dev.slne.surf.core.paper.event
 
-import dev.slne.surf.api.bukkit.api.extensions.pluginManager
-import dev.slne.surf.api.core.api.messages.Colors
-import dev.slne.surf.api.core.api.messages.adventure.sendText
-import dev.slne.surf.api.core.api.messages.builder.SurfComponentBuilder
+import dev.slne.surf.api.core.messages.Colors
+import dev.slne.surf.api.core.messages.adventure.sendText
+import dev.slne.surf.api.core.messages.builder.SurfComponentBuilder
+import dev.slne.surf.api.paper.extensions.pluginManager
 import dev.slne.surf.core.api.common.event.SurfEventHandler
 import dev.slne.surf.core.api.common.event.SurfServerOnlineEvent
 import dev.slne.surf.core.api.common.event.SurfServerStartEvent

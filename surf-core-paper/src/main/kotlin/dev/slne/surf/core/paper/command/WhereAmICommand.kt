@@ -3,6 +3,7 @@ package dev.slne.surf.core.paper.command
 import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.jorel.commandapi.kotlindsl.playerExecutor
 import dev.slne.surf.core.core.common.player.SurfPlayerService
+import dev.slne.surf.core.core.common.util.appendCorePrefix
 import dev.slne.surf.core.core.common.util.formatMillis
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
@@ -15,14 +16,14 @@ fun whereAmICommand() = commandTree("whereami") {
         val surfPlayer =
             SurfPlayerService.players.firstOrNull { it.uuid == player.uniqueId } ?: run {
                 player.sendText {
-                    appendErrorPrefix()
+                    appendCorePrefix()
                     error("Deine Spielerdaten konnten nicht geladen werden.")
                 }
                 return@playerExecutor
             }
 
         player.sendText {
-            appendInfoPrefix()
+            appendCorePrefix()
             info("Du, ")
             append {
                 variableValue(player.name)

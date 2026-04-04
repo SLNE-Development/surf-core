@@ -15,15 +15,19 @@ object TeleportManager {
         val surfPlayer = player.surfPlayer
 
         if (player.surfPlayer.currentServer != targetServer) {
-            surfPlayer.sendAwaiting(targetServer)
-
-            CoreInstance.redisApi.publishEvent(
-                SurfPlayerTeleportRequestRedisEvent(
-                    surfPlayer,
-                    target
+            if (surfPlayer.sendAwaiting(targetServer).isSuccessful()) {
+                CoreInstance.redisApi.publishEvent(
+                    SurfPlayerTeleportRequestRedisEvent(
+                        surfPlayer,
+                        target
+                    )
                 )
-            )
-            
+            } else {
+                player.sendText {
+                    appendErrorPrefix()
+                    error("Du konntest nicht zum Zielserver teleportiert werden.")
+                }
+            }
             return
         }
 

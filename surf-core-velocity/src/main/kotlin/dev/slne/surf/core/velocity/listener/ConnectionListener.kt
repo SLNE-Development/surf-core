@@ -13,7 +13,7 @@ import dev.slne.surf.core.api.common.event.SurfPlayerConnectEvent
 import dev.slne.surf.core.api.common.event.SurfPlayerDisconnectEvent
 import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
-import dev.slne.surf.core.core.common.event.surfEventBus
+import dev.slne.surf.core.core.common.event.SurfEventBus
 import dev.slne.surf.core.core.common.player.SurfPlayerService
 import dev.slne.surf.core.core.common.player.history.SurfPlayerIpAddressHistoryService
 import dev.slne.surf.core.core.common.player.history.SurfPlayerNameHistoryService
@@ -126,7 +126,7 @@ object ConnectionListener {
 
         SurfPlayerService.cachePlayer(player)
 
-        surfEventBus.fire(
+        SurfEventBus.fire(
             SurfPlayerConnectEvent(
                 player
             )
@@ -154,7 +154,6 @@ object ConnectionListener {
     ) {
         println("[connection update] $playerName was redirected from '$fromServer' to '$toServer'")
 
-
         val server = SurfServer[toServer] ?: error("SurfServer '$toServer' not found")
         val player = SurfPlayerService.players.firstOrNull { it.uuid == playerUuid }
             ?.copy(currentServer = server)
@@ -171,13 +170,13 @@ object ConnectionListener {
         if (successfullyLogin == DisconnectEvent.LoginStatus.SUCCESSFUL_LOGIN) {
             println("[connection closed] $playerName disconnected")
         } else {
-            println("[connection closed] $playerName tried to connect: ${successfullyLogin.name}")
+            println("[connection closed] $playerName failed to connect: ${successfullyLogin.name}")
         }
 
 
         val player = SurfPlayerService.findPlayerByUuid(playerUuid) ?: return
 
-        surfEventBus.fire(
+        SurfEventBus.fire(
             SurfPlayerDisconnectEvent(
                 player
             )

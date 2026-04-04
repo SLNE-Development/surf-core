@@ -64,23 +64,23 @@ object AuthenticationListener {
 
         transfers.add(event.player.uniqueId)
 
-        authenticationService.continuations[event.player.uniqueId] = continuation
-        event.player.requestCookie(authenticationService.key)
+        AuthenticationService.continuations[event.player.uniqueId] = continuation
+        event.player.requestCookie(AuthenticationService.key)
     }
 
     @Subscribe
     fun onCookieReceive(event: CookieReceiveEvent) {
-        if (event.originalKey != authenticationService.key) return
+        if (event.originalKey != AuthenticationService.key) return
 
         event.originalData?.let {
-            authenticationService.authenticate(event.player.uniqueId, it)
+            AuthenticationService.authenticate(event.player.uniqueId, it)
         }
     }
 
     @Subscribe
     fun onInitialServer(event: PlayerChooseInitialServerEvent) {
         val player = event.player
-        val lastServerName = authenticationService.lastServerMap.remove(player.uniqueId) ?: return
+        val lastServerName = AuthenticationService.lastServerMap.remove(player.uniqueId) ?: return
 
         if (event.player.handshakeIntent != HandshakeIntent.TRANSFER) {
             return
@@ -96,12 +96,11 @@ object AuthenticationListener {
         val player = event.player()
         val token = generateToken()
 
-        authenticationService.preTransfer(player.uniqueId, token)
+        AuthenticationService.preTransfer(player.uniqueId, token)
 
-        player.storeCookie(authenticationService.key, token)
-
+        player.storeCookie(AuthenticationService.key, token)
         player.currentServer.getOrNull()?.serverInfo?.name?.let {
-            authenticationService.lastServerMap[player.uniqueId] = it
+            AuthenticationService.lastServerMap[player.uniqueId] = it
         }
     }
 

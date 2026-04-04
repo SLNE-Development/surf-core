@@ -3,8 +3,6 @@ package dev.slne.surf.core.velocity.api
 import com.google.auto.service.AutoService
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.player.SurfPlayer
-import dev.slne.surf.core.api.common.server.CommonSurfServer
-import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.common.server.connection.SurfServerConnectResult
 import dev.slne.surf.core.core.common.SurfCoreApiImpl
@@ -21,49 +19,24 @@ class SurfCoreApiVelocityImpl : SurfCoreApiImpl(), Services.Fallback {
     override fun getCurrentServerCategory() = surfServerConfig.serverCategory
     override fun getCurrentServerDisplayName() = surfServerConfig.serverDisplayName
 
-    override fun sendPlayer(
-        player: SurfPlayer,
-        server: CommonSurfServer
-    ) {
-        when (server) {
-            is SurfProxyServer -> {
-                plugin.proxy.getPlayer(player.uuid).getOrNull()?.transferToHost(
-                    server.address
-                )
-            }
-
-            is SurfServer -> {
-                val velocityServer = plugin.proxy.getServer(server.name).getOrNull()
-                    ?: error("SurfServer ${server.name} not found on proxy")
-                plugin.proxy.getPlayer(player.uuid).getOrNull()
-                    ?.createConnectionRequest(velocityServer)?.fireAndForget()
-            }
-        }
-    }
-
     override suspend fun sendPlayerAwaiting(
         surfPlayer: SurfPlayer,
         surfServer: SurfServer
     ): SurfServerConnectResult {
-        // try fast-path first
         val player = plugin.proxy.getPlayer(surfPlayer.uuid).getOrNull()
         if (player == null) {
-            // slow-path
             return super.sendPlayerAwaiting(surfPlayer, surfServer)
         } else {
-            // player is on this proxy
             val velocityServer = plugin.proxy.getServer(surfServer.name).getOrNull()
                 ?: return SurfServerConnectResult(
                     SurfServerConnectResult.Status.SERVER_NOT_FOUND,
                     null
                 )
-
-            val result = player.createConnectionRequest(velocityServer)
+            
+            return player.createConnectionRequest(velocityServer)
                 .connect()
                 .await()
                 .convertResult()
-
-            return result
         }
     }
 }

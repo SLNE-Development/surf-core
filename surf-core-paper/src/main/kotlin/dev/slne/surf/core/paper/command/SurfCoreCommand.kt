@@ -11,6 +11,7 @@ import dev.slne.surf.core.api.paper.util.surfPlayer
 import dev.slne.surf.core.core.CoreInstance
 import dev.slne.surf.core.core.common.player.SurfPlayerService
 import dev.slne.surf.core.core.common.redis.event.SurfPlayerResyncRedisEvent
+import dev.slne.surf.core.core.common.util.appendCorePrefix
 import dev.slne.surf.core.paper.PaperBootstrap
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.core.paper.plugin
@@ -20,10 +21,10 @@ fun surfCoreCommand() = commandTree("core") {
     withPermission(PermissionRegistry.COMMAND_CORE)
     literalArgument("reload") {
         anyExecutor { executor, _ ->
-            PaperBootstrap.surfServerConfigHolder.reload()
+            PaperBootstrap.surfServerConfiguration.reload()
 
             executor.sendText {
-                appendSuccessPrefix()
+                appendCorePrefix()
                 success("Die Konfiguration wurde neu geladen.")
             }
         }
@@ -34,14 +35,14 @@ fun surfCoreCommand() = commandTree("core") {
             SurfPlayerService.clearPlayers()
 
             executor.sendText {
-                appendSuccessPrefix()
+                appendCorePrefix()
                 success("Die Spieler-Caches wurden geleert.")
             }
 
             CoreInstance.redisApi.publishEvent(SurfPlayerResyncRedisEvent)
 
             executor.sendText {
-                appendInfoPrefix()
+                appendCorePrefix()
                 info("Die Spieler werden nun auf allen Servern neu synchronisiert.")
             }
         }
@@ -55,7 +56,7 @@ fun surfCoreCommand() = commandTree("core") {
                     val backend: SurfServer by args
 
                     player.sendText {
-                        appendInfoPrefix()
+                        appendCorePrefix()
                         info("Du wirst auf den Server gesendet...")
                     }
 
@@ -64,14 +65,14 @@ fun surfCoreCommand() = commandTree("core") {
 
                         if (result.isSuccessful()) {
                             player.sendText {
-                                appendSuccessPrefix()
+                                appendCorePrefix()
                                 success("Du wurdest erfolgreich zum Server ")
                                 variableValue(backend.name)
                                 success(" gesendet.")
                             }
                         } else {
                             player.sendText {
-                                appendErrorPrefix()
+                                appendCorePrefix()
                                 error("Es gab ein Problem beim Senden zum Server: ${result.status.name}")
                             }
                         }
@@ -87,7 +88,7 @@ fun surfCoreCommand() = commandTree("core") {
                     val proxy: SurfProxyServer by args
 
                     player.sendText {
-                        appendInfoPrefix()
+                        appendCorePrefix()
                         info("Du wirst zum Proxy gesendet...")
                     }
 
@@ -96,14 +97,14 @@ fun surfCoreCommand() = commandTree("core") {
 
                         if (result.isSuccessful()) {
                             player.sendText {
-                                appendSuccessPrefix()
+                                appendCorePrefix()
                                 success("Du wurdest erfolgreich zum Proxy ")
                                 variableValue(proxy.name)
                                 success(" gesendet.")
                             }
                         } else {
                             player.sendText {
-                                appendErrorPrefix()
+                                appendCorePrefix()
                                 error("Es gab ein Problem beim Senden zum Proxy: ${result.status.name}")
                             }
                         }

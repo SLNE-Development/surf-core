@@ -4,7 +4,7 @@ import dev.slne.surf.surfapi.core.api.config.manager.SpongeConfigManager
 import dev.slne.surf.surfapi.core.api.config.surfConfigApi
 import java.nio.file.Path
 
-class SurfServerConfigHolder(
+class SurfServerConfiguration(
     dataPath: Path
 ) {
     private val configManager: SpongeConfigManager<SurfServerConfig>

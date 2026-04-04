@@ -12,6 +12,7 @@ import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.paper.command.argument.surfPlayerArgument
 import dev.slne.surf.core.api.paper.command.argument.surfServerArgument
+import dev.slne.surf.core.core.common.util.appendCorePrefix
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.core.paper.plugin
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
@@ -38,7 +39,7 @@ fun networkSendCommand() = commandTree("nsend") {
 
                                 if (result.isSuccessful()) {
                                     executor.sendText {
-                                        appendSuccessPrefix()
+                                        appendCorePrefix()
                                         success("Der Spieler ")
                                         variableValue(player.username)
                                         success(" wurde erfolgreich zum Proxy ")
@@ -47,7 +48,7 @@ fun networkSendCommand() = commandTree("nsend") {
                                     }
                                 } else {
                                     executor.sendText {
-                                        appendErrorPrefix()
+                                        appendCorePrefix()
                                         error("Der Spieler ")
                                         variableValue(player.username)
                                         error(" konnte nicht gesendet werden: ${result.status}")
@@ -62,7 +63,7 @@ fun networkSendCommand() = commandTree("nsend") {
 
                                 if (result.isSuccessful()) {
                                     executor.sendText {
-                                        appendSuccessPrefix()
+                                        appendCorePrefix()
                                         success("Der Spieler ")
                                         variableValue(player.username)
                                         success(" wurde erfolgreich zum Server ")
@@ -71,7 +72,7 @@ fun networkSendCommand() = commandTree("nsend") {
                                     }
                                 } else {
                                     executor.sendText {
-                                        appendErrorPrefix()
+                                        appendCorePrefix()
                                         error("Der Spieler ")
                                         variableValue(player.username)
                                         error(" konnte nicht gesendet werden: ")

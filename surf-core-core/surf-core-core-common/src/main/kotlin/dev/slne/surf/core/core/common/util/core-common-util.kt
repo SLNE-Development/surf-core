@@ -1,5 +1,6 @@
 package dev.slne.surf.core.core.common.util
 
+import dev.slne.surf.surfapi.core.api.messages.builder.SurfComponentBuilder
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.ZoneId
@@ -25,6 +26,15 @@ fun Long.formatTimeMillis(): String =
     Instant.ofEpochMilli(this)
         .atZone(zone)
         .format(timeFormatter)
+
+fun SurfComponentBuilder.appendCorePrefix() = append {
+    spacer(">>")
+    appendSpace()
+    primary("Core")
+    appendSpace()
+    darkSpacer("|")
+    appendSpace()
+}
 
 
 fun OffsetDateTime.formatDateTime(

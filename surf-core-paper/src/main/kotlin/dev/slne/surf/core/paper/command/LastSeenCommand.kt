@@ -6,6 +6,7 @@ import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.jorel.commandapi.kotlindsl.getValue
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.paper.command.argument.surfOfflinePlayerArgument
+import dev.slne.surf.core.core.common.util.appendCorePrefix
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.core.paper.plugin
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
@@ -22,7 +23,7 @@ fun lastSeenCommand() = commandTree("lastseen") {
             plugin.launch {
                 val surfPlayer = player.await() ?: run {
                     executor.sendText {
-                        appendErrorPrefix()
+                        appendCorePrefix()
                         error("Der Spieler wurde nicht gefunden.")
                     }
                     return@launch
@@ -30,7 +31,7 @@ fun lastSeenCommand() = commandTree("lastseen") {
 
                 if (surfPlayer.isOnline()) {
                     executor.sendText {
-                        appendSuccessPrefix()
+                        appendCorePrefix()
                         success("Der Spieler ")
                         variableValue(surfPlayer.lastKnownName ?: surfPlayer.uuid.toString())
                         success(" ist aktuell online.")
@@ -40,7 +41,7 @@ fun lastSeenCommand() = commandTree("lastseen") {
 
                 val lastSeen = surfPlayer.lastSeen ?: run {
                     executor.sendText {
-                        appendErrorPrefix()
+                        appendCorePrefix()
                         error("Der Spieler wurde noch nie auf dem Netzwerk gesehen.")
                     }
                     return@launch
@@ -48,7 +49,7 @@ fun lastSeenCommand() = commandTree("lastseen") {
 
 
                 executor.sendText {
-                    appendInfoPrefix()
+                    appendCorePrefix()
                     info("Der Spieler ")
                     variableValue(surfPlayer.lastKnownName ?: surfPlayer.uuid.toString())
                     info(" wurde zuletzt am ")

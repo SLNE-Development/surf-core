@@ -4,6 +4,8 @@ import dev.slne.surf.core.api.common.event.SurfEventHandler
 import dev.slne.surf.core.api.common.event.SurfServerOnlineEvent
 import dev.slne.surf.core.api.common.event.SurfServerStartEvent
 import dev.slne.surf.core.api.common.event.SurfServerStoppingEvent
+import dev.slne.surf.core.api.paper.util.getOrCreatePermission
+import dev.slne.surf.surfapi.bukkit.api.extensions.pluginManager
 import dev.slne.surf.surfapi.core.api.messages.Colors
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 import dev.slne.surf.surfapi.core.api.messages.builder.SurfComponentBuilder
@@ -20,6 +22,8 @@ object SurfServerEventListener {
                 info(" startet nun...")
             }
         }
+
+        pluginManager.getOrCreatePermission("surf.core.server.${event.serverName}")
     }
 
     @SurfEventHandler

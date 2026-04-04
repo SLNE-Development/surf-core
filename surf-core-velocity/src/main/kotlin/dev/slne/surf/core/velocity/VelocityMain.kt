@@ -19,11 +19,11 @@ import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.state.SurfServerState
 import dev.slne.surf.core.api.common.util.sendText
 import dev.slne.surf.core.client.ClientCoreInstance
-import dev.slne.surf.core.core.common.config.SurfServerConfigHolder
-import dev.slne.surf.core.core.common.event.surfEventBus
+import dev.slne.surf.core.core.common.config.SurfServerConfiguration
+import dev.slne.surf.core.core.common.event.SurfEventBus
 import dev.slne.surf.core.core.common.server.SurfServerService
 import dev.slne.surf.core.velocity.auth.AuthenticationListener
-import dev.slne.surf.core.velocity.auth.authenticationService
+import dev.slne.surf.core.velocity.auth.AuthenticationService
 import dev.slne.surf.core.velocity.config.VelocityCoreConfigManager
 import dev.slne.surf.core.velocity.listener.ConnectionListener
 import dev.slne.surf.core.velocity.listener.VelocityServerListener
@@ -37,6 +37,7 @@ import net.kyori.adventure.text.format.TextDecoration
 import org.slf4j.Logger
 import java.net.InetSocketAddress
 import java.nio.file.Path
+import java.time.OffsetDateTime
 
 class VelocityMain @Inject constructor(
     val proxy: ProxyServer,
@@ -51,14 +52,14 @@ class VelocityMain @Inject constructor(
         suspendingPluginContainer.initialize(this)
 
         instance = this
-        surfServerConfigHolder = SurfServerConfigHolder(dataPath)
+        surfServerConfiguration = SurfServerConfiguration(dataPath)
 
         runBlocking {
             ClientCoreInstance.clientLoader.onBootstrap()
             ClientCoreInstance.clientLoader.onLoad()
         }
 
-        authenticationService.init()
+        AuthenticationService.init()
 
         ClientCoreInstance.clientLoader.withListener(VelocityRedisListener)
         ClientCoreInstance.clientLoader.withRequestResponseHandler(SendPlayerToProxyHandler)
@@ -71,13 +72,15 @@ class VelocityMain @Inject constructor(
             category = surfServerConfig.serverCategory,
             state = SurfServerState.STARTING,
             maxPlayers = plugin.proxy.configuration.showMaxPlayers,
+            uuid = surfServerConfig.serverUuid,
+            startedAt = OffsetDateTime.now(),
             address = InetSocketAddress(
                 velocityCoreConfigManager.config.connectionAddress.host,
                 velocityCoreConfigManager.config.connectionAddress.port
             )
         )
 
-        surfEventBus.fire(SurfServerStartEvent(surfServerConfig.serverName))
+        SurfEventBus.fire(SurfServerStartEvent(surfServerConfig.serverName))
         SurfServerService.addServer(server)
     }
 
@@ -87,7 +90,7 @@ class VelocityMain @Inject constructor(
             ClientCoreInstance.clientLoader.onEnable()
         }
 
-        surfEventBus.fire(SurfServerOnlineEvent(surfServerConfig.serverName))
+        SurfEventBus.fire(SurfServerOnlineEvent(surfServerConfig.serverName))
         eventManager.register(this, AuthenticationListener)
         eventManager.register(this, VelocityServerListener)
         eventManager.registerSuspend(this, ConnectionListener)
@@ -101,7 +104,7 @@ class VelocityMain @Inject constructor(
     fun onProxyShutdown(event: ProxyShutdownEvent) {
         surfPlayerSyncTask.stop()
 
-        surfEventBus.fire(SurfServerStoppingEvent(surfServerConfig.serverName))
+        SurfEventBus.fire(SurfServerStoppingEvent(surfServerConfig.serverName))
 
         SurfCoreApi.getOnlinePlayers().forEach {
             it.sendText {
@@ -134,7 +137,7 @@ class VelocityMain @Inject constructor(
 
     companion object {
         lateinit var instance: VelocityMain
-        lateinit var surfServerConfigHolder: SurfServerConfigHolder
+        lateinit var surfServerConfiguration: SurfServerConfiguration
     }
 }
 
@@ -142,4 +145,4 @@ val velocityCoreConfigManager = VelocityCoreConfigManager()
 
 val proxy get() = VelocityMain.instance.proxy
 val plugin get() = VelocityMain.instance
-val surfServerConfig get() = VelocityMain.surfServerConfigHolder.config
+val surfServerConfig get() = VelocityMain.surfServerConfiguration.config

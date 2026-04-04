@@ -6,7 +6,7 @@ import dev.slne.surf.core.api.common.event.SurfServerStoppingEvent
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.common.server.state.SurfServerState
 import dev.slne.surf.core.client.ClientCoreInstance
-import dev.slne.surf.core.core.common.event.surfEventBus
+import dev.slne.surf.core.core.common.event.SurfEventBus
 import dev.slne.surf.core.core.common.server.SurfServerService
 import dev.slne.surf.core.paper.command.*
 import dev.slne.surf.core.paper.event.SurfServerEventListener
@@ -20,13 +20,13 @@ val plugin get() = JavaPlugin.getPlugin(PaperMain::class.java)
 
 class PaperMain : SuspendingJavaPlugin() {
     override suspend fun onLoadAsync() {
-        surfEventBus.registerListener(SurfServerEventListener)
+        SurfEventBus.registerListener(SurfServerEventListener)
     }
 
     override suspend fun onEnableAsync() {
         ClientCoreInstance.clientLoader.onEnable()
 
-        surfEventBus.fire(SurfServerOnlineEvent(surfServerConfig.serverName))
+        SurfEventBus.fire(SurfServerOnlineEvent(surfServerConfig.serverName))
         SurfServerService.changeState(SurfServer.current(), SurfServerState.RUNNING)
 
         lastSeenCommand()
@@ -52,7 +52,7 @@ class PaperMain : SuspendingJavaPlugin() {
 
     override suspend fun onDisableAsync() {
         surfServerInformationSyncTask.stop()
-        surfEventBus.fire(SurfServerStoppingEvent(surfServerConfig.serverName))
+        SurfEventBus.fire(SurfServerStoppingEvent(surfServerConfig.serverName))
         SurfServerService.changeState(SurfServer.current(), SurfServerState.STOPPING)
         SurfServerService.removeServer(SurfServer.current())
 

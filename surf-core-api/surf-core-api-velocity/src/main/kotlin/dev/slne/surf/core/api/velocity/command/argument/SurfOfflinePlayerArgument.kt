@@ -16,7 +16,7 @@ import kotlinx.coroutines.future.future
 
 @Suppress("UNCHECKED_CAST")
 open class SurfOfflinePlayerArgument(nodeName: String) :
-    Argument<Deferred<SurfPlayer?>>(nodeName, StringArgumentType.string()) {
+    Argument<Deferred<SurfPlayer?>>(nodeName, StringArgumentType::string) {
     override fun getPrimitiveType(): Class<Deferred<SurfPlayer?>> {
         return Deferred::class.java as Class<Deferred<SurfPlayer?>>
     }

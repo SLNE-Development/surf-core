@@ -8,6 +8,7 @@ import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.paper.command.argument.surfBackendServerArgument
 import dev.slne.surf.core.core.CoreInstance
 import dev.slne.surf.core.core.common.redis.event.SurfServerChangeMaxPlayersRedisEvent
+import dev.slne.surf.core.core.common.util.appendCorePrefix
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 
@@ -28,7 +29,7 @@ fun networkServerMaxPlayersCommand() = commandTree("nmaxplayers") {
                 )
 
                 sender.sendText {
-                    appendSuccessPrefix()
+                    appendCorePrefix()
                     success("Die maximale Spieleranzahl des Servers ")
                     variableValue("'${backend.name}'")
                     success(" wurde auf ")

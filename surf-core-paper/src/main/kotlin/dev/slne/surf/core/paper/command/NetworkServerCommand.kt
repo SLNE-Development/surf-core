@@ -10,6 +10,7 @@ import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.paper.command.argument.permissionSurfServerArgument
 import dev.slne.surf.core.api.paper.util.toSurfPlayer
+import dev.slne.surf.core.core.common.util.appendCorePrefix
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.core.paper.plugin
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
@@ -23,7 +24,7 @@ fun networkServerCommand() = commandTree("nserver") {
             val surfPlayer = player.toSurfPlayer()
 
             player.sendText {
-                appendInfoPrefix()
+                appendCorePrefix()
                 info("Du wirst zum Server ")
                 variableValue(server.name)
                 info(" gesendet...")
@@ -36,14 +37,14 @@ fun networkServerCommand() = commandTree("nserver") {
 
                         if (status.isSuccessful()) {
                             player.sendText {
-                                appendSuccessPrefix()
+                                appendCorePrefix()
                                 success("Du wurdest erfolgreich zum Server ")
                                 variableValue(server.name)
                                 success(" gesendet!")
                             }
                         } else {
                             player.sendText {
-                                appendErrorPrefix()
+                                appendCorePrefix()
                                 error("Du konntest nicht zum Server verbunden werden: ${status.status}")
                             }
                         }
@@ -56,14 +57,14 @@ fun networkServerCommand() = commandTree("nserver") {
 
                         if (status.isSuccessful()) {
                             player.sendText {
-                                appendSuccessPrefix()
+                                appendCorePrefix()
                                 success("Du wurdest erfolgreich zum Server ")
                                 variableValue(server.name)
                                 success(" gesendet!")
                             }
                         } else {
                             player.sendText {
-                                appendErrorPrefix()
+                                appendCorePrefix()
                                 error("Du konntest nicht zum Server verbunden werden")
 
                                 status.velocityMessage.let {

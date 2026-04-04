@@ -2,7 +2,6 @@ package dev.slne.surf.core.api.common.player
 
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.player.serializer.SurfPlayerSerializer
-import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
 import kotlinx.serialization.Contextual
@@ -24,7 +23,6 @@ data class SurfPlayer(
 ) {
     val username get() = lastKnownName ?: "#Unbekannt"
     fun isOnline() = SurfCoreApi.getOnlinePlayers().any { it.uuid == uuid }
-    fun send(server: CommonSurfServer) = SurfCoreApi.sendPlayer(this, server)
     suspend fun sendAwaiting(server: SurfServer) = SurfCoreApi.sendPlayerAwaiting(this, server)
     suspend fun sendAwaiting(proxy: SurfProxyServer) = SurfCoreApi.sendPlayerAwaiting(this, proxy)
 

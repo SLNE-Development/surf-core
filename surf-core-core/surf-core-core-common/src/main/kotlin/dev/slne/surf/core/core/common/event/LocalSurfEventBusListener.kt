@@ -6,6 +6,6 @@ import dev.slne.surf.redis.event.OnRedisEvent
 object LocalSurfEventBusListener {
     @OnRedisEvent
     fun onSurfEventFire(event: SurfEventFireRedisEvent) {
-        surfEventBus.fireLocal(event.event)
+        SurfEventBus.fireLocal(event.event)
     }
 }

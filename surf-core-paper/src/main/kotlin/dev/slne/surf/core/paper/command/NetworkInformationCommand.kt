@@ -10,6 +10,7 @@ import dev.slne.surf.core.api.paper.command.argument.surfPlayerArgument
 import dev.slne.surf.core.api.paper.command.argument.surfServerArgument
 import dev.slne.surf.core.core.common.player.SurfPlayerService
 import dev.slne.surf.core.core.common.server.SurfServerService
+import dev.slne.surf.core.core.common.util.appendCorePrefix
 import dev.slne.surf.core.core.common.util.formatDateTime
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
@@ -19,7 +20,7 @@ fun networkInformationCommand() = commandTree("ninfo") {
 
     anyExecutor { sender, _ ->
         sender.sendText {
-            appendInfoPrefix()
+            appendCorePrefix()
             info("Derzeit sind ")
             variableValue(SurfPlayerService.players.size)
             info(" Spieler verteilt auf ")

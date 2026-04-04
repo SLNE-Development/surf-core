@@ -9,6 +9,7 @@ import dev.slne.surf.core.client.ClientCoreInstance
 import dev.slne.surf.core.core.common.server.SurfServerService
 import dev.slne.surf.surfapi.core.api.util.toObjectSet
 import it.unimi.dsi.fastutil.objects.ObjectSet
+import java.util.*
 
 @AutoService(SurfServerService::class)
 class SurfServerServiceImpl : SurfServerService {
@@ -41,13 +42,11 @@ class SurfServerServiceImpl : SurfServerService {
         val server = when (commonSurfServer) {
             is SurfProxyServer -> _proxies[commonSurfServer.name]
             is SurfServer -> _servers[commonSurfServer.name]
-            else -> error("Unknown server type: ${commonSurfServer::class}")
         } ?: error("Server ${commonSurfServer.name} not found")
 
         val updatedServer = when (server) {
             is SurfProxyServer -> server.copy(state = state)
             is SurfServer -> server.copy(state = state)
-            else -> error("Unknown server type: ${server::class}")
         }
 
         when (updatedServer) {
@@ -56,19 +55,13 @@ class SurfServerServiceImpl : SurfServerService {
         }
     }
 
-    override fun getServerByName(name: String): SurfServer? {
-        return servers.find { it.name == name }
-    }
+    override fun getServerByName(name: String) = servers.find { it.name == name }
+    override fun getServerByCategory(category: String) =
+        servers.filter { it.category == category }.toObjectSet()
 
-    override fun getServerByCategory(category: String): ObjectSet<SurfServer> {
-        return servers.filter { it.category == category }.toObjectSet()
-    }
+    override fun getProxyServerByName(name: String) = proxyServers.find { it.name == name }
+    override fun getProxyServerByCategory(category: String) =
+        proxyServers.filter { it.category == category }.toObjectSet()
 
-    override fun getProxyServerByName(name: String): SurfProxyServer? {
-        return proxyServers.find { it.name == name }
-    }
-
-    override fun getProxyServerByCategory(category: String): ObjectSet<SurfProxyServer> {
-        return proxyServers.filter { it.category == category }.toObjectSet()
-    }
+    override fun getServerByUuid(uuid: UUID): CommonSurfServer? = servers.find { it.uuid == uuid }
 }

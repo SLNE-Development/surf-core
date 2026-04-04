@@ -3,6 +3,7 @@ package dev.slne.surf.core.paper.command
 import dev.jorel.commandapi.kotlindsl.anyExecutor
 import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.slne.surf.core.core.common.player.SurfPlayerService
+import dev.slne.surf.core.core.common.util.appendCorePrefix
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 
@@ -13,7 +14,7 @@ fun networkListCommand() = commandTree("nlist") {
 
         if (players.isEmpty()) {
             executor.sendText {
-                appendErrorPrefix()
+                appendCorePrefix()
                 error("Es sind derzeit keine Spieler im Netzwerk online.")
             }
             return@anyExecutor
@@ -32,7 +33,7 @@ fun networkListCommand() = commandTree("nlist") {
             .groupBy({ it.first }, { it.second })
 
         executor.sendText {
-            appendInfoPrefix()
+            appendCorePrefix()
             info("Es sind derzeit ")
             variableValue(players.size)
             info(" Spieler auf dem Netzwerk online:\n")

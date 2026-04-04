@@ -26,8 +26,6 @@ class SurfServerInformationSyncTask {
                     )
                 )
             }
-
-
         }, 0L, 1L, TimeUnit.SECONDS)
     }
 

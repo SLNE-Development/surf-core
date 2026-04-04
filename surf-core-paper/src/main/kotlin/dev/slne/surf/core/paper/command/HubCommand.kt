@@ -5,6 +5,7 @@ import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.jorel.commandapi.kotlindsl.playerExecutor
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.paper.util.surfPlayer
+import dev.slne.surf.core.core.common.util.appendCorePrefix
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.core.paper.plugin
 import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
@@ -15,7 +16,7 @@ fun hubCommand() = commandTree("hub") {
 
     playerExecutor { player, _ ->
         player.sendText {
-            appendInfoPrefix()
+            appendCorePrefix()
             info("Du wirst zum Hub gesendet...")
         }
 
@@ -23,7 +24,7 @@ fun hubCommand() = commandTree("hub") {
 
         if (server == null) {
             player.sendText {
-                appendErrorPrefix()
+                appendCorePrefix()
                 error("Es konnte kein Hub-Server gefunden werden.")
             }
             return@playerExecutor
@@ -34,12 +35,12 @@ fun hubCommand() = commandTree("hub") {
 
             if (result.isSuccessful()) {
                 player.sendText {
-                    appendSuccessPrefix()
+                    appendCorePrefix()
                     success("Du wurdest erfolgreich zum Hub gesendet.")
                 }
             } else {
                 player.sendText {
-                    appendErrorPrefix()
+                    appendCorePrefix()
                     error("Es gab ein Problem beim Senden zum Hub")
 
                     result.velocityMessage.let {

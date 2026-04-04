@@ -7,6 +7,7 @@ import dev.slne.surf.core.api.common.server.state.SurfServerState
 import dev.slne.surf.surfapi.core.api.util.requiredService
 import it.unimi.dsi.fastutil.objects.ObjectSet
 import org.jetbrains.annotations.UnmodifiableView
+import java.util.*
 
 private val service = requiredService<SurfServerService>()
 
@@ -19,6 +20,7 @@ interface SurfServerService {
     fun changeState(commonSurfServer: CommonSurfServer, state: SurfServerState)
 
     fun getServerByName(name: String): SurfServer?
+    fun getServerByUuid(uuid: UUID): CommonSurfServer?
     fun getServerByCategory(category: String): ObjectSet<SurfServer>
     fun getProxyServerByName(name: String): SurfProxyServer?
     fun getProxyServerByCategory(category: String): ObjectSet<SurfProxyServer>

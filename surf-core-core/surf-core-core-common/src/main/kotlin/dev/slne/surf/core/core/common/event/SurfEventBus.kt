@@ -9,9 +9,7 @@ import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.jvm.isAccessible
 
-val surfEventBus = SurfEventBus()
-
-class SurfEventBus {
+object SurfEventBus {
     private val listeners = mutableMapOf<KClass<out SurfEvent>, MutableList<(SurfEvent) -> Unit>>()
 
     fun registerListener(listener: Any) {

@@ -14,7 +14,7 @@ import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 
 open class SurfProxyServerArgument(nodeName: String) :
-    Argument<SurfProxyServer>(nodeName, StringArgumentType.string()) {
+    Argument<SurfProxyServer>(nodeName, StringArgumentType::string) {
     override fun getPrimitiveType(): Class<SurfProxyServer> {
         return SurfProxyServer::class.java
     }

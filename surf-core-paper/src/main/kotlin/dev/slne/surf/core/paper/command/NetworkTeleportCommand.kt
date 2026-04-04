@@ -6,6 +6,7 @@ import dev.jorel.commandapi.kotlindsl.getValue
 import dev.jorel.commandapi.kotlindsl.playerExecutor
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.paper.command.argument.surfPlayerArgument
+import dev.slne.surf.core.core.common.util.appendCorePrefix
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.core.paper.plugin
 import dev.slne.surf.core.paper.teleport.TeleportManager
@@ -18,7 +19,7 @@ fun networkTeleportCommand() = commandTree("ntp") {
             val target: SurfPlayer by args
 
             player.sendText {
-                appendInfoPrefix()
+                appendCorePrefix()
                 info("Du wirst zu ")
                 variableValue(target.lastKnownName ?: target.uuid.toString())
                 info(" teleportiert...")

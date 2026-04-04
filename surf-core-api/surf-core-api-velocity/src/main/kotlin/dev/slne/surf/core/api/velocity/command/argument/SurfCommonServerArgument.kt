@@ -14,7 +14,7 @@ import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 
 open class SurfServerArgument(nodeName: String) :
-    Argument<CommonSurfServer>(nodeName, StringArgumentType.string()) {
+    Argument<CommonSurfServer>(nodeName, StringArgumentType::string) {
     override fun getPrimitiveType(): Class<CommonSurfServer> {
         return CommonSurfServer::class.java
     }

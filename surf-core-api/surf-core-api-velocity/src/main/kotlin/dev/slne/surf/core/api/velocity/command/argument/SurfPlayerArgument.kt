@@ -14,7 +14,7 @@ import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 
 open class SurfPlayerArgument(nodeName: String) :
-    Argument<SurfPlayer>(nodeName, StringArgumentType.string()) {
+    Argument<SurfPlayer>(nodeName, StringArgumentType::string) {
     override fun getPrimitiveType(): Class<SurfPlayer> {
         return SurfPlayer::class.java
     }

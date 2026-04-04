@@ -29,5 +29,9 @@ sealed interface CommonSurfServer {
 
     companion object {
         operator fun get(name: String) = SurfCoreApi.getCommonServerByName(name)
+        fun current(): CommonSurfServer = SurfCoreApi.getCurrentServerName().let {
+            SurfCoreApi.getServerByName(it) ?: SurfCoreApi.getProxyServerByName(it)
+        }
+            ?: error("Current server ${SurfCoreApi.getCurrentServerName()} not found! Are you sure you're running on a Surf server?")
     }
 }

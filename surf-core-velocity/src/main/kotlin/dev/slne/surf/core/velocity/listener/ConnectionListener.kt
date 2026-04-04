@@ -1,6 +1,7 @@
 package dev.slne.surf.core.velocity.listener
 
 import com.github.shynixn.mccoroutine.velocity.launch
+import com.github.shynixn.mccoroutine.velocity.scope
 import com.velocitypowered.api.event.ResultedEvent
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.connection.DisconnectEvent
@@ -15,10 +16,12 @@ import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.core.common.event.SurfEventBus
 import dev.slne.surf.core.core.common.player.SurfPlayerService
+import dev.slne.surf.core.core.common.player.error.SurfPlayerErrorService
 import dev.slne.surf.core.core.common.player.history.SurfPlayerIpAddressHistoryService
 import dev.slne.surf.core.core.common.player.history.SurfPlayerNameHistoryService
 import dev.slne.surf.core.core.common.player.history.SurfPlayerTextureHistoryService
 import dev.slne.surf.core.core.common.server.SurfServerService
+import dev.slne.surf.core.core.common.util.niceRed
 import dev.slne.surf.core.velocity.auth.AuthenticationListener
 import dev.slne.surf.core.velocity.plugin
 import dev.slne.surf.surfapi.core.api.messages.adventure.appendNewline
@@ -46,7 +49,16 @@ object ConnectionListener {
             println("[connection timeout] ${event.player.username} (${event.player.remoteAddress}) took too long to log in")
 
             event.result =
-                ResultedEvent.ComponentResult.denied(failedToLoadDataComponent("Internal server error: Timeout while loading player data."))
+                ResultedEvent.ComponentResult.denied(
+                    failedToLoadDataComponent(
+                        "Internal server error: Timeout while loading player data.",
+                        SurfPlayerErrorService.saveError(
+                            playerUuid = event.player.uniqueId,
+                            staffMessage = "Player timed out while logging in, most likely a internal database issue. Is rabbit or microservice down?",
+                            scope = plugin.pluginContainer.scope
+                        )
+                    )
+                )
         }
     }
 
@@ -89,7 +101,16 @@ object ConnectionListener {
         val surfPlayer = SurfPlayerService.findPlayerByUuid(player.uniqueId)
 
         if (surfPlayer == null) {
-            player.disconnect(failedToLoadDataComponent("Internal server error: Failed to receive data while connecting to the initial server."))
+            player.disconnect(
+                failedToLoadDataComponent(
+                    "Internal server error: Failed to receive data while connecting to the initial server.",
+                    SurfPlayerErrorService.saveError(
+                        playerUuid = player.uniqueId,
+                        staffMessage = "Player could not connect to initial server, most likely a redis issue. Is redis down?",
+                        scope = plugin.pluginContainer.scope
+                    )
+                )
+            )
             return
         }
 
@@ -189,13 +210,16 @@ object ConnectionListener {
         })
     }
 
-    private fun failedToLoadDataComponent(message: String) = buildText {
+    private fun failedToLoadDataComponent(message: String, errorCode: String) = buildText {
         appendNewline(2)
         primary("CASTCRAFTER")
         appendNewline()
         primary("COMMUNITY SERVER")
         appendNewline(2)
         error("DEINE SPIELERDATEN KONNTEN NICHT GELADEN WERDEN.")
+        appendNewline()
+        spacer("Fehlercode: ")
+        niceRed(errorCode)
         appendNewline()
         error(message)
         appendNewline(3)

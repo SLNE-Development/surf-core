@@ -1,6 +1,8 @@
 package dev.slne.surf.core.core.common.util
 
 import dev.slne.surf.surfapi.core.api.messages.builder.SurfComponentBuilder
+import net.kyori.adventure.text.format.TextColor
+import net.kyori.adventure.text.format.TextDecoration
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.ZoneId
@@ -40,3 +42,8 @@ fun SurfComponentBuilder.appendCorePrefix() = append {
 fun OffsetDateTime.formatDateTime(
     formatter: DateTimeFormatter = dateTimeFormatter
 ): String = this.format(formatter)
+
+fun SurfComponentBuilder.niceRed(text: String, vararg decoration: TextDecoration) = text(
+    text,
+    TextColor.color(227, 0, 58), *decoration
+)

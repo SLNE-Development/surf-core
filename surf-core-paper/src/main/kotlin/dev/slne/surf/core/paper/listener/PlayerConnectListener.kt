@@ -1,13 +1,16 @@
 package dev.slne.surf.core.paper.listener
 
 import com.github.shynixn.mccoroutine.folia.launch
+import com.github.shynixn.mccoroutine.folia.scope
 import dev.slne.surf.core.api.common.server.connection.SurfProxyServerConnectionResult
 import dev.slne.surf.core.api.paper.util.surfPlayer
 import dev.slne.surf.core.core.CoreInstance
 import dev.slne.surf.core.core.common.player.SurfPlayerService
+import dev.slne.surf.core.core.common.player.error.SurfPlayerErrorService
 import dev.slne.surf.core.core.common.redis.request.SendPlayerToProxyRequest
 import dev.slne.surf.core.core.common.redis.watcher.PlayerProxyConnectionResultWatcher
 import dev.slne.surf.core.core.common.util.formatMillis
+import dev.slne.surf.core.core.common.util.niceRed
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.core.paper.plugin
 import dev.slne.surf.surfapi.bukkit.api.command.util.idOrThrow
@@ -32,7 +35,15 @@ object PlayerConnectListener : Listener {
         val surfPlayer = SurfPlayerService.findPlayerByUuid(player.uniqueId)
 
         if (surfPlayer == null) {
-            player.kick(buildDisconnectComponent(), PlayerKickEvent.Cause.UNKNOWN)
+            player.kick(
+                buildDisconnectComponent(
+                    SurfPlayerErrorService.saveError(
+                        playerUuid = player.uniqueId,
+                        staffMessage = "Player not found in redis after connecting to a server, most likely a redis issue. Is redis down?",
+                        scope = plugin.scope
+                    )
+                ), PlayerKickEvent.Cause.UNKNOWN
+            )
             return
         }
 
@@ -66,12 +77,20 @@ object PlayerConnectListener : Listener {
     @Suppress("UnstableApiUsage")
     @EventHandler
     fun onPlayerConnect(event: AsyncPlayerConnectionConfigureEvent) {
-        val surfPlayer =
-            event.connection.audience.uuidOrNull()?.let { SurfPlayerService.findPlayerByUuid(it) }
+        val uuid = event.connection.audience.uuid()
+        val surfPlayer = SurfPlayerService.findPlayerByUuid(uuid)
 
         if (surfPlayer == null) {
             plugin.logger.severe("Failed to load player data for player with UUID ${event.connection.audience.uuidOrNull()}. The player will be disconnected.")
-            event.connection.disconnect(buildDisconnectComponent())
+            event.connection.disconnect(
+                buildDisconnectComponent(
+                    SurfPlayerErrorService.saveError(
+                        playerUuid = uuid,
+                        staffMessage = "Player not found in redis after connecting to a server, most likely a redis issue. Is redis down?",
+                        scope = plugin.scope
+                    )
+                )
+            )
         }
     }
 
@@ -108,13 +127,16 @@ object PlayerConnectListener : Listener {
         }
     }
 
-    private fun buildDisconnectComponent() = buildText {
+    private fun buildDisconnectComponent(errorCode: String) = buildText {
         appendNewline(2)
         primary("CASTCRAFTER")
         appendNewline()
         primary("COMMUNITY SERVER")
         appendNewline(2)
         error("DEINE SPIELERDATEN KONNTEN NICHT GELADEN WERDEN.")
+        appendNewline()
+        spacer("Fehlercode: ")
+        niceRed(errorCode)
         appendNewline()
         error("Internal Server error. Data Transmitter or holder may be down?")
         appendNewline(3)

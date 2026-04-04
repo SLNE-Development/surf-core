@@ -1,7 +1,7 @@
 package dev.slne.surf.core.core.common.player
 
+import dev.slne.surf.api.core.api.util.requiredService
 import dev.slne.surf.core.api.common.player.SurfPlayer
-import dev.slne.surf.surfapi.core.api.util.requiredService
 import it.unimi.dsi.fastutil.objects.ObjectSet
 import org.jetbrains.annotations.UnmodifiableView
 import java.util.*

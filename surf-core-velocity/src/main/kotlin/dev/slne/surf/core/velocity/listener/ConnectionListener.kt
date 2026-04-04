@@ -10,6 +10,7 @@ import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent
 import com.velocitypowered.api.event.player.ServerConnectedEvent
 import com.velocitypowered.api.proxy.Player
 import com.velocitypowered.api.util.GameProfile
+import dev.slne.surf.api.core.messages.adventure.buildText
 import dev.slne.surf.core.api.common.event.SurfPlayerConnectEvent
 import dev.slne.surf.core.api.common.event.SurfPlayerDisconnectEvent
 import dev.slne.surf.core.api.common.server.SurfProxyServer
@@ -24,8 +25,6 @@ import dev.slne.surf.core.core.common.server.SurfServerService
 import dev.slne.surf.core.core.common.util.niceRed
 import dev.slne.surf.core.velocity.auth.AuthenticationListener
 import dev.slne.surf.core.velocity.plugin
-import dev.slne.surf.surfapi.core.api.messages.adventure.appendNewline
-import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 import kotlinx.coroutines.withTimeoutOrNull
 import java.net.InetAddress
 import java.time.OffsetDateTime

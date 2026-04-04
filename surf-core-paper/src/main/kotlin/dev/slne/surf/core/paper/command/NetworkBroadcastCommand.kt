@@ -8,7 +8,6 @@ import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.util.sendText
 import dev.slne.surf.core.core.common.util.appendCorePrefix
 import dev.slne.surf.core.paper.permission.PermissionRegistry
-import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 import net.kyori.adventure.text.minimessage.MiniMessage
 
 fun networkBroadcastCommand() = commandTree("nbroadcast") {

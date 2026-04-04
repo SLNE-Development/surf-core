@@ -1,11 +1,11 @@
 package dev.slne.surf.core.paper.teleport
 
+import dev.slne.surf.api.core.api.messages.adventure.sendText
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.paper.util.bukkitPlayer
 import dev.slne.surf.core.api.paper.util.surfPlayer
 import dev.slne.surf.core.core.CoreInstance
 import dev.slne.surf.core.core.common.redis.event.SurfPlayerTeleportRequestRedisEvent
-import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 import org.bukkit.entity.Player
 
 object TeleportManager {

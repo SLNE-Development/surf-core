@@ -2,6 +2,8 @@ package dev.slne.surf.core.paper.listener
 
 import com.github.shynixn.mccoroutine.folia.launch
 import com.github.shynixn.mccoroutine.folia.scope
+import dev.slne.surf.api.bukkit.api.command.util.idOrThrow
+import dev.slne.surf.api.core.api.messages.adventure.*
 import dev.slne.surf.core.api.common.server.connection.SurfProxyServerConnectionResult
 import dev.slne.surf.core.api.paper.util.surfPlayer
 import dev.slne.surf.core.core.CoreInstance
@@ -13,8 +15,6 @@ import dev.slne.surf.core.core.common.util.formatMillis
 import dev.slne.surf.core.core.common.util.niceRed
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.core.paper.plugin
-import dev.slne.surf.surfapi.bukkit.api.command.util.idOrThrow
-import dev.slne.surf.surfapi.core.api.messages.adventure.*
 import io.papermc.paper.event.connection.configuration.AsyncPlayerConnectionConfigureEvent
 import io.papermc.paper.event.player.PlayerClientLoadedWorldEvent
 import io.papermc.paper.event.player.PlayerServerFullCheckEvent

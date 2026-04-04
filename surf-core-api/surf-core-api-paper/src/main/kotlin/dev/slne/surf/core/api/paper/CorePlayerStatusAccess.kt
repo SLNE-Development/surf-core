@@ -1,7 +1,7 @@
 package dev.slne.surf.core.api.paper
 
+import dev.slne.surf.api.core.util.requiredService
 import dev.slne.surf.core.api.common.player.SurfPlayer
-import dev.slne.surf.surfapi.core.api.util.requiredService
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 

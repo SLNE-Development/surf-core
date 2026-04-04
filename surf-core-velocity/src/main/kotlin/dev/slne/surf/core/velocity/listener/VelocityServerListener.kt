@@ -4,6 +4,8 @@ import com.github.shynixn.mccoroutine.velocity.launch
 import com.velocitypowered.api.event.Continuation
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.proxy.ProxyPreShutdownEvent
+import dev.slne.surf.api.core.api.util.mutableObjectSetOf
+import dev.slne.surf.api.core.messages.adventure.buildText
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.connection.SurfProxyServerConnectionResult
@@ -11,9 +13,6 @@ import dev.slne.surf.core.api.common.util.sendText
 import dev.slne.surf.core.api.velocity.util.surfPlayer
 import dev.slne.surf.core.core.common.server.SurfServerService
 import dev.slne.surf.core.velocity.plugin
-import dev.slne.surf.surfapi.core.api.messages.adventure.appendNewline
-import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
-import dev.slne.surf.surfapi.core.api.util.mutableObjectSetOf
 import it.unimi.dsi.fastutil.objects.ObjectSet
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll

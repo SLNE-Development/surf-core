@@ -6,9 +6,9 @@ import dev.jorel.commandapi.arguments.Argument
 import dev.jorel.commandapi.arguments.ArgumentSuggestions
 import dev.jorel.commandapi.arguments.CustomArgument
 import dev.jorel.commandapi.arguments.StringArgument
+import dev.slne.surf.api.core.messages.adventure.buildText
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.server.SurfServer
-import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 
 class SurfBackendServerArgument(nodeName: String) :
     CustomArgument<SurfServer, String>(StringArgument(nodeName), { info ->

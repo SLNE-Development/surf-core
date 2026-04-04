@@ -7,9 +7,9 @@ import dev.jorel.commandapi.CommandTree
 import dev.jorel.commandapi.arguments.Argument
 import dev.jorel.commandapi.arguments.CommandAPIArgumentType
 import dev.jorel.commandapi.executors.CommandArguments
+import dev.slne.surf.api.core.util.logger
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.player.SurfPlayer
-import dev.slne.surf.surfapi.core.api.util.logger
 import kotlinx.coroutines.*
 import kotlinx.coroutines.future.asDeferred
 import kotlinx.coroutines.future.future

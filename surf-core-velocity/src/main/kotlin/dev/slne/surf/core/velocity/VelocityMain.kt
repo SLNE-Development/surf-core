@@ -11,6 +11,7 @@ import com.velocitypowered.api.plugin.PluginContainer
 import com.velocitypowered.api.plugin.PluginManager
 import com.velocitypowered.api.plugin.annotation.DataDirectory
 import com.velocitypowered.api.proxy.ProxyServer
+import dev.slne.surf.api.core.messages.adventure.buildText
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.event.SurfServerOnlineEvent
 import dev.slne.surf.core.api.common.event.SurfServerStartEvent
@@ -31,7 +32,6 @@ import dev.slne.surf.core.velocity.redis.handler.SendPlayerToProxyHandler
 import dev.slne.surf.core.velocity.redis.handler.SendPlayerToServerHandler
 import dev.slne.surf.core.velocity.redis.listener.VelocityRedisListener
 import dev.slne.surf.core.velocity.task.surfPlayerSyncTask
-import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 import kotlinx.coroutines.runBlocking
 import net.kyori.adventure.text.format.TextDecoration
 import org.slf4j.Logger

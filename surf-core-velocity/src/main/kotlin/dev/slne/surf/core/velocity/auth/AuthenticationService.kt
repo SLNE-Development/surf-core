@@ -1,9 +1,9 @@
 package dev.slne.surf.core.velocity.auth
 
 import com.velocitypowered.api.event.Continuation
+import dev.slne.surf.api.core.api.messages.adventure.key
+import dev.slne.surf.api.core.api.util.mutableObject2ObjectMapOf
 import dev.slne.surf.core.core.CoreInstance
-import dev.slne.surf.surfapi.core.api.messages.adventure.key
-import dev.slne.surf.surfapi.core.api.util.mutableObject2ObjectMapOf
 import java.security.MessageDigest
 import java.util.*
 import kotlin.time.Duration.Companion.seconds

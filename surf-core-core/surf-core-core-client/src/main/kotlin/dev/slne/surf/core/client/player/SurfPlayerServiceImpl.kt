@@ -1,6 +1,7 @@
 package dev.slne.surf.core.client.player
 
 import com.google.auto.service.AutoService
+import dev.slne.surf.api.core.api.util.toObjectSet
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.client.ClientCoreInstance
 import dev.slne.surf.core.core.CoreInstance
@@ -8,7 +9,6 @@ import dev.slne.surf.core.core.common.player.SurfPlayerService
 import dev.slne.surf.core.core.common.rabbit.packet.player.load.LoadPlayerByNameRequestPacket
 import dev.slne.surf.core.core.common.rabbit.packet.player.load.LoadPlayerByUuidRequestPacket
 import dev.slne.surf.core.core.common.rabbit.packet.player.save.SaveSurfPlayerRequestPacket
-import dev.slne.surf.surfapi.core.api.util.toObjectSet
 import java.util.*
 
 @AutoService(SurfPlayerService::class)

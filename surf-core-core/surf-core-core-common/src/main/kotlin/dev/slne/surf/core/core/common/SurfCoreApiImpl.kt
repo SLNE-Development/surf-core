@@ -1,5 +1,6 @@
 package dev.slne.surf.core.core.common
 
+import dev.slne.surf.api.core.api.util.mutableObjectSetOf
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.event.SurfEvent
 import dev.slne.surf.core.api.common.player.SurfPlayer
@@ -18,7 +19,6 @@ import dev.slne.surf.core.core.common.redis.watcher.PlayerProxyConnectionResultW
 import dev.slne.surf.core.core.common.redis.watcher.PlayerServerConnectionResultWatcher
 import dev.slne.surf.core.core.common.server.SurfServerService
 import dev.slne.surf.redis.request.RequestTimeoutException
-import dev.slne.surf.surfapi.core.api.util.mutableObjectSetOf
 import it.unimi.dsi.fastutil.objects.ObjectSet
 import kotlinx.coroutines.withTimeoutOrNull
 import net.kyori.adventure.text.Component

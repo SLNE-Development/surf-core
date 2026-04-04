@@ -9,9 +9,9 @@ import dev.jorel.commandapi.CommandTree
 import dev.jorel.commandapi.arguments.Argument
 import dev.jorel.commandapi.arguments.CommandAPIArgumentType
 import dev.jorel.commandapi.executors.CommandArguments
+import dev.slne.surf.api.core.messages.adventure.buildText
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.player.SurfPlayer
-import dev.slne.surf.surfapi.core.api.messages.adventure.buildText
 
 open class SurfPlayerArgument(nodeName: String) :
     Argument<SurfPlayer>(nodeName, StringArgumentType::string) {

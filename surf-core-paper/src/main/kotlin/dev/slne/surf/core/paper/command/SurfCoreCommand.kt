@@ -2,6 +2,7 @@ package dev.slne.surf.core.paper.command
 
 import com.github.shynixn.mccoroutine.folia.launch
 import dev.jorel.commandapi.kotlindsl.*
+import dev.slne.surf.api.core.api.messages.adventure.sendText
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
@@ -15,7 +16,6 @@ import dev.slne.surf.core.core.common.util.appendCorePrefix
 import dev.slne.surf.core.paper.PaperBootstrap
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.core.paper.plugin
-import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
 
 fun surfCoreCommand() = commandTree("core") {
     withPermission(PermissionRegistry.COMMAND_CORE)

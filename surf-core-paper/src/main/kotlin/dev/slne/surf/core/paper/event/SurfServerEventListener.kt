@@ -1,14 +1,14 @@
 package dev.slne.surf.core.paper.event
 
+import dev.slne.surf.api.bukkit.api.extensions.pluginManager
+import dev.slne.surf.api.core.api.messages.Colors
+import dev.slne.surf.api.core.api.messages.adventure.sendText
+import dev.slne.surf.api.core.api.messages.builder.SurfComponentBuilder
 import dev.slne.surf.core.api.common.event.SurfEventHandler
 import dev.slne.surf.core.api.common.event.SurfServerOnlineEvent
 import dev.slne.surf.core.api.common.event.SurfServerStartEvent
 import dev.slne.surf.core.api.common.event.SurfServerStoppingEvent
 import dev.slne.surf.core.api.paper.util.getOrCreatePermission
-import dev.slne.surf.surfapi.bukkit.api.extensions.pluginManager
-import dev.slne.surf.surfapi.core.api.messages.Colors
-import dev.slne.surf.surfapi.core.api.messages.adventure.sendText
-import dev.slne.surf.surfapi.core.api.messages.builder.SurfComponentBuilder
 import org.bukkit.Bukkit
 
 object SurfServerEventListener {

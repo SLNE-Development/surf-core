@@ -1,6 +1,6 @@
 package dev.slne.surf.core.core.common.config
 
-import dev.slne.surf.surfapi.core.api.serializer.java.uuid.SerializableUUID
+import dev.slne.surf.api.core.api.serializer.java.uuid.SerializableUUID
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 
 @ConfigSerializable

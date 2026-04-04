@@ -1,10 +1,10 @@
 package dev.slne.surf.core.api.common.player.serializer
 
+import dev.slne.surf.api.core.serializer.java.datetime.datetime.offset.OffsetDateTimeSerializer
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
-import dev.slne.surf.surfapi.core.api.serializer.java.datetime.datetime.offset.OffsetDateTimeSerializer
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.serializer

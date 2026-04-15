@@ -141,7 +141,7 @@ private fun handleMultipleSend(
 ) {
     if (players.isEmpty()) {
         executor.sendText {
-            appendErrorPrefix()
+            appendCorePrefix()
             error("Es sind keine Spieler vorhanden.")
         }
         return
@@ -162,7 +162,7 @@ private fun handleMultipleSend(
 
                 if (failed.isEmpty()) {
                     executor.sendText {
-                        appendSuccessPrefix()
+                        appendCorePrefix()
                         variableValue(results.size)
                         success(" Spieler wurden erfolgreich von ")
                         variableValue(sourceName)
@@ -178,7 +178,7 @@ private fun handleMultipleSend(
                 }
 
                 executor.sendText {
-                    appendErrorPrefix()
+                    appendCorePrefix()
                     error("Es konnten ")
                     variableValue(failed.size)
                     error(" von ")
@@ -215,7 +215,7 @@ private fun handleMultipleSend(
 
                 if (failed.isEmpty()) {
                     executor.sendText {
-                        appendSuccessPrefix()
+                        appendCorePrefix()
                         variableValue(results.size)
                         success(" Spieler wurden erfolgreich von ")
                         variableValue(sourceName)
@@ -231,7 +231,7 @@ private fun handleMultipleSend(
                 }
 
                 executor.sendText {
-                    appendErrorPrefix()
+                    appendCorePrefix()
                     error("Es konnten ")
                     variableValue(failed.size)
                     error(" von ")

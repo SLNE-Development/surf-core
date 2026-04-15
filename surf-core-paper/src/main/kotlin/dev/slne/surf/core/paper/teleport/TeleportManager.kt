@@ -6,6 +6,7 @@ import dev.slne.surf.core.api.paper.util.bukkitPlayer
 import dev.slne.surf.core.api.paper.util.surfPlayer
 import dev.slne.surf.core.core.CoreInstance
 import dev.slne.surf.core.core.common.redis.event.SurfPlayerTeleportRequestRedisEvent
+import dev.slne.surf.core.core.common.util.appendCorePrefix
 import org.bukkit.entity.Player
 
 object TeleportManager {
@@ -24,7 +25,7 @@ object TeleportManager {
                 )
             } else {
                 player.sendText {
-                    appendErrorPrefix()
+                    appendCorePrefix()
                     error("Du konntest nicht zum Zielserver teleportiert werden.")
                 }
             }
@@ -35,7 +36,7 @@ object TeleportManager {
 
         player.teleportAsync(bukkitTarget.location).thenRun {
             player.sendText {
-                appendSuccessPrefix()
+                appendCorePrefix()
                 success("Du wurdest zu ")
                 variableValue(bukkitTarget.name)
                 success(" teleportiert.")

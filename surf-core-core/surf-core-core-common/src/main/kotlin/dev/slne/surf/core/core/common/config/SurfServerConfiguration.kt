@@ -1,7 +1,7 @@
 package dev.slne.surf.core.core.common.config
 
-import dev.slne.surf.api.core.config.SurfConfigApi
 import dev.slne.surf.api.core.config.manager.SpongeConfigManager
+import dev.slne.surf.api.core.config.surfConfigApi
 import java.nio.file.Path
 
 class SurfServerConfiguration(
@@ -10,13 +10,13 @@ class SurfServerConfiguration(
     private val configManager: SpongeConfigManager<SurfServerConfig>
 
     init {
-        SurfConfigApi.createSpongeYmlConfig(
+        surfConfigApi.createSpongeYmlConfig(
             SurfServerConfig::class.java,
             dataPath,
             "config.yml"
         )
 
-        configManager = SurfConfigApi.getSpongeConfigManagerForConfig(SurfServerConfig::class.java)
+        configManager = surfConfigApi.getSpongeConfigManagerForConfig(SurfServerConfig::class.java)
 
         this.reload()
     }

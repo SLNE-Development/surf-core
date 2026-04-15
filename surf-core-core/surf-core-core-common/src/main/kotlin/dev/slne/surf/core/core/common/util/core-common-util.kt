@@ -30,9 +30,9 @@ fun Long.formatTimeMillis(): String =
         .format(timeFormatter)
 
 fun SurfComponentBuilder.appendCorePrefix() = append {
-    spacer(">>")
+    spacer("»")
     appendSpace()
-    primary("Core")
+    note("CC")
     appendSpace()
     darkSpacer("|")
     appendSpace()

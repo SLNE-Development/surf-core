@@ -35,8 +35,13 @@ class SurfPlayerSyncTask {
                         .also {
                             it.currentProxyName = SurfProxyServer.current().name
                         }
-                val currentServerName = velocityPlayer.currentServer.getOrNull()?.serverInfo?.name
-                surfPlayer.copy(currentServerName = currentServerName)
+                val velocityServerName =
+                    velocityPlayer.currentServer.getOrNull()?.serverInfo?.name
+                if (velocityServerName != null) {
+                    surfPlayer.copy(currentServerName = velocityServerName)
+                } else {
+                    surfPlayer
+                }
             }
 
             val onlineUuids = onlinePlayers.map { it.uuid }.toHashSet()

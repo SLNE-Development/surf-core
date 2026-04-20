@@ -39,8 +39,7 @@ object ConnectionListener {
                 playerUuid = event.player.uniqueId,
                 playerName = event.player.username,
                 inetAddress = event.player.remoteAddress.address,
-                initialServer = event.player.currentServer.getOrNull()?.serverInfo?.name
-                    ?: "unknown",
+                initialServer = event.player.currentServer.getOrNull()?.serverInfo?.name,
                 gameProfile = event.player.gameProfile
             )
         } ?: {
@@ -123,7 +122,7 @@ object ConnectionListener {
         playerUuid: UUID,
         playerName: String,
         inetAddress: InetAddress,
-        initialServer: String,
+        initialServer: String?,
         gameProfile: GameProfile
     ) {
         val player = SurfPlayerService.getOrLoadOrCreatePlayerByUuid(
@@ -135,7 +134,9 @@ object ConnectionListener {
 
             lastSeen = OffsetDateTime.now()
             lastKnownName = playerName
-            currentServerName = initialServer
+            if (initialServer != null) {
+                currentServerName = initialServer
+            }
             currentProxyName = SurfProxyServer.current().name
             lastKnownIpAddress = inetAddress
             transferred = AuthenticationListener.transfers.remove(playerUuid)

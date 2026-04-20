@@ -15,14 +15,12 @@ import dev.slne.surf.api.core.messages.adventure.buildText
 import dev.slne.surf.core.api.common.event.SurfPlayerConnectEvent
 import dev.slne.surf.core.api.common.event.SurfPlayerDisconnectEvent
 import dev.slne.surf.core.api.common.server.SurfProxyServer
-import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.core.common.event.SurfEventBus
 import dev.slne.surf.core.core.common.player.SurfPlayerService
 import dev.slne.surf.core.core.common.player.error.SurfPlayerErrorService
 import dev.slne.surf.core.core.common.player.history.SurfPlayerIpAddressHistoryService
 import dev.slne.surf.core.core.common.player.history.SurfPlayerNameHistoryService
 import dev.slne.surf.core.core.common.player.history.SurfPlayerTextureHistoryService
-import dev.slne.surf.core.core.common.server.SurfServerService
 import dev.slne.surf.core.core.common.util.niceRed
 import dev.slne.surf.core.velocity.auth.AuthenticationListener
 import dev.slne.surf.core.velocity.plugin
@@ -41,8 +39,7 @@ object ConnectionListener {
                 playerUuid = event.player.uniqueId,
                 playerName = event.player.username,
                 inetAddress = event.player.remoteAddress.address,
-                initialServer = event.player.currentServer.getOrNull()?.serverInfo?.name
-                    ?: "unknown",
+                initialServer = event.player.currentServer.getOrNull()?.serverInfo?.name,
                 gameProfile = event.player.gameProfile
             )
         } ?: {
@@ -114,11 +111,9 @@ object ConnectionListener {
             return
         }
 
-        val surfServer = SurfServer[serverName] ?: return
-
         SurfPlayerService.cachePlayer(
             surfPlayer.copy(
-                currentServer = surfServer
+                currentServerName = serverName
             )
         )
     }
@@ -127,7 +122,7 @@ object ConnectionListener {
         playerUuid: UUID,
         playerName: String,
         inetAddress: InetAddress,
-        initialServer: String,
+        initialServer: String?,
         gameProfile: GameProfile
     ) {
         val player = SurfPlayerService.getOrLoadOrCreatePlayerByUuid(
@@ -139,8 +134,10 @@ object ConnectionListener {
 
             lastSeen = OffsetDateTime.now()
             lastKnownName = playerName
-            currentServer = SurfServerService.getServerByName(initialServer)
-            currentProxy = SurfProxyServer.current()
+            if (initialServer != null) {
+                currentServerName = initialServer
+            }
+            currentProxyName = SurfProxyServer.current().name
             lastKnownIpAddress = inetAddress
             transferred = AuthenticationListener.transfers.remove(playerUuid)
         }
@@ -175,9 +172,8 @@ object ConnectionListener {
     ) {
         println("[connection update] $playerName was redirected from '$fromServer' to '$toServer'")
 
-        val server = SurfServer[toServer] ?: error("SurfServer '$toServer' not found")
         val player = SurfPlayerService.players.firstOrNull { it.uuid == playerUuid }
-            ?.copy(currentServer = server)
+            ?.copy(currentServerName = toServer)
             ?: error("Player $playerName is not cached")
 
         SurfPlayerService.cachePlayer(player)

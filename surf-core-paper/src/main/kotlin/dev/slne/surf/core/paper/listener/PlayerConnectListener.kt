@@ -67,9 +67,9 @@ object PlayerConnectListener : Listener {
                 clickCopiesToClipboard(System.currentTimeMillis().toString())
             }
             info(", auf dem Server ")
-            variableValue(surfPlayer.currentServer?.name ?: "Unbekannt")
+            variableValue(surfPlayer.currentServerName ?: "Unbekannt")
             info(" auf dem Proxy ")
-            variableValue(surfPlayer.currentProxy?.name ?: "Unbekannt")
+            variableValue(surfPlayer.currentProxyName ?: "Unbekannt")
             info(".")
         }
     }

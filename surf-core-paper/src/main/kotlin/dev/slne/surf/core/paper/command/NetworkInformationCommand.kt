@@ -58,7 +58,7 @@ fun networkInformationCommand() = commandTree("ninfo") {
                     variableKey("Aktueller Server:")
                     appendNewline()
                     darkSpacer("» | ")
-                    variableValue(target.currentServer?.name ?: "Unbekannt")
+                    variableValue(target.currentServerName ?: "Unbekannt")
 
                     appendNewline()
                     darkSpacer("» | ")
@@ -68,7 +68,7 @@ fun networkInformationCommand() = commandTree("ninfo") {
                     variableKey("Aktueller Proxy:")
                     appendNewline()
                     darkSpacer("» | ")
-                    variableValue(target.currentProxy?.name ?: "Unbekannt")
+                    variableValue(target.currentProxyName ?: "Unbekannt")
 
                     appendNewline()
                     darkSpacer("» | ")

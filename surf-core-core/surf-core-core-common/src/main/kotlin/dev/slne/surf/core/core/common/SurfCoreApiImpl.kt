@@ -97,7 +97,7 @@ abstract class SurfCoreApiImpl : SurfCoreApi {
     ): SurfProxyServerConnectionResult {
         val playerUuid = surfPlayer.uuid
 
-        if (surfPlayer.currentProxy?.name == surfProxyServer.name) {
+        if (surfPlayer.currentProxyName == surfProxyServer.name) {
             return SurfProxyServerConnectionResult(SurfProxyServerConnectionResult.Status.ALREADY_CONNECTED)
         }
 

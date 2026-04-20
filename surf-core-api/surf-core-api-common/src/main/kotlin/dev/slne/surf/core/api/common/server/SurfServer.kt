@@ -20,7 +20,7 @@ data class SurfServer(
     override val startedAt: SerializableOffsetDateTime
 ) : CommonSurfServer {
     override fun getPlayers(): ObjectSet<SurfPlayer> =
-        SurfCoreApi.getOnlinePlayers().filter { it.currentServer?.name == name }.toObjectSet()
+        SurfCoreApi.getOnlinePlayers().filter { it.currentServerName == name }.toObjectSet()
 
     companion object {
         fun current() = SurfCoreApi.getCurrentServer()

@@ -52,8 +52,8 @@ class SurfPlayerServiceImpl : SurfPlayerService {
                 name = player.lastKnownName,
                 firstSeen = player.firstSeen,
                 lastSeen = player.lastSeen,
-                latestServer = player.currentServer?.name,
-                latestProxy = player.currentProxy?.name
+                latestServer = player.currentServerName,
+                latestProxy = player.currentProxyName
             )
         )
     }

@@ -22,13 +22,13 @@ fun networkListCommand() = commandTree("nlist") {
 
         val serverGroups = players
             .mapNotNull { player ->
-                player.currentServer?.name?.let { it to player }
+                player.currentServerName?.let { it to player }
             }
             .groupBy({ it.first }, { it.second })
 
         val proxyGroups = players
             .mapNotNull { player ->
-                player.currentProxy?.name?.let { it to player }
+                player.currentProxyName?.let { it to player }
             }
             .groupBy({ it.first }, { it.second })
 

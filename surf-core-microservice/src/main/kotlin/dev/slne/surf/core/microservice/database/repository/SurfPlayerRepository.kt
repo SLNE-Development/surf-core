@@ -52,8 +52,8 @@ object SurfPlayerRepository {
         lastKnownName = row[SurfPlayersTable.name],
         firstSeen = row[SurfPlayersTable.firstSeen],
         lastSeen = row[SurfPlayersTable.lastSeen],
-        currentServer = null,
-        currentProxy = null,
+        currentServerName = null,
+        currentProxyName = null,
         transferred = false
     )
 }

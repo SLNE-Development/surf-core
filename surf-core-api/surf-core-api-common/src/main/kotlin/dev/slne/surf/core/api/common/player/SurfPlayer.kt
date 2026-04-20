@@ -16,18 +16,21 @@ data class SurfPlayer(
     var lastKnownName: String?,
     var firstSeen: @Contextual OffsetDateTime?,
     var lastSeen: @Contextual OffsetDateTime?,
-    var currentServer: SurfServer? = null,
-    var currentProxy: SurfProxyServer? = null,
+    var currentServerName: String? = null,
+    var currentProxyName: String? = null,
     var lastKnownIpAddress: @Contextual InetAddress? = null,
     var transferred: Boolean
 ) {
+    val currentServer: SurfServer? get() = currentServerName?.let(SurfCoreApi::getServerByName)
+    val currentProxy: SurfProxyServer? get() = currentProxyName?.let(SurfCoreApi::getProxyServerByName)
+
     val username get() = lastKnownName ?: "#Unbekannt"
     fun isOnline() = SurfCoreApi.getOnlinePlayers().any { it.uuid == uuid }
     suspend fun sendAwaiting(server: SurfServer) = SurfCoreApi.sendPlayerAwaiting(this, server)
     suspend fun sendAwaiting(proxy: SurfProxyServer) = SurfCoreApi.sendPlayerAwaiting(this, proxy)
 
     override fun toString(): String {
-        return "SurfPlayer(uuid=$uuid, lastKnownName=$lastKnownName, firstSeen=$firstSeen, lastSeen=$lastSeen, currentServer=${currentServer?.name}, currentProxy=${currentProxy?.name}, lastKnownIpAddress=$lastKnownIpAddress)"
+        return "SurfPlayer(uuid=$uuid, lastKnownName=$lastKnownName, firstSeen=$firstSeen, lastSeen=$lastSeen, currentServerName=$currentServerName, currentProxyName=$currentProxyName, lastKnownIpAddress=$lastKnownIpAddress)"
     }
 
 }

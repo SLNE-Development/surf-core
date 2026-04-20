@@ -3,7 +3,6 @@ package dev.slne.surf.core.velocity.task
 import com.github.shynixn.mccoroutine.velocity.launch
 import com.velocitypowered.api.scheduler.ScheduledTask
 import dev.slne.surf.core.api.common.server.SurfProxyServer
-import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.core.common.player.SurfPlayerService
 import dev.slne.surf.core.velocity.plugin
 import dev.slne.surf.core.velocity.proxy
@@ -34,11 +33,10 @@ class SurfPlayerSyncTask {
                 val surfPlayer = SurfPlayerService.findPlayerByUuid(velocityPlayer.uniqueId)
                     ?: SurfPlayerService.getOrLoadOrCreatePlayerByUuid(velocityPlayer.uniqueId)
                         .also {
-                            it.currentProxy = SurfProxyServer.current()
+                            it.currentProxyName = SurfProxyServer.current().name
                         }
                 val currentServerName = velocityPlayer.currentServer.getOrNull()?.serverInfo?.name
-                val currentServer = currentServerName?.let { SurfServer[it] }
-                surfPlayer.copy(currentServer = currentServer)
+                surfPlayer.copy(currentServerName = currentServerName)
             }
 
             val onlineUuids = onlinePlayers.map { it.uuid }.toHashSet()

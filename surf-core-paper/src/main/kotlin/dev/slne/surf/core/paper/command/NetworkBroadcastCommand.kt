@@ -19,7 +19,7 @@ fun networkBroadcastCommand() = commandTree("nbroadcast") {
 
             SurfCoreApi.getOnlinePlayers().forEach {
                 it.sendText {
-                    appendInfoPrefix()
+                    appendCorePrefix()
                     append(MiniMessage.miniMessage().deserialize(message))
                 }
             }

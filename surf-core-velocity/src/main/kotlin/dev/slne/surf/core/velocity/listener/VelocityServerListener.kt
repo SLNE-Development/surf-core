@@ -13,6 +13,8 @@ import dev.slne.surf.core.api.common.server.connection.SurfProxyServerConnection
 import dev.slne.surf.core.api.common.util.sendText
 import dev.slne.surf.core.api.velocity.util.surfPlayer
 import dev.slne.surf.core.core.common.server.SurfServerService
+import dev.slne.surf.core.core.common.util.appendCorePrefix
+import dev.slne.surf.core.core.common.util.niceRed
 import dev.slne.surf.core.velocity.plugin
 import it.unimi.dsi.fastutil.objects.ObjectSet
 import kotlinx.coroutines.async
@@ -31,8 +33,8 @@ object VelocityServerListener {
 
         SurfCoreApi.getOnlinePlayers().forEach {
             it.sendText {
-                appendInfoPrefix()
-                error("SYSTEM-NEUSTART", TextDecoration.BOLD)
+                appendCorePrefix()
+                niceRed("SYSTEM-NEUSTART", TextDecoration.BOLD)
                 spacer(": ")
                 spacer("Derzeit werden Hintergrundsysteme neugestartet. Bitte habt Verständnis, sollten in diesem Zeitraum Probleme auftreten!")
             }

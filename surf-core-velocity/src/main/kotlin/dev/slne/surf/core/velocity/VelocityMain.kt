@@ -23,6 +23,8 @@ import dev.slne.surf.core.client.ClientCoreInstance
 import dev.slne.surf.core.core.common.config.SurfServerConfiguration
 import dev.slne.surf.core.core.common.event.SurfEventBus
 import dev.slne.surf.core.core.common.server.SurfServerService
+import dev.slne.surf.core.core.common.util.appendCorePrefix
+import dev.slne.surf.core.core.common.util.niceRed
 import dev.slne.surf.core.velocity.auth.AuthenticationListener
 import dev.slne.surf.core.velocity.auth.AuthenticationService
 import dev.slne.surf.core.velocity.config.VelocityCoreConfigManager
@@ -108,8 +110,8 @@ class VelocityMain @Inject constructor(
 
         SurfCoreApi.getOnlinePlayers().forEach {
             it.sendText {
-                appendInfoPrefix()
-                error("SYSTEM-NEUSTART", TextDecoration.BOLD)
+                appendCorePrefix()
+                niceRed("SYSTEM-NEUSTART", TextDecoration.BOLD)
                 spacer(": ")
                 spacer("Derzeit werden Hintergrundsysteme neugestartet. Bitte habt Verständnis, sollten in diesem Zeitraum Probleme auftreten!")
             }

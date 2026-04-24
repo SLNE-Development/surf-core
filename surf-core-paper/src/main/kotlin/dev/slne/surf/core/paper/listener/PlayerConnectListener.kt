@@ -11,6 +11,7 @@ import dev.slne.surf.core.core.common.player.SurfPlayerService
 import dev.slne.surf.core.core.common.player.error.SurfPlayerErrorService
 import dev.slne.surf.core.core.common.redis.request.SendPlayerToProxyRequest
 import dev.slne.surf.core.core.common.redis.watcher.PlayerProxyConnectionResultWatcher
+import dev.slne.surf.core.core.common.util.appendCorePrefix
 import dev.slne.surf.core.core.common.util.formatMillis
 import dev.slne.surf.core.core.common.util.niceRed
 import dev.slne.surf.core.paper.permission.PermissionRegistry
@@ -52,7 +53,7 @@ object PlayerConnectListener : Listener {
         }
 
         player.sendText {
-            appendInfoPrefix()
+            appendCorePrefix()
             info("Du, ")
             append {
                 variableValue(player.name)

@@ -6,6 +6,7 @@ import com.velocitypowered.api.event.ResultedEvent
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.connection.DisconnectEvent
 import com.velocitypowered.api.event.connection.LoginEvent
+import com.velocitypowered.api.event.player.KickedFromServerEvent
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent
 import com.velocitypowered.api.event.player.ServerConnectedEvent
 import com.velocitypowered.api.proxy.Player
@@ -71,6 +72,32 @@ object ConnectionListener {
                 newServer
             )
         }
+    }
+
+    @Subscribe(priority = Short.MIN_VALUE)
+    fun onKickedFromServer(event: KickedFromServerEvent) {
+        if (!event.kickedDuringServerConnect()) {
+            return
+        }
+
+        if (event.serverKickReason.isPresent) {
+            return
+        }
+
+        if (event.result !is KickedFromServerEvent.DisconnectPlayer) {
+            return
+        }
+
+        event.result = KickedFromServerEvent.DisconnectPlayer.create(
+            failedToConnectComponent(
+                "Internal server error: Failed to connect to the target server.",
+                SurfPlayerErrorService.saveError(
+                    playerUuid = event.player.uniqueId,
+                    staffMessage = "Player was kicked from target server during connection to ${event.server.serverInfo.name}, no other information available.",
+                    scope = plugin.pluginContainer.scope
+                )
+            )
+        )
     }
 
     @Subscribe
@@ -220,6 +247,26 @@ object ConnectionListener {
         error(message)
         appendNewline(3)
         spacer("Beim Laden deiner Spielerdaten ist ein interner Fehler aufgetreten.")
+        appendNewline()
+        spacer("Sollte das Problem weiterhin bestehen, wende dich bitte an den Support.")
+        appendNewline(2)
+        primary("discord.gg/castcrafter")
+    }
+
+    private fun failedToConnectComponent(message: String, errorCode: String) = buildText {
+        appendNewline(2)
+        primary("CASTCRAFTER")
+        appendNewline()
+        primary("COMMUNITY SERVER")
+        appendNewline(2)
+        error("DEINE VERBINDUNG KONNTE NICHT HERGESTELLT WERDEN.")
+        appendNewline()
+        spacer("Fehlercode: ")
+        niceRed(errorCode)
+        appendNewline()
+        error(message)
+        appendNewline(3)
+        spacer("Beim Herstellen der Verbindung ist ein interner Fehler aufgetreten.")
         appendNewline()
         spacer("Sollte das Problem weiterhin bestehen, wende dich bitte an den Support.")
         appendNewline(2)

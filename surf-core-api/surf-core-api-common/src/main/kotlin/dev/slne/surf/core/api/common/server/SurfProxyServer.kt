@@ -22,7 +22,7 @@ data class SurfProxyServer(
     val address: SerializableInetSocketAddress
 ) : CommonSurfServer {
     override fun getPlayers(): ObjectSet<SurfPlayer> =
-        SurfCoreApi.getOnlinePlayers().filter { it.currentProxy?.name == name }.toObjectSet()
+        SurfCoreApi.getOnlinePlayers().filter { it.currentProxyName == name }.toObjectSet()
 
     companion object {
         fun current() = SurfCoreApi.getCurrentProxy()

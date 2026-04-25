@@ -31,7 +31,6 @@ import dev.slne.surf.core.velocity.command.coreCommand
 import dev.slne.surf.core.velocity.config.VelocityCoreConfigManager
 import dev.slne.surf.core.velocity.listener.ConnectionListener
 import dev.slne.surf.core.velocity.listener.VelocityServerListener
-import dev.slne.surf.core.velocity.listener.VelocityShutdownListener
 import dev.slne.surf.core.velocity.redis.handler.SendPlayerToProxyHandler
 import dev.slne.surf.core.velocity.redis.handler.SendPlayerToServerHandler
 import dev.slne.surf.core.velocity.redis.listener.VelocityRedisListener
@@ -64,7 +63,6 @@ class VelocityMain @Inject constructor(
         }
 
         AuthenticationService.init()
-        ClientCoreInstance.redisApi.registerRequestHandler(VelocityShutdownListener)
 
         ClientCoreInstance.clientLoader.withListener(VelocityRedisListener)
         ClientCoreInstance.clientLoader.withRequestResponseHandler(SendPlayerToProxyHandler)

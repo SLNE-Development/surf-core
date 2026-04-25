@@ -7,6 +7,7 @@ import com.velocitypowered.api.command.VelocityBrigadierMessage
 import dev.jorel.commandapi.CommandAPICommand
 import dev.jorel.commandapi.CommandTree
 import dev.jorel.commandapi.arguments.Argument
+import dev.jorel.commandapi.arguments.ArgumentSuggestions
 import dev.jorel.commandapi.arguments.CommandAPIArgumentType
 import dev.jorel.commandapi.executors.CommandArguments
 import dev.slne.surf.api.core.messages.adventure.buildText
@@ -17,6 +18,14 @@ open class SurfServerArgument(nodeName: String) :
     Argument<CommonSurfServer>(nodeName, StringArgumentType::string) {
     override fun getPrimitiveType(): Class<CommonSurfServer> {
         return CommonSurfServer::class.java
+    }
+
+    init {
+        replaceSuggestions(
+            ArgumentSuggestions.stringCollection { _ ->
+                SurfCoreApi.getCommonServers().map { it.name }
+            }
+        )
     }
 
     override fun getArgumentType(): CommandAPIArgumentType? {

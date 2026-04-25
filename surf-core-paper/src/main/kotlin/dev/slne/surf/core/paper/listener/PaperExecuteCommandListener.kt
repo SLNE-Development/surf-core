@@ -7,13 +7,13 @@ import dev.slne.surf.core.core.common.redis.listener.ExecuteCommandServerListene
 import org.bukkit.Bukkit
 
 @AutoService(ExecuteCommandServerListener::class)
-object PaperExecuteCommandListener : ExecuteCommandServerListener {
+class PaperExecuteCommandListener : ExecuteCommandServerListener {
     override suspend fun executeCommand(
         commonSurfServer: CommonSurfServer,
         command: String
-    ): Boolean {
+    ): Boolean? {
         if (commonSurfServer.uuid != SurfServer.current().uuid) {
-            return false
+            return null
         }
 
         return Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command)

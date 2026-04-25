@@ -11,10 +11,10 @@ import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 
 @AutoService(ShutdownServerListener::class)
-object PaperShutdownListener : ShutdownServerListener {
-    override fun shutdown(commonSurfServer: CommonSurfServer, reason: Component?): Boolean {
+class PaperShutdownListener : ShutdownServerListener {
+    override fun shutdown(commonSurfServer: CommonSurfServer, reason: Component?): Boolean? {
         if (commonSurfServer.uuid != SurfServer.current().uuid) {
-            return false
+            return null
         }
 
         forEachPlayer { player ->

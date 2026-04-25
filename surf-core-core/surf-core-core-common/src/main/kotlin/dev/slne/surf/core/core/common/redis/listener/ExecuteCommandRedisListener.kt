@@ -7,13 +7,15 @@ import dev.slne.surf.redis.request.RequestContext
 object ExecuteCommandRedisListener {
     @HandleRedisRequest
     suspend fun handleExecuteCommandRequest(context: RequestContext<ExecuteCommandServerRequest.Request>) {
-        context.respond(
-            ExecuteCommandServerRequest.Response(
-                ExecuteCommandServerListener.executeCommand(
-                    context.request.commonSurfServer,
-                    context.request.command
+        ExecuteCommandServerListener.executeCommand(
+            context.request.commonSurfServer,
+            context.request.command
+        )?.let {
+            context.respond(
+                ExecuteCommandServerRequest.Response(
+                    it
                 )
             )
-        )
+        }
     }
 }

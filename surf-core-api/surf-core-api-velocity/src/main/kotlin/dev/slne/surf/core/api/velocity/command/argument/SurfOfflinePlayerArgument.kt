@@ -2,9 +2,11 @@ package dev.slne.surf.core.api.velocity.command.argument
 
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
+import com.velocitypowered.api.command.CommandSource
 import dev.jorel.commandapi.CommandAPICommand
 import dev.jorel.commandapi.CommandTree
 import dev.jorel.commandapi.arguments.Argument
+import dev.jorel.commandapi.arguments.ArgumentSuggestions
 import dev.jorel.commandapi.arguments.CommandAPIArgumentType
 import dev.jorel.commandapi.executors.CommandArguments
 import dev.slne.surf.api.core.util.logger
@@ -32,6 +34,14 @@ open class SurfOfflinePlayerArgument(nodeName: String) :
     ): Deferred<SurfPlayer?> = scope.future {
         SurfCoreApi.getOfflinePlayer(StringArgumentType.getString(cmdCtx, key))
     }.asDeferred()
+
+    override fun replaceSuggestions(suggestions: ArgumentSuggestions<CommandSource>): Argument<Deferred<SurfPlayer?>> =
+        super.replaceSuggestions(
+            ArgumentSuggestions.stringCollection { _ ->
+                SurfCoreApi.getOnlinePlayers()
+                    .mapNotNull { it.lastKnownName }
+            }
+        )
 
     companion object {
         private val log = logger()

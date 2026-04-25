@@ -3,10 +3,12 @@ package dev.slne.surf.core.api.velocity.command.argument
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType
+import com.velocitypowered.api.command.CommandSource
 import com.velocitypowered.api.command.VelocityBrigadierMessage
 import dev.jorel.commandapi.CommandAPICommand
 import dev.jorel.commandapi.CommandTree
 import dev.jorel.commandapi.arguments.Argument
+import dev.jorel.commandapi.arguments.ArgumentSuggestions
 import dev.jorel.commandapi.arguments.CommandAPIArgumentType
 import dev.jorel.commandapi.executors.CommandArguments
 import dev.slne.surf.api.core.messages.adventure.buildText
@@ -36,6 +38,14 @@ open class SurfPlayerArgument(nodeName: String) :
                 }
             )
         ).create()
+
+    override fun replaceSuggestions(suggestions: ArgumentSuggestions<CommandSource>): Argument<SurfPlayer> =
+        super.replaceSuggestions(
+            ArgumentSuggestions.stringCollection { _ ->
+                SurfCoreApi.getOnlinePlayers()
+                    .mapNotNull { it.lastKnownName }
+            }
+        )
 }
 
 inline fun CommandTree.surfPlayerArgument(

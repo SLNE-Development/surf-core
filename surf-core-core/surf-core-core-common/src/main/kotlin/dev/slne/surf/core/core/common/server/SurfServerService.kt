@@ -6,6 +6,7 @@ import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.common.server.state.SurfServerState
 import it.unimi.dsi.fastutil.objects.ObjectSet
+import net.kyori.adventure.text.Component
 import org.jetbrains.annotations.UnmodifiableView
 import java.util.*
 
@@ -18,6 +19,9 @@ interface SurfServerService {
     fun addServer(server: CommonSurfServer)
     fun removeServer(server: CommonSurfServer)
     fun changeState(commonSurfServer: CommonSurfServer, state: SurfServerState)
+
+    suspend fun shutdown(commonSurfServer: CommonSurfServer, reason: Component?): Boolean
+    suspend fun executeCommand(commonSurfServer: CommonSurfServer, command: String): Boolean
 
     fun getServerByName(name: String): SurfServer?
     fun getServerByUuid(uuid: UUID): CommonSurfServer?

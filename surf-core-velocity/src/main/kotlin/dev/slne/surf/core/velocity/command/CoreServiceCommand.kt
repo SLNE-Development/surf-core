@@ -3,9 +3,12 @@ package dev.slne.surf.core.velocity.command
 import com.github.shynixn.mccoroutine.velocity.launch
 import com.velocitypowered.api.proxy.ConsoleCommandSource
 import dev.jorel.commandapi.kotlindsl.*
+import dev.slne.surf.api.core.messages.adventure.buildText
+import dev.slne.surf.api.core.messages.adventure.clickRunsCommand
 import dev.slne.surf.api.core.messages.adventure.sendText
 import dev.slne.surf.api.core.minimessage.miniMessage
 import dev.slne.surf.api.velocity.command.executors.anyExecutorSuspend
+import dev.slne.surf.api.velocity.command.executors.playerExecutorSuspend
 import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.velocity.command.argument.surfServerArgument
 import dev.slne.surf.core.core.common.server.SurfServerService
@@ -20,7 +23,37 @@ fun coreServiceCommand() = subcommand("service") {
     withPermission(PermissionList.CORE_COMMAND_SERVICE)
 
     literalArgument("list") {
+        anyExecutor { source, _ ->
+            val services = SurfServerService.servers
 
+            if (services.isEmpty()) {
+                source.sendText {
+                    appendCorePrefix()
+                    error("Derzeit sind keine Server auf dem Netzwerk online.")
+                }
+                return@anyExecutor
+            }
+
+            source.sendText {
+                appendCorePrefix()
+                info("Derzeit sind ")
+                variableValue(services.size)
+                info(" Server aktiv: ")
+                appendCollection(services) { service ->
+                    buildText {
+                        variableValue(service.displayName)
+                        clickRunsCommand("/core service ${service.name} info")
+                        hoverEvent(buildText {
+                            info("ID: ")
+                            variableValue(service.uuid.toString())
+                            appendNewline()
+                            info("Spieler: ")
+                            variableValue("${service.getPlayerCount()}/${service.maxPlayers}")
+                        })
+                    }
+                }
+            }
+        }
     }
 
 
@@ -107,8 +140,6 @@ fun coreServiceCommand() = subcommand("service") {
                             })
                         }
                     }
-
-
                 }
             }
         }
@@ -180,7 +211,7 @@ fun coreServiceCommand() = subcommand("service") {
         literalArgument("sudo") {
             textArgument("command")
 
-            playerExecutor { player, arguments ->
+            playerExecutorSuspend { player, arguments ->
                 val service: CommonSurfServer by arguments
                 val command: String by arguments
 
@@ -191,7 +222,7 @@ fun coreServiceCommand() = subcommand("service") {
                         variableValue(service.name)
                         error(" ausführen.")
                     }
-                    return@playerExecutor
+                    return@playerExecutorSuspend
                 }
 
                 val result = SurfServerService.executeCommand(service, command)

@@ -4,6 +4,7 @@ import com.github.shynixn.mccoroutine.folia.launch
 import com.github.shynixn.mccoroutine.folia.scope
 import dev.slne.surf.api.core.messages.adventure.*
 import dev.slne.surf.api.paper.command.util.idOrThrow
+import dev.slne.surf.api.paper.util.getPrefixedName
 import dev.slne.surf.core.api.common.server.connection.SurfProxyServerConnectionResult
 import dev.slne.surf.core.api.paper.util.surfPlayer
 import dev.slne.surf.core.core.CoreInstance
@@ -126,6 +127,13 @@ object PlayerConnectListener : Listener {
         plugin.launch {
             PlayerProxyConnectionResultWatcher.cleanUp(player.uuid)
         }
+    }
+
+    @EventHandler
+    fun onJoin(event: PlayerJoinEvent) {
+        event.player.displayName(buildText {
+            append(event.player.getPrefixedName())
+        })
     }
 
     private fun buildDisconnectComponent(errorCode: String) = buildText {

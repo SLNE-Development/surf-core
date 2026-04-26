@@ -1,7 +1,9 @@
 package dev.slne.surf.core.paper
 
 import com.github.shynixn.mccoroutine.folia.SuspendingJavaPlugin
+import dev.slne.surf.api.core.luckperms.LuckPermsAccess
 import dev.slne.surf.api.paper.event.register
+import dev.slne.surf.api.paper.util.getPrefixedName
 import dev.slne.surf.core.api.common.event.SurfServerOnlineEvent
 import dev.slne.surf.core.api.common.event.SurfServerStoppingEvent
 import dev.slne.surf.core.api.common.server.SurfServer
@@ -13,6 +15,7 @@ import dev.slne.surf.core.paper.command.*
 import dev.slne.surf.core.paper.event.SurfServerEventListener
 import dev.slne.surf.core.paper.listener.PlayerConnectListener
 import dev.slne.surf.core.paper.task.surfServerInformationSyncTask
+import net.luckperms.api.event.user.UserDataRecalculateEvent
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -47,6 +50,9 @@ class PaperMain : SuspendingJavaPlugin() {
             SurfServer.current().copy(maxPlayers = Bukkit.getMaxPlayers())
         )
 
+
+        luckPerms()
+
         surfServerInformationSyncTask.start()
     }
 
@@ -57,5 +63,17 @@ class PaperMain : SuspendingJavaPlugin() {
         SurfServerService.removeServer(SurfServer.current())
 
         ClientCoreInstance.clientLoader.onDisable()
+    }
+
+
+    private fun luckPerms() {
+        LuckPermsAccess.luckperms.eventBus.subscribe(
+            plugin,
+            UserDataRecalculateEvent::class.java
+        ) { event ->
+            Bukkit.getPlayer(event.user.uniqueId)?.let {
+                it.displayName(it.getPrefixedName())
+            }
+        }
     }
 }

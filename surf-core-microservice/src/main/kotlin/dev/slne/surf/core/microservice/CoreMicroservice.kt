@@ -1,10 +1,7 @@
 package dev.slne.surf.core.microservice
 
 import com.google.auto.service.AutoService
-import dev.slne.surf.core.microservice.database.tables.SurfPlayerIpAddressHistoriesTable
-import dev.slne.surf.core.microservice.database.tables.SurfPlayerNameHistoriesTable
-import dev.slne.surf.core.microservice.database.tables.SurfPlayerTexturesHistoriesTable
-import dev.slne.surf.core.microservice.database.tables.SurfPlayersTable
+import dev.slne.surf.core.microservice.database.tables.*
 import dev.slne.surf.core.microservice.rabbit.*
 import dev.slne.surf.database.DatabaseApi
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.SchemaUtils
@@ -25,7 +22,8 @@ class CoreMicroservice : Microservice() {
                 SurfPlayerIpAddressHistoriesTable,
                 SurfPlayerNameHistoriesTable,
                 SurfPlayersTable,
-                SurfPlayerTexturesHistoriesTable
+                SurfPlayerTexturesHistoriesTable,
+                SurfPlayerErrorsTable
             )
         }
 

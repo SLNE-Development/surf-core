@@ -8,7 +8,9 @@ import dev.slne.surf.api.core.messages.adventure.sendText
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.util.sendText
 import dev.slne.surf.core.core.common.util.appendCorePrefix
+import dev.slne.surf.core.core.common.util.niceRed
 import dev.slne.surf.core.paper.permission.PermissionRegistry
+import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.minimessage.MiniMessage
 
 fun networkBroadcastCommand() = commandTree("nbroadcast") {
@@ -19,7 +21,8 @@ fun networkBroadcastCommand() = commandTree("nbroadcast") {
 
             SurfCoreApi.getOnlinePlayers().forEach {
                 it.sendText {
-                    appendCorePrefix()
+                    appendNewline()
+                    niceRed("INFO: ", TextDecoration.BOLD)
                     append(MiniMessage.miniMessage().deserialize(message))
                 }
             }

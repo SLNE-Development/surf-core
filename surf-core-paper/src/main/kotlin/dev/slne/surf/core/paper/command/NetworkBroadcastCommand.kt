@@ -21,10 +21,15 @@ fun networkBroadcastCommand() = commandTree("nbroadcast") {
 
             SurfCoreApi.getOnlinePlayers().forEach {
                 it.sendText {
+                    appendCorePrefix()
+
                     appendNewline()
+                    appendCorePrefix()
                     niceRed("INFO: ", TextDecoration.BOLD)
                     append(MiniMessage.miniMessage().deserialize(message))
+
                     appendNewline()
+                    appendCorePrefix()
                 }
             }
 

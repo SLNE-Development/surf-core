@@ -24,6 +24,7 @@ fun networkBroadcastCommand() = commandTree("nbroadcast") {
                     appendNewline()
                     niceRed("INFO: ", TextDecoration.BOLD)
                     append(MiniMessage.miniMessage().deserialize(message))
+                    appendNewline()
                 }
             }
 

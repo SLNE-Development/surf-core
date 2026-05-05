@@ -3,11 +3,13 @@ package dev.slne.surf.core.paper
 import dev.slne.surf.core.api.common.event.SurfServerStartEvent
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.common.server.state.SurfServerState
+import dev.slne.surf.core.api.paper.CorePlayerInfoProvider
 import dev.slne.surf.core.client.ClientCoreInstance
 import dev.slne.surf.core.core.CoreInstance
 import dev.slne.surf.core.core.common.config.SurfServerConfiguration
 import dev.slne.surf.core.core.common.event.SurfEventBus
 import dev.slne.surf.core.core.common.server.SurfServerService
+import dev.slne.surf.core.paper.api.DefaultCorePlayerInfoProvider
 import dev.slne.surf.core.paper.redis.listener.PaperRedisListener
 import dev.slne.surf.core.paper.teleport.TeleportRedisListener
 import io.papermc.paper.plugin.bootstrap.BootstrapContext
@@ -46,6 +48,8 @@ class PaperBootstrap : PluginBootstrap {
 
         SurfEventBus.fire(SurfServerStartEvent(surfServerConfig.serverName))
         SurfServerService.addServer(server)
+
+        CorePlayerInfoProvider.setInstance(DefaultCorePlayerInfoProvider)
     }
 
     companion object {

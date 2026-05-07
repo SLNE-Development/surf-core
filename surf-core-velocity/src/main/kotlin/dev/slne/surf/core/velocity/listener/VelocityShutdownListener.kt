@@ -14,7 +14,17 @@ class VelocityShutdownListener : ShutdownServerListener {
             return null
         }
 
-        plugin.proxy.shutdown(reason)
+        val shutdownThread = Thread {
+            try {
+                Thread.sleep(100)
+            } catch (_: InterruptedException) {
+                Thread.currentThread().interrupt()
+            }
+
+            plugin.proxy.shutdown(reason)
+        }
+        shutdownThread.isDaemon = false
+        shutdownThread.start()
         return true
     }
 }

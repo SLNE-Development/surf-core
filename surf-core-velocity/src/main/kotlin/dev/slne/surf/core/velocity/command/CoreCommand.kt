@@ -3,6 +3,7 @@ package dev.slne.surf.core.velocity.command
 import com.github.shynixn.mccoroutine.velocity.launch
 import com.velocitypowered.api.proxy.ConsoleCommandSource
 import dev.jorel.commandapi.kotlindsl.*
+import dev.slne.surf.api.core.messages.CommonComponents
 import dev.slne.surf.api.core.messages.adventure.buildText
 import dev.slne.surf.api.core.messages.adventure.clickRunsCommand
 import dev.slne.surf.api.core.messages.adventure.sendText
@@ -26,15 +27,14 @@ import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.TextDecoration
 import java.time.Duration
 import java.time.OffsetDateTime
-import kotlin.jvm.optionals.getOrNull
+import kotlin.jvm.optionals.getOrElse
+import kotlin.time.toKotlinDuration
 
 fun coreCommand() = commandTree("core") {
     withPermission(PermissionList.CORE_COMMAND)
 
     anyExecutor { source, _ ->
-        val coreVersion =
-            plugin.pluginManager.getPlugin("surf-core-velocity")
-                .getOrNull()?.description?.version?.getOrNull() ?: "Unbekannt"
+        val coreVersion = plugin.pluginContainer.description.version.getOrElse { "#Unknown" }
         val platform = plugin.proxy.version.name
         val platformVersion = plugin.proxy.version.version
         val vendor = plugin.proxy.version.vendor
@@ -384,18 +384,19 @@ fun coreCommand() = commandTree("core") {
                         appendNewline()
                         appendCorePrefix()
                         info("Uptime: ")
-                        variableValue(
-                            formatDuration(
+                        append(
+                            CommonComponents.formatTime(
                                 Duration.between(
                                     service.startedAt,
                                     OffsetDateTime.now()
-                                )
+                                ).toKotlinDuration(),
+                                showSeconds = true,
+                                shortForms = false
                             )
                         )
 
                         appendNewline()
                         appendCorePrefix()
-
 
                         appendNewline()
                         appendCorePrefix()

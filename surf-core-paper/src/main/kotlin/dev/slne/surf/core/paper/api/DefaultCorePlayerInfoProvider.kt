@@ -12,7 +12,7 @@ object DefaultCorePlayerInfoProvider : CorePlayerInfoProvider {
 
         return CorePlayerInfoProvider.ServerInfo(
             serverName = SurfServer.current().name,
-            serverNiceName = SurfServer.current().displayName,
+            serverDisplayName = SurfServer.current().displayName,
             serverRegion = when (player.world.environment) {
                 World.Environment.NETHER -> "Nether"
                 World.Environment.THE_END -> "End"

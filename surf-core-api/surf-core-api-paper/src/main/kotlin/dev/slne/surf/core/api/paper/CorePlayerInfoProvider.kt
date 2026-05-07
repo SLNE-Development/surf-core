@@ -10,7 +10,7 @@ interface CorePlayerInfoProvider {
      * Server Info data class containing the server name, nice name and region. This is used to provide information about the server a player is currently on.
      *
      * @param serverName The name of the server the player is currently on.
-     * @param serverNiceName The nice name of the server the player is currently on.
+     * @param serverDisplayName The nice name of the server the player is currently on.
      * @param serverRegion The region of the server the player is currently on.
      *
      * NOTE: This method should not be used to gain access to players current server. Use [dev.slne.surf.core.api.common.player.SurfPlayer.currentServer] instead.
@@ -19,7 +19,7 @@ interface CorePlayerInfoProvider {
      */
     data class ServerInfo(
         val serverName: String,
-        val serverNiceName: String,
+        val serverDisplayName: String,
         val serverRegion: String
     )
 

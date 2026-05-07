@@ -7,7 +7,7 @@ import dev.slne.surf.redis.request.RequestContext
 object ShutdownServerRedisListener {
     @HandleRedisRequest
     fun handleShutdownRequest(context: RequestContext<ShutdownServerRequest.Request>) {
-        ShutdownServerListener.shutdown(
+        ServerShutdownHandler.shutdown(
             context.request.commonSurfServer,
             context.request.reason
         )?.let {

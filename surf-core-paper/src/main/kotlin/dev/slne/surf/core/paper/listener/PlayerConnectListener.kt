@@ -131,9 +131,7 @@ object PlayerConnectListener : Listener {
 
     @EventHandler
     fun onJoin(event: PlayerJoinEvent) {
-        event.player.displayName(buildText {
-            append(event.player.getPrefixedName())
-        })
+        event.player.displayName(event.player.getPrefixedName())
     }
 
     private fun buildDisconnectComponent(errorCode: String) = buildText {

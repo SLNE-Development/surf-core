@@ -13,7 +13,9 @@ data class CoreLauncherConfig(
     val serverName: String = "unknown",
     val serverDisplayName: String = "unknown",
     val serverCategory: String = "unknown",
-    val serverUuid: SerializableUUID = UUID.randomUUID()
+    val serverUuid: SerializableUUID = UUID.randomUUID(),
+    val autoUpdateSurfPlugins: Boolean = true,
+    val personalAccessToken: String = ""
 ) {
     companion object : SpongeYmlConfigClass<CoreLauncherConfig>(
         CoreLauncherConfig::class.java,

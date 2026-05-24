@@ -4,9 +4,11 @@ import dev.slne.surf.api.standalone.SurfApiStandaloneBootstrap
 import dev.slne.surf.core.launcher.api.LauncherConstants
 import dev.slne.surf.core.launcher.server.config.CoreLauncherConfig
 import dev.slne.surf.core.launcher.server.ping.MinecraftServerPinger
+import dev.slne.surf.core.launcher.server.updater.process.PluginUpdater
 import kotlinx.coroutines.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.time.Duration.Companion.seconds
 
 const val LOG_PREFIX = "\u001B[0;91m[CoreLauncher]\u001B[0m"
 
@@ -20,6 +22,20 @@ object CoreLauncher {
     suspend fun launch() {
         SurfApiStandaloneBootstrap.bootstrap()
         SurfApiStandaloneBootstrap.enable()
+
+        if (CoreLauncherConfig.getConfig().autoUpdateSurfPlugins) {
+            println("$LOG_PREFIX Searching plugin updates...")
+
+            withTimeoutOrNull(20.seconds) {
+                if (CoreLauncherConfig.getConfig().personalAccessToken.isBlank()) {
+                    println("$LOG_PREFIX No GitHub personal access token provided, skipping plugin update check")
+                    return@withTimeoutOrNull
+                }
+                
+                PluginUpdater.start()
+            }
+                ?: println("$LOG_PREFIX Plugin update check timed out after 30 seconds, continuing with server startup")
+        }
 
         println("$LOG_PREFIX Starting Minecraft Server...")
 

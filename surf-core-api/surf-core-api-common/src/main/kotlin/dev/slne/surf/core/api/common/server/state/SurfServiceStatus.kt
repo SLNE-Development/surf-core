@@ -1,10 +1,8 @@
 package dev.slne.surf.core.api.common.server.state
 
-enum class ExternalSurfServerState {
-    STARTING,
+enum class SurfServiceStatus {
+    LAUNCHING,
     ONLINE,
-    STOPPING,
-    OFFLINE,
     UNREACHABLE,
     CRASHED
 }

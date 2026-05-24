@@ -1,61 +1,67 @@
 package dev.slne.surf.core.launcher.server.ping
 
-import dev.slne.surf.core.api.common.server.state.ExternalSurfServerState
 import dev.slne.surf.core.launcher.server.CoreLauncher
 import dev.slne.surf.core.launcher.server.CoreLauncherEnvironment
 import dev.slne.surf.core.launcher.server.LOG_PREFIX
 import kotlinx.coroutines.*
-import java.io.IOException
+import java.io.DataInputStream
+import java.io.DataOutputStream
+import java.net.InetSocketAddress
 import java.net.Socket
-import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 object MinecraftServerPinger {
-    suspend fun build() {
-        val process = CoreLauncher.serverProcess
-
-        coroutineScope {
-            launch {
-                process.waitFor()
-
-                delay(500.milliseconds)
-
-                val lastStatus = CoreLauncher.getCurrentServerState()
-                if (lastStatus != ExternalSurfServerState.OFFLINE && lastStatus != ExternalSurfServerState.STOPPING) {
-                    println("$LOG_PREFIX Server process died unexpectedly → CRASHED")
-                    CoreLauncher.updateServerState(ExternalSurfServerState.CRASHED)
-                }
-
-                this@coroutineScope.cancel()
+    suspend fun monitor(process: Process): Unit = coroutineScope {
+        launch {
+            val exitCode = process.waitFor()
+            if (CoreLauncher.isShuttingDown()) {
+                return@launch
             }
 
-            launch {
-                while (process.isAlive) {
-                    delay(5_000L.milliseconds)
+            if (exitCode == 0) {
+                println("$LOG_PREFIX Minecraft server stopped")
+            } else {
+                println("$LOG_PREFIX Minecraft server crashed!")
+            }
+        }
 
-                    val reachable = pingServer(CoreLauncherEnvironment.SERVER_PORT)
-                    val currentStatus = CoreLauncher.getCurrentServerState()
+        launch {
+            while (process.isAlive && CoreLauncher.minecraftServerOnline) {
+                delay(5.seconds)
 
-                    if (reachable) {
-                        if (currentStatus != ExternalSurfServerState.ONLINE) {
-                            println("$LOG_PREFIX Server is ONLINE")
-                            CoreLauncher.updateServerState(ExternalSurfServerState.ONLINE)
-                        }
-                    } else {
-                        if (currentStatus == ExternalSurfServerState.ONLINE) {
-                            println("$LOG_PREFIX Server UNREACHABLE")
-                            CoreLauncher.updateServerState(ExternalSurfServerState.UNREACHABLE)
-                        }
+                val reachable = withContext(Dispatchers.IO) {
+                    isMinecraftReady(CoreLauncherEnvironment.SERVER_PORT)
+                }
+
+                if (!reachable) {
+                    println("$LOG_PREFIX Minecraft server is unreachable")
+                }
+            }
+        }
+
+        awaitCancellation()
+    }
+
+    private fun isMinecraftReady(port: Int): Boolean =
+        runCatching {
+            Socket().use { socket ->
+                val host = "127.0.0.1"
+                socket.connect(InetSocketAddress(host, port), 1500)
+                socket.soTimeout = 1500
+
+                DataOutputStream(socket.getOutputStream()).use { output ->
+                    DataInputStream(socket.getInputStream()).use { input ->
+                        val handshake = buildHandshakePacket(host, port)
+
+                        output.write(handshake)
+                        output.write(byteArrayOf(0x01, 0x00))
+                        output.flush()
+
+                        input.readByte()
+
+                        true
                     }
                 }
             }
-
-            awaitCancellation()
-        }
-    }
-
-    private fun pingServer(port: Int): Boolean = try {
-        Socket("127.0.0.1", port).use { true }
-    } catch (e: IOException) {
-        false
-    }
+        }.getOrDefault(false)
 }

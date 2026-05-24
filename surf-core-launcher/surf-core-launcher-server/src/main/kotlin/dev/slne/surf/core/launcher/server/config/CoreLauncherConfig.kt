@@ -9,6 +9,7 @@ import kotlin.io.path.Path
 @ConfigSerializable
 data class CoreLauncherConfig(
     val serverStartupCommand: String = "java -jar server.jar --nogui",
+    val startedMessage: String = "For help, type \"help\"",
     val serverName: String = "unknown",
     val serverDisplayName: String = "unknown",
     val serverCategory: String = "unknown",

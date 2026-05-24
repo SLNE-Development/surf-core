@@ -1,92 +1,98 @@
 package dev.slne.surf.core.launcher.server
 
 import dev.slne.surf.api.standalone.SurfApiStandaloneBootstrap
-import dev.slne.surf.core.api.common.server.state.ExternalSurfServerState
 import dev.slne.surf.core.launcher.api.LauncherConstants
 import dev.slne.surf.core.launcher.server.config.CoreLauncherConfig
 import dev.slne.surf.core.launcher.server.ping.MinecraftServerPinger
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 
 const val LOG_PREFIX = "\u001B[0;91m[CoreLauncher]\u001B[0m"
 
 object CoreLauncher {
-//    val redisApi = RedisApi.create("surf-core-launcher")
-//    private val redisStatusMap =
-//        redisApi.createSyncMap<String, ExternalSurfServerState>("server_status")
-
-
-    var currentState: ExternalSurfServerState = ExternalSurfServerState.OFFLINE
-        set(value) {
-            field = value
-            println("$LOG_PREFIX Server state changed to: $value")
-        }
-
-    fun getCurrentServerState(): ExternalSurfServerState =
-        currentState
-
-    fun updateServerState(newState: ExternalSurfServerState) {
-        currentState = newState
-    }
-
-    private fun buildStartupCommand(): List<String> {
-        val base = CoreLauncherConfig.getConfig().serverStartupCommand
-        val parts = base.split(" ").toMutableList()
-
-        if (parts.none { it == "-D${LauncherConstants.PROPERTY_LAUNCHED_BY_CORE}=true" }) {
-            parts.add(1, "-D${LauncherConstants.PROPERTY_LAUNCHED_BY_CORE}=true")
-        }
-
-        return parts
-    }
-
+    private val shuttingDown = AtomicBoolean(false)
     lateinit var serverProcess: Process
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private var monitorJob: Job? = null
+    var minecraftServerOnline: Boolean = false
 
-
-    suspend fun launch(args: Array<String>) {
+    suspend fun launch() {
         SurfApiStandaloneBootstrap.bootstrap()
         SurfApiStandaloneBootstrap.enable()
 
-        withContext(Dispatchers.IO) {
-            println("$LOG_PREFIX Connected to Redis!")
-            updateServerState(ExternalSurfServerState.STARTING)
+        println("$LOG_PREFIX Starting Minecraft Server...")
 
-            serverProcess = ProcessBuilder(buildStartupCommand())
-                .redirectOutput(ProcessBuilder.Redirect.INHERIT)
-                .redirectError(ProcessBuilder.Redirect.INHERIT)
-                .redirectInput(ProcessBuilder.Redirect.INHERIT)
-                .start()
+        val command = buildStartupCommand()
 
-            println("$LOG_PREFIX Server process started! (PID: ${serverProcess.pid()})")
+        serverProcess = ProcessBuilder(command)
+            .redirectInput(ProcessBuilder.Redirect.INHERIT)
+            .redirectOutput(ProcessBuilder.Redirect.PIPE)
+            .redirectError(ProcessBuilder.Redirect.INHERIT)
+            .start()
 
-            runCatching {
-                MinecraftServerPinger.build()
+        println("$LOG_PREFIX Server process started")
+
+        monitorJob = scope.launch {
+
+            launch {
+                serverProcess.inputStream.bufferedReader().forEachLine { line ->
+                    println(line)
+
+                    if (line.contains(
+                            CoreLauncherConfig.getConfig().startedMessage,
+                            ignoreCase = true
+                        )
+                    ) {
+                        minecraftServerOnline = true
+                        println("$LOG_PREFIX Server is now online.")
+                    }
+                }
             }
+
+            launch {
+                serverProcess.errorStream.bufferedReader().forEachLine { line ->
+                    println(line)
+                }
+            }
+
+            MinecraftServerPinger.monitor(serverProcess)
         }
     }
 
+    suspend fun shutdown() {
+        println("$LOG_PREFIX Shutting down launcher/server...")
 
-    fun shutdown() {
-        println("$LOG_PREFIX Shutdown signal received, stopping server...")
-        updateServerState(ExternalSurfServerState.STOPPING)
+        monitorJob?.cancelAndJoin()
 
-        serverProcess.destroy()
-
-        if (serverProcess.isAlive) {
-            serverProcess.waitFor(30, TimeUnit.SECONDS)
-        }
-
-        updateServerState(ExternalSurfServerState.OFFLINE)
-//        redisApi.disconnect()
-
-        if (serverProcess.isAlive) {
-            println("$LOG_PREFIX Warning: Server process did not stop gracefully within 30s, waiting longer... (no force yet)")
+        if (::serverProcess.isInitialized && serverProcess.isAlive) {
             serverProcess.destroy()
-        } else {
-            println("$LOG_PREFIX Server process stopped gracefully.")
+
+            if (!serverProcess.waitFor(45, TimeUnit.SECONDS)) {
+                println("$LOG_PREFIX Server did not stop within 45 seconds")
+            }
         }
+
+        scope.cancel()
+    }
+
+    fun isShuttingDown(): Boolean = shuttingDown.get()
+
+    private fun buildStartupCommand(): List<String> {
+        val base = CoreLauncherConfig.getConfig().serverStartupCommand
+
+        val parts = Regex("""[^\s"]+|"([^"]*)"""")
+            .findAll(base)
+            .map { it.value.replace("\"", "") }
+            .toMutableList()
+
+        val flag = "-D${LauncherConstants.PROPERTY_LAUNCHED_BY_CORE}=true"
+
+        if (parts.none { it == flag }) {
+            parts.add(1, flag)
+        }
+
+        return parts
     }
 }
 
@@ -98,5 +104,7 @@ suspend fun main(args: Array<String>) {
         }
     })
 
-    CoreLauncher.launch(args)
+    CoreLauncher.launch()
+    CoreLauncher.serverProcess.waitFor()
+    SurfApiStandaloneBootstrap.shutdown()
 }

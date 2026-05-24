@@ -1,15 +1,16 @@
 package dev.slne.surf.core.launcher.server
 
-import dev.slne.surf.api.core.util.logger
 import dev.slne.surf.api.standalone.SurfApiStandaloneBootstrap
 import dev.slne.surf.core.api.common.server.state.ExternalSurfServerState
 import dev.slne.surf.core.launcher.api.LauncherConstants
 import dev.slne.surf.core.launcher.server.config.CoreLauncherConfig
 import dev.slne.surf.core.launcher.server.ping.MinecraftServerPinger
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
-val logger = logger()
+const val LOG_PREFIX = "\u001B[0;91m[CoreLauncher]\u001B[0m"
 
 object CoreLauncher {
 //    val redisApi = RedisApi.create("surf-core-launcher")
@@ -20,7 +21,7 @@ object CoreLauncher {
     var currentState: ExternalSurfServerState = ExternalSurfServerState.OFFLINE
         set(value) {
             field = value
-            logger.atInfo().log("[CoreLauncher] Server state changed to: $value")
+            println("$LOG_PREFIX Server state changed to: $value")
         }
 
     fun getCurrentServerState(): ExternalSurfServerState =
@@ -41,14 +42,7 @@ object CoreLauncher {
         return parts
     }
 
-
-    val serverProcess: Process = ProcessBuilder(
-        buildStartupCommand()
-    )
-        .redirectOutput(ProcessBuilder.Redirect.INHERIT)
-        .redirectError(ProcessBuilder.Redirect.INHERIT)
-        .redirectInput(ProcessBuilder.Redirect.INHERIT)
-        .start()
+    lateinit var serverProcess: Process
 
 
     suspend fun launch(args: Array<String>) {
@@ -56,26 +50,26 @@ object CoreLauncher {
         SurfApiStandaloneBootstrap.enable()
 
         withContext(Dispatchers.IO) {
-//            redisApi.freezeAndConnect()
-            logger.atInfo().log("[CoreLauncher] Connected to Redis!")
-
+            println("$LOG_PREFIX Connected to Redis!")
             updateServerState(ExternalSurfServerState.STARTING)
-        }
 
-        MinecraftServerPinger.build()
+            serverProcess = ProcessBuilder(buildStartupCommand())
+                .redirectOutput(ProcessBuilder.Redirect.INHERIT)
+                .redirectError(ProcessBuilder.Redirect.INHERIT)
+                .redirectInput(ProcessBuilder.Redirect.INHERIT)
+                .start()
 
-        logger.atInfo().log("[CoreLauncher] Server process started! (PID: ${serverProcess.pid()})")
+            println("$LOG_PREFIX Server process started! (PID: ${serverProcess.pid()})")
 
-        coroutineScope {
-            launch {
-                awaitCancellation()
-            }.join()
+            runCatching {
+                MinecraftServerPinger.build()
+            }
         }
     }
 
 
     fun shutdown() {
-        logger.atInfo().log("[CoreLauncher] Shutdown signal received, stopping server...")
+        println("$LOG_PREFIX Shutdown signal received, stopping server...")
         updateServerState(ExternalSurfServerState.STOPPING)
 
         serverProcess.destroy()
@@ -88,11 +82,10 @@ object CoreLauncher {
 //        redisApi.disconnect()
 
         if (serverProcess.isAlive) {
-            logger.atWarning()
-                .log("[CoreLauncher] Server process did not stop gracefully within 30s, waiting longer... (no force yet)")
+            println("$LOG_PREFIX Warning: Server process did not stop gracefully within 30s, waiting longer... (no force yet)")
             serverProcess.destroy()
         } else {
-            logger.atInfo().log("[CoreLauncher] Server process stopped gracefully.")
+            println("$LOG_PREFIX Server process stopped gracefully.")
         }
     }
 }

@@ -31,7 +31,7 @@ object CoreLauncher {
                     println("$LOG_PREFIX No GitHub personal access token provided, skipping plugin update check")
                     return@withTimeoutOrNull
                 }
-                
+
                 PluginUpdater.start()
             }
                 ?: println("$LOG_PREFIX Plugin update check timed out after 30 seconds, continuing with server startup")
@@ -50,7 +50,6 @@ object CoreLauncher {
         println("$LOG_PREFIX Server process started")
 
         monitorJob = scope.launch {
-
             launch {
                 serverProcess.inputStream.bufferedReader().forEachLine { line ->
                     println(line)
@@ -63,12 +62,6 @@ object CoreLauncher {
                         minecraftServerOnline = true
                         println("$LOG_PREFIX Server is now online.")
                     }
-                }
-            }
-
-            launch {
-                serverProcess.errorStream.bufferedReader().forEachLine { line ->
-                    println(line)
                 }
             }
 

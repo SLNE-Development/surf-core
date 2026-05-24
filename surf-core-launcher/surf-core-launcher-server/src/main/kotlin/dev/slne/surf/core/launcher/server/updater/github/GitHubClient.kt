@@ -10,27 +10,21 @@ import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 
 class GitHubClient(private val token: String?) {
-
     private val mapper = jacksonObjectMapper()
 
-    fun fetchLatestRelease(plugin: UpdatablePlugin): Map<String, Any>? {
-        return try {
-            val connection = openConnection(plugin.latestReleaseUrl, "application/vnd.github+json")
-            connection.setRequestProperty("X-GitHub-Api-Version", "2022-11-28")
-            connection.connect()
+    fun fetchLatestRelease(plugin: UpdatablePlugin): Map<String, Any>? = runCatching {
+        val connection = openConnection(plugin.latestReleaseUrl, "application/vnd.github+json")
+        connection.setRequestProperty("X-GitHub-Api-Version", "2022-11-28")
+        connection.connect()
 
-            if (connection.responseCode != 200) {
-                println("[GitHub] API antwortete mit ${connection.responseCode} für ${plugin.name}")
-                return null
-            }
-
-            connection.inputStream.use { input ->
-                mapper.readValue(input, object : TypeReference<Map<String, Any>>() {})
-            }
-        } catch (e: Exception) {
-            null
+        if (connection.responseCode != 200) {
+            return null
         }
-    }
+
+        connection.inputStream.use { input ->
+            mapper.readValue(input, object : TypeReference<Map<String, Any>>() {})
+        }
+    }.getOrNull()
 
     fun downloadAsset(url: String, target: Path) {
         val connection = openConnection(url, "application/octet-stream")

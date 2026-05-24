@@ -4,7 +4,7 @@ plugins {
 
 dependencies {
     api(projects.surfCoreLauncher.surfCoreLauncherApi)
-    implementation("dev.slne.surf.redis:surf-redis-api:1.6.0")
+    compileOnly("dev.slne.surf.redis:surf-redis-api:1.6.0")
 }
 
 tasks.shadowJar {

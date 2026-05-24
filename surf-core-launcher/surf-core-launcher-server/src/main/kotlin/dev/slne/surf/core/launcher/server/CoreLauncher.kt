@@ -6,22 +6,28 @@ import dev.slne.surf.core.api.common.server.state.ExternalSurfServerState
 import dev.slne.surf.core.launcher.api.LauncherConstants
 import dev.slne.surf.core.launcher.server.config.CoreLauncherConfig
 import dev.slne.surf.core.launcher.server.ping.MinecraftServerPinger
-import dev.slne.surf.redis.RedisApi
 import kotlinx.coroutines.*
 import java.util.concurrent.TimeUnit
 
 val logger = logger()
 
 object CoreLauncher {
-    val redisApi = RedisApi.create("surf-core-launcher")
-    private val redisStatusMap =
-        redisApi.createSyncMap<String, ExternalSurfServerState>("server_status")
+//    val redisApi = RedisApi.create("surf-core-launcher")
+//    private val redisStatusMap =
+//        redisApi.createSyncMap<String, ExternalSurfServerState>("server_status")
 
-    fun getCurrentServerState(): ExternalSurfServerState? =
-        redisStatusMap[CoreLauncherConfig.getConfig().serverName]
+
+    var currentState: ExternalSurfServerState = ExternalSurfServerState.OFFLINE
+        set(value) {
+            field = value
+            logger.atInfo().log("[CoreLauncher] Server state changed to: $value")
+        }
+
+    fun getCurrentServerState(): ExternalSurfServerState =
+        currentState
 
     fun updateServerState(newState: ExternalSurfServerState) {
-        redisStatusMap[CoreLauncherConfig.getConfig().serverName] = newState
+        currentState = newState
     }
 
     private fun buildStartupCommand(): List<String> {
@@ -30,14 +36,6 @@ object CoreLauncher {
 
         if (parts.none { it == "-D${LauncherConstants.PROPERTY_LAUNCHED_BY_CORE}=true" }) {
             parts.add(1, "-D${LauncherConstants.PROPERTY_LAUNCHED_BY_CORE}=true")
-        }
-
-        if (parts.none { it.startsWith("-Xms") }) {
-            parts.add(1, "-Xms${CoreLauncherEnvironment.MC_MEMORY_MIN}M")
-        }
-
-        if (parts.none { it.startsWith("-Xmx") }) {
-            parts.add(1, "-Xmx${CoreLauncherEnvironment.MC_MEMORY_MAX}M")
         }
 
         return parts
@@ -58,7 +56,7 @@ object CoreLauncher {
         SurfApiStandaloneBootstrap.enable()
 
         withContext(Dispatchers.IO) {
-            redisApi.freezeAndConnect()
+//            redisApi.freezeAndConnect()
             logger.atInfo().log("[CoreLauncher] Connected to Redis!")
 
             updateServerState(ExternalSurfServerState.STARTING)
@@ -87,7 +85,7 @@ object CoreLauncher {
         }
 
         updateServerState(ExternalSurfServerState.OFFLINE)
-        redisApi.disconnect()
+//        redisApi.disconnect()
 
         if (serverProcess.isAlive) {
             logger.atWarning()

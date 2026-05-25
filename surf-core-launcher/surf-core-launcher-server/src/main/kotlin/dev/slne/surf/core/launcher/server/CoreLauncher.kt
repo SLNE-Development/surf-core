@@ -1,16 +1,22 @@
 package dev.slne.surf.core.launcher.server
 
+import dev.slne.surf.api.core.util.dateTimeFormatter
 import dev.slne.surf.api.standalone.SurfApiStandaloneBootstrap
 import dev.slne.surf.core.launcher.api.LauncherConstants
 import dev.slne.surf.core.launcher.server.config.CoreLauncherConfig
 import dev.slne.surf.core.launcher.server.ping.MinecraftServerPinger
 import dev.slne.surf.core.launcher.server.updater.process.PluginUpdater
 import kotlinx.coroutines.*
+import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.Duration.Companion.seconds
 
-const val LOG_PREFIX = "\u001B[0;91m[CoreLauncher]\u001B[0m"
+val LOG_PREFIX
+    get() =
+        "\u001B[0;91m${
+            LocalDateTime.now().format(dateTimeFormatter)
+        }\u001B[0m \u001B[0;91m[CoreLauncher]\u001B[0m"
 
 object CoreLauncher {
     private val shuttingDown = AtomicBoolean(false)

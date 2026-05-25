@@ -5,8 +5,7 @@ import dev.slne.surf.core.launcher.server.config.CoreLauncherConfig
 import dev.slne.surf.core.launcher.server.updater.UpdatablePlugin
 import dev.slne.surf.core.launcher.server.updater.cooldown.UpdateCooldownTracker
 import dev.slne.surf.core.launcher.server.updater.github.GitHubClient
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
@@ -36,7 +35,13 @@ object PluginUpdater {
         println("$LOG_PREFIX (Updater) Checking plugin updates for ${plugins.size} plugins...")
 
         val duration = measureTimeMillis {
-            plugins.forEach { checkAndUpdate(it) }
+            coroutineScope {
+                plugins.map { plugin ->
+                    async(Dispatchers.IO) {
+                        checkAndUpdate(plugin)
+                    }
+                }.awaitAll()
+            }
         }
 
         println("$LOG_PREFIX (Updater) Update check completed in ${duration}ms")

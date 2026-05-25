@@ -14,7 +14,7 @@ import kotlin.system.measureTimeMillis
 
 object PluginUpdater {
     private val pluginsPath = Path.of("plugins")
-    private val oldPath = pluginsPath.resolve("old")
+    private val oldPath = pluginsPath.resolve(".old")
 
     private val scanner = PluginScanner(pluginsPath)
     private val gitHubClient = GitHubClient(CoreLauncherConfig.getConfig().personalAccessToken)
@@ -28,10 +28,12 @@ object PluginUpdater {
         }
 
         withContext(Dispatchers.IO) {
-            if (!Files.exists(oldPath)) Files.createDirectories(oldPath)
+            if (!Files.exists(oldPath)) {
+                Files.createDirectories(oldPath)
+            }
         }
 
-        println("$LOG_PREFIX (Updater) Checking plugin updated for ${plugins.size} plugins...")
+        println("$LOG_PREFIX (Updater) Checking plugin updates for ${plugins.size} plugins...")
 
         val duration = measureTimeMillis {
             plugins.forEach { checkAndUpdate(it) }
@@ -56,10 +58,23 @@ object PluginUpdater {
         @Suppress("UNCHECKED_CAST")
         val assets = release["assets"] as? List<Map<String, Any>> ?: return@withContext
 
+        val expectedPrefix = buildString {
+            append("surf-")
+            append(plugin.findPluginName())
+
+            plugin.findPluginType()?.let {
+                append("-")
+                append(plugin.findPluginType())
+            }
+        }
+
         val matchingAsset = assets.firstOrNull { asset ->
             val assetName = asset["name"]?.toString() ?: return@firstOrNull false
-            assetName.endsWith(".jar") && assetName.contains(plugin.findPluginType())
+
+            assetName.endsWith(".jar") &&
+                    assetName.startsWith(expectedPrefix)
         } ?: run {
+            println("$LOG_PREFIX (Updater) No matching asset found for ${plugin.name} in release $latestVersion")
             return@withContext
         }
 

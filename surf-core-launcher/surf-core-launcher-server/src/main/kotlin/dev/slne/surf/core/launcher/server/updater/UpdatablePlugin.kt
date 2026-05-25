@@ -17,13 +17,19 @@ data class UpdatablePlugin(
     /**
      * The Plugin name, e.g. core, captcha or api
      */
-    fun findPluginName() =
-        name.substringAfter("surf-").substringBefore("-paper").substringBefore("-velocity")
+    fun findPluginName(): String {
+        if (name == "surf-paper-api") { // Special case for the old API plugin name
+            return "api"
+        }
+
+        return name.substringAfter("surf-").substringBefore("-paper").substringBefore("-velocity")
+            .replace("-server", "").replace("-api", "")
+    }
 
     fun findPluginType() = when {
         name.contains("-paper") -> "paper"
         name.contains("-velocity") -> "velocity"
-        else -> "velocity"
+        else -> null
     }
 
     val latestReleaseUrl get() = "https://api.github.com/repos/SLNE-DEVELOPMENT/surf-${findPluginName()}/releases/latest"

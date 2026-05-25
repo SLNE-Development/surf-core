@@ -16,9 +16,9 @@ private val secondDateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH
 
 val LOG_PREFIX
     get() =
-        "\u001B[0;91m{${
+        "\u001B[0;91m[${
             LocalDateTime.now().format(secondDateTimeFormatter)
-        }]\u001B[0m \u001B[0;91m[CoreLauncher]\u001B[0m"
+        } CoreLauncher]\u001B[0m"
 
 object CoreLauncher {
     private val shuttingDown = AtomicBoolean(false)

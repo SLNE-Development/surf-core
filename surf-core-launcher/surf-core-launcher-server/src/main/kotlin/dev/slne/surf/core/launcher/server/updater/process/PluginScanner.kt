@@ -1,5 +1,6 @@
 package dev.slne.surf.core.launcher.server.updater.process
 
+import dev.slne.surf.core.launcher.server.CoreLauncher
 import dev.slne.surf.core.launcher.server.updater.UpdatablePlugin
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -24,6 +25,7 @@ class PluginScanner(private val pluginsPath: Path) {
                 .filter { it.name.startsWith("surf-") }
                 .toList()
                 .mapNotNull { readPlugin(it) }
+                .filter { it.name !in CoreLauncher.config.autoUpdateIgnoredPlugins }
                 .toList()
         }
     }

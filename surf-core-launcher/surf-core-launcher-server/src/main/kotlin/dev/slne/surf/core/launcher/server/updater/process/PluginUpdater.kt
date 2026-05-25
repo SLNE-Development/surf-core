@@ -1,7 +1,7 @@
 package dev.slne.surf.core.launcher.server.updater.process
 
+import dev.slne.surf.core.launcher.server.CoreLauncher
 import dev.slne.surf.core.launcher.server.LOG_PREFIX
-import dev.slne.surf.core.launcher.server.config.CoreLauncherConfig
 import dev.slne.surf.core.launcher.server.updater.UpdatablePlugin
 import dev.slne.surf.core.launcher.server.updater.cooldown.UpdateCooldownTracker
 import dev.slne.surf.core.launcher.server.updater.github.GitHubClient
@@ -16,7 +16,7 @@ object PluginUpdater {
     private val oldPath = pluginsPath.resolve(".old")
 
     private val scanner = PluginScanner(pluginsPath)
-    private val gitHubClient = GitHubClient(CoreLauncherConfig.getConfig().personalAccessToken)
+    private val gitHubClient = GitHubClient(CoreLauncher.config.personalAccessToken)
     private val cooldownTracker = UpdateCooldownTracker(pluginsPath.resolve(".last-updates"))
 
     suspend fun start() {

@@ -26,16 +26,19 @@ object CoreLauncher {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var monitorJob: Job? = null
     var minecraftServerOnline: Boolean = false
+    val config by lazy {
+        CoreLauncherConfig.getConfig()
+    }
 
     suspend fun launch() {
         SurfApiStandaloneBootstrap.bootstrap()
         SurfApiStandaloneBootstrap.enable()
 
-        if (CoreLauncherConfig.getConfig().autoUpdateSurfPlugins) {
+        if (config.autoUpdateSurfPlugins) {
             println("$LOG_PREFIX Searching plugin updates...")
 
             withTimeoutOrNull(20.seconds) {
-                if (CoreLauncherConfig.getConfig().personalAccessToken.isBlank()) {
+                if (config.personalAccessToken.isBlank()) {
                     println("$LOG_PREFIX No GitHub personal access token provided, skipping plugin update check")
                     return@withTimeoutOrNull
                 }
@@ -63,7 +66,7 @@ object CoreLauncher {
                     println(line)
 
                     if (line.contains(
-                            CoreLauncherConfig.getConfig().startedMessage,
+                            config.startedMessage,
                             ignoreCase = true
                         )
                     ) {
@@ -96,7 +99,7 @@ object CoreLauncher {
     fun isShuttingDown(): Boolean = shuttingDown.get()
 
     private fun buildStartupCommand(): List<String> {
-        val base = CoreLauncherConfig.getConfig().serverStartupCommand
+        val base = config.serverStartupCommand
 
         val parts = Regex("""[^\s"]+|"([^"]*)"""")
             .findAll(base)

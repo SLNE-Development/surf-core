@@ -3,6 +3,7 @@ package dev.slne.surf.core.velocity.redis.listener
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.sksamuel.aedile.core.expireAfterWrite
 import dev.slne.surf.api.core.messages.adventure.sendText
+import dev.slne.surf.api.core.util.random
 import dev.slne.surf.core.api.common.server.state.SurfServiceStatus
 import dev.slne.surf.core.core.common.redis.event.SurfPlayerMessageRedisEvent
 import dev.slne.surf.core.core.common.redis.event.SurfPlayerResyncRedisEvent
@@ -11,6 +12,8 @@ import dev.slne.surf.core.launcher.api.redis.ServiceStatusRedisEvent
 import dev.slne.surf.core.velocity.plugin
 import dev.slne.surf.core.velocity.task.surfPlayerSyncTask
 import dev.slne.surf.redis.event.OnRedisEvent
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.jvm.optionals.getOrNull
 import kotlin.time.Duration.Companion.seconds
 
@@ -27,7 +30,9 @@ object VelocityRedisListener {
 
     private val instableConnectionCache = Caffeine.newBuilder()
         .expireAfterWrite(10.seconds)
-        .build<Unit, ServiceStatusRedisEvent>()
+        .build<Int, ServiceStatusRedisEvent>()
+
+    val ignoringPlayers: ConcurrentHashMap.KeySetView<UUID, Boolean> = ConcurrentHashMap.newKeySet()
 
     @OnRedisEvent
     fun onServiceStatus(event: ServiceStatusRedisEvent) {
@@ -37,6 +42,10 @@ object VelocityRedisListener {
 
         if (cachedAmount < 2) {
             plugin.proxy.allPlayers.filter { it.hasPermission("surf.core.servernotify") }.forEach {
+                if (ignoringPlayers.contains(it.uniqueId)) {
+                    return@forEach
+                }
+
                 it.sendText {
                     appendCorePrefix()
                     info("Der Server ")
@@ -52,6 +61,10 @@ object VelocityRedisListener {
             }
         } else {
             plugin.proxy.allPlayers.filter { it.hasPermission("surf.core.servernotify") }.forEach {
+                if (ignoringPlayers.contains(it.uniqueId)) {
+                    return@forEach
+                }
+
                 it.sendText {
                     appendCorePrefix()
                     info("Der Server ")
@@ -60,5 +73,7 @@ object VelocityRedisListener {
                 }
             }
         }
+
+        instableConnectionCache.put(random.nextInt(), event)
     }
 }

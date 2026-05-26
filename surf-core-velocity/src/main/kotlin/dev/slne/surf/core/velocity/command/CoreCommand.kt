@@ -20,6 +20,7 @@ import dev.slne.surf.core.core.common.player.SurfPlayerService
 import dev.slne.surf.core.core.common.server.SurfServerService
 import dev.slne.surf.core.core.common.util.appendCorePrefix
 import dev.slne.surf.core.core.common.util.niceRed
+import dev.slne.surf.core.launcher.api.LauncherConstants
 import dev.slne.surf.core.velocity.permission.PermissionList
 import dev.slne.surf.core.velocity.plugin
 import net.kyori.adventure.text.Component
@@ -52,6 +53,10 @@ fun coreCommand() = commandTree("core") {
             info(" by ")
             variableValue(vendor)
             info(".")
+
+            if (System.getProperty(LauncherConstants.PROPERTY_LAUNCHED_BY_CORE) != null) {
+                spacer(" (and is launched by the core launcher)")
+            }
         }
     }
 

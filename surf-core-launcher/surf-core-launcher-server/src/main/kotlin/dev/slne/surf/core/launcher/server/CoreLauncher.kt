@@ -106,7 +106,7 @@ object CoreLauncher {
             .map { it.value.replace("\"", "") }
             .toMutableList()
 
-        val flag = "-D${LauncherConstants.PROPERTY_LAUNCHED_BY_CORE}=true"
+        val flag = "-D${LauncherConstants.PROPERTY_LAUNCHED_BY_CORE}"
 
         if (parts.none { it == flag }) {
             parts.add(1, flag)

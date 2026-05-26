@@ -4,9 +4,9 @@ plugins {
 
 dependencies {
     api(projects.surfCoreLauncher.surfCoreLauncherApi)
+    implementation(projects.surfCoreApi.surfCoreApiCommon)
     implementation("dev.slne.surf.redis:surf-redis-api:1.6.0")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.2")
-    implementation(projects.surfCoreApi.surfCoreApiCommon)
 }
 
 tasks.shadowJar {

@@ -1,9 +1,12 @@
 package dev.slne.surf.core.launcher.server.ping
 
+import dev.slne.surf.core.api.common.server.state.SurfServiceStatus
+import dev.slne.surf.core.launcher.api.redis.ServiceStatusRedisEvent
 import dev.slne.surf.core.launcher.server.CoreLauncher
 import dev.slne.surf.core.launcher.server.CoreLauncherEnvironment
 import dev.slne.surf.core.launcher.server.LOG_PREFIX
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.first
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.InetSocketAddress
@@ -22,12 +25,24 @@ object MinecraftServerPinger {
                 println("$LOG_PREFIX Minecraft server stopped")
             } else {
                 println("$LOG_PREFIX Minecraft server crashed!")
+                CoreLauncher.redisApi.publishEvent(
+                    ServiceStatusRedisEvent(
+                        serviceName = CoreLauncher.config.serverName,
+                        status = SurfServiceStatus.CRASHED
+                    )
+                )
             }
         }
 
         launch {
-            while (process.isAlive && CoreLauncher.minecraftServerOnline) {
-                delay(5.seconds)
+            CoreLauncher.serverOnline.first { it }
+
+            if (!process.isAlive) {
+                return@launch
+            }
+
+            while (process.isAlive && !CoreLauncher.isShuttingDown()) {
+                delay(3.seconds)
 
                 val reachable = withContext(Dispatchers.IO) {
                     isMinecraftReady(CoreLauncherEnvironment.SERVER_PORT)
@@ -35,6 +50,12 @@ object MinecraftServerPinger {
 
                 if (!reachable) {
                     println("$LOG_PREFIX Minecraft server is unreachable")
+                    CoreLauncher.redisApi.publishEvent(
+                        ServiceStatusRedisEvent(
+                            serviceName = CoreLauncher.config.serverName,
+                            status = SurfServiceStatus.UNREACHABLE
+                        )
+                    )
                 }
             }
         }
@@ -51,17 +72,30 @@ object MinecraftServerPinger {
 
                 DataOutputStream(socket.getOutputStream()).use { output ->
                     DataInputStream(socket.getInputStream()).use { input ->
-                        val handshake = buildHandshakePacket(host, port)
-
-                        output.write(handshake)
-                        output.write(byteArrayOf(0x01, 0x00))
+                        output.write(buildHandshakePacket(host, port))
+                        output.write(byteArrayOf(0x01, 0x00)) // Status request
                         output.flush()
 
-                        input.readByte()
+                        readVarInt(input)          // Packet length
+                        val packetId = readVarInt(input) // Packet ID
 
-                        true
+                        packetId == 0x00           // 0x00 = gültiger Status Response
                     }
                 }
             }
         }.getOrDefault(false)
+
+    private fun readVarInt(input: DataInputStream): Int {
+        var value = 0
+        var position = 0
+        while (true) {
+            val byte = input.readByte().toInt()
+            value = value or ((byte and 0x7F) shl position)
+            if (byte and 0x80 == 0) break
+            position += 7
+            if (position >= 35) error("VarInt too large")
+        }
+        return value
+    }
+
 }

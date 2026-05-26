@@ -1,15 +1,22 @@
 package dev.slne.surf.core.launcher.server
 
 import dev.slne.surf.api.standalone.SurfApiStandaloneBootstrap
+import dev.slne.surf.core.api.common.event.SurfServerStartEvent
+import dev.slne.surf.core.api.common.event.redis.SurfEventFireRedisEvent
 import dev.slne.surf.core.launcher.api.LauncherConstants
 import dev.slne.surf.core.launcher.server.config.CoreLauncherConfig
 import dev.slne.surf.core.launcher.server.ping.MinecraftServerPinger
 import dev.slne.surf.core.launcher.server.updater.process.PluginUpdater
+import dev.slne.surf.redis.RedisApi
+import dev.slne.surf.redis.StandaloneRedisInstance
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import java.nio.file.Path
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.io.path.Path
 import kotlin.time.Duration.Companion.seconds
 
 private val secondDateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")
@@ -23,16 +30,33 @@ val LOG_PREFIX
 object CoreLauncher {
     private val shuttingDown = AtomicBoolean(false)
     lateinit var serverProcess: Process
+
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var monitorJob: Job? = null
-    var minecraftServerOnline: Boolean = false
+    private val redisInstance = StandaloneRedisInstance(
+        name = "surf-core-launcher",
+        configPath = findRedisPluginPath()
+            ?: error("Could not find Redis plugin configuration path, cannot start Redis instance")
+    )
+    lateinit var redisApi: RedisApi
+
+    val serverOnline = MutableStateFlow(false)
+
     val config by lazy {
         CoreLauncherConfig.getConfig()
     }
 
-    suspend fun launch() {
+    suspend fun launch() = withContext(Dispatchers.IO) {
         SurfApiStandaloneBootstrap.bootstrap()
         SurfApiStandaloneBootstrap.enable()
+
+        println("$LOG_PREFIX Initializing Redis instance...")
+
+        redisInstance.create()
+        redisApi = RedisApi.create()
+        redisApi.freezeAndConnect()
+
+        println("$LOG_PREFIX Redis instance initialized and connected")
 
         if (config.autoUpdateSurfPlugins) {
             println("$LOG_PREFIX Searching plugin updates...")
@@ -60,6 +84,14 @@ object CoreLauncher {
 
         println("$LOG_PREFIX Server process started")
 
+        redisApi.publishEvent(
+            SurfEventFireRedisEvent(
+                SurfServerStartEvent(
+                    serverName = config.serverName
+                )
+            )
+        )
+
         monitorJob = scope.launch {
             launch {
                 serverProcess.inputStream.bufferedReader().forEachLine { line ->
@@ -70,7 +102,7 @@ object CoreLauncher {
                             ignoreCase = true
                         )
                     ) {
-                        minecraftServerOnline = true
+                        serverOnline.value = true
                         println("$LOG_PREFIX Server is now online.")
                     }
                 }
@@ -81,7 +113,16 @@ object CoreLauncher {
     }
 
     suspend fun shutdown() {
+        if (!shuttingDown.compareAndSet(false, true)) {
+            return
+        }
+
         println("$LOG_PREFIX Shutting down launcher/server...")
+        println("$LOG_PREFIX Disconnecting Redis instance...")
+
+        redisApi.disconnect()
+        redisInstance.shutdown()
+        println("$LOG_PREFIX Redis instance disconnected and shutdown")
 
         monitorJob?.cancelAndJoin()
 
@@ -114,6 +155,17 @@ object CoreLauncher {
 
         return parts
     }
+
+    private fun findRedisPluginPath(): Path? {
+        val possiblePaths = listOf(
+            Path("plugins", "surf-redis-paper"),
+            Path("plugins", "surf-redis-velocity")
+        )
+
+        return possiblePaths.firstOrNull { path ->
+            path.toFile().exists()
+        }
+    }
 }
 
 suspend fun main(args: Array<String>) {
@@ -126,5 +178,7 @@ suspend fun main(args: Array<String>) {
 
     CoreLauncher.launch()
     CoreLauncher.serverProcess.waitFor()
+
+    CoreLauncher.shutdown()
     SurfApiStandaloneBootstrap.shutdown()
 }

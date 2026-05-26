@@ -48,13 +48,13 @@ object VelocityRedisListener {
 
                 it.sendText {
                     appendCorePrefix()
-                    info("Der Server ")
+                    error("Der Server ")
                     variableValue(event.serviceName)
 
                     when (status) {
-                        SurfServiceStatus.UNREACHABLE -> info("hat derzeit Verbindungsprobleme!")
+                        SurfServiceStatus.UNREACHABLE -> error(" hat derzeit Verbindungsprobleme!")
                         SurfServiceStatus.CRASHED -> {
-                            info("hat die Verbindung verloren! (CRASH?)")
+                            error(" hat die Verbindung verloren! (CRASH?)")
                         }
                     }
                 }
@@ -67,9 +67,9 @@ object VelocityRedisListener {
 
                 it.sendText {
                     appendCorePrefix()
-                    info("Der Server ")
+                    error("Der Server ")
                     variableValue(event.serviceName)
-                    info(" hat derzeit Verbindungsprobleme! Check server logs. (x$cachedAmount $status)")
+                    error(" hat derzeit Verbindungsprobleme! Check server logs. (x$cachedAmount $status)")
                 }
             }
         }

@@ -1,10 +1,11 @@
 package dev.slne.surf.core.paper.command
 
 import dev.jorel.commandapi.kotlindsl.anyExecutor
+import dev.jorel.commandapi.kotlindsl.argument
 import dev.jorel.commandapi.kotlindsl.commandTree
 import dev.jorel.commandapi.kotlindsl.getValue
-import dev.jorel.commandapi.kotlindsl.greedyStringArgument
 import dev.slne.surf.api.core.messages.adventure.sendText
+import dev.slne.surf.api.paper.command.args.MiniMessageArgument
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.util.sendText
 import dev.slne.surf.core.core.common.util.appendCorePrefix
@@ -15,7 +16,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 
 fun networkBroadcastCommand() = commandTree("nbroadcast") {
     withPermission(PermissionRegistry.COMMAND_NETWORK_BROADCAST)
-    greedyStringArgument("message") {
+    argument(MiniMessageArgument("message")) {
         anyExecutor { executor, args ->
             val message: String by args
 

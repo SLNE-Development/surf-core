@@ -4,8 +4,8 @@ import com.github.shynixn.mccoroutine.velocity.launch
 import com.velocitypowered.api.event.Continuation
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.proxy.ProxyPreShutdownEvent
-import dev.slne.surf.api.core.messages.adventure.appendNewline
-import dev.slne.surf.api.core.messages.adventure.buildText
+import dev.slne.surf.api.core.messages.CommonComponents
+import dev.slne.surf.api.core.messages.builder.SurfComponentBuilder
 import dev.slne.surf.api.core.util.mutableObjectSetOf
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.server.SurfProxyServer
@@ -133,16 +133,13 @@ object VelocityServerListener {
         }
     }
 
-    private fun buildDisconnectComponent() = buildText {
-        appendNewline(2)
-        primary("CASTCRAFTER")
-        appendNewline()
-        primary("COMMUNITY SERVER")
-        appendNewline(2)
-        error("DER PROXY WIRD HERUNTERGEFAHREN.")
-        appendNewline(3)
-        spacer("Es wurde kein anderer Proxy Server gefunden, zu dem du wechseln könntest.")
-        appendNewline(2)
-        primary("discord.gg/castcrafter")
-    }
+    private fun buildDisconnectComponent() = CommonComponents.renderDisconnectMessage(
+        SurfComponentBuilder(),
+        "DER PROXY WIRD HERUNTERGEFAHREN.",
+        {
+            spacer("Es wurde kein anderer Proxy Server gefunden, zu dem du wechseln könntest.")
+        },
+        {
+            appendDiscordLink()
+        })
 }

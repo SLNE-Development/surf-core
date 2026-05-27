@@ -9,6 +9,9 @@ object PermissionList {
 
     const val CORE_COMMAND_SERVICE = "$CORE_COMMAND.service"
 
-    val CORE_COMMAND_TOGGLE_SERVICE_STATUS_MESSAGES =
+    const val CORE_COMMAND_TOGGLE_SERVICE_STATUS_MESSAGES =
         "$CORE_COMMAND.togglecoreservicestatusmessages"
+
+    const val BYPASS_PERMISSION = "$BASE.bypass"
+    const val TEAM_PERMISSION = "$BASE.team"
 }

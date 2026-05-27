@@ -11,8 +11,9 @@ import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent
 import com.velocitypowered.api.event.player.ServerConnectedEvent
 import com.velocitypowered.api.proxy.Player
 import com.velocitypowered.api.util.GameProfile
+import dev.slne.surf.api.core.messages.CommonComponents
 import dev.slne.surf.api.core.messages.adventure.appendNewline
-import dev.slne.surf.api.core.messages.adventure.buildText
+import dev.slne.surf.api.core.messages.builder.SurfComponentBuilder
 import dev.slne.surf.core.api.common.event.SurfPlayerConnectEvent
 import dev.slne.surf.core.api.common.event.SurfPlayerDisconnectEvent
 import dev.slne.surf.core.api.common.server.SurfProxyServer
@@ -233,43 +234,40 @@ object ConnectionListener {
         })
     }
 
-    private fun failedToLoadDataComponent(message: String, errorCode: String) = buildText {
-        appendNewline(2)
-        primary("CASTCRAFTER")
-        appendNewline()
-        primary("COMMUNITY SERVER")
-        appendNewline(2)
-        error("DEINE SPIELERDATEN KONNTEN NICHT GELADEN WERDEN.")
-        appendNewline()
-        spacer("Fehlercode: ")
-        niceRed(errorCode)
-        appendNewline()
-        error(message)
-        appendNewline(3)
-        spacer("Beim Laden deiner Spielerdaten ist ein interner Fehler aufgetreten.")
-        appendNewline()
-        spacer("Sollte das Problem weiterhin bestehen, wende dich bitte an den Support.")
-        appendNewline(2)
-        primary("discord.gg/castcrafter")
-    }
 
-    private fun failedToConnectComponent(message: String, errorCode: String) = buildText {
-        appendNewline(2)
-        primary("CASTCRAFTER")
-        appendNewline()
-        primary("COMMUNITY SERVER")
-        appendNewline(2)
-        error("DEINE VERBINDUNG KONNTE NICHT HERGESTELLT WERDEN.")
-        appendNewline()
-        spacer("Fehlercode: ")
-        niceRed(errorCode)
-        appendNewline()
-        error(message)
-        appendNewline(3)
-        spacer("Beim Herstellen der Verbindung ist ein interner Fehler aufgetreten.")
-        appendNewline()
-        spacer("Sollte das Problem weiterhin bestehen, wende dich bitte an den Support.")
-        appendNewline(2)
-        primary("discord.gg/castcrafter")
-    }
+    private fun failedToLoadDataComponent(message: String, errorCode: String) =
+        CommonComponents.renderDisconnectMessage(
+            SurfComponentBuilder(),
+            "DEINE SPIELERDATEN KONNTEN NICHT GELADEN WERDEN.",
+            {
+                spacer("Fehlercode: ")
+                niceRed(errorCode)
+                appendNewline()
+                error(message)
+                appendNewline(3)
+                spacer("Beim Laden deiner Spielerdaten ist ein interner Fehler aufgetreten.")
+            },
+            {
+                spacer("Sollte das Problem weiterhin bestehen, wende dich bitte an den Support.")
+                appendNewline(2)
+                primary("discord.gg/castcrafter")
+            })
+
+    private fun failedToConnectComponent(message: String, errorCode: String) =
+        CommonComponents.renderDisconnectMessage(
+            SurfComponentBuilder(),
+            "DEINE VERBINDUNG KONNTE NICHT HERGESTELLT WERDEN.",
+            {
+                spacer("Fehlercode: ")
+                niceRed(errorCode)
+                appendNewline()
+                error(message)
+                appendNewline(3)
+                spacer("Beim Herstellen der Verbindung ist ein interner Fehler aufgetreten.")
+            },
+            {
+                spacer("Sollte das Problem weiterhin bestehen, wende dich bitte an den Support.")
+                appendNewline(2)
+                primary("discord.gg/castcrafter")
+            })
 }

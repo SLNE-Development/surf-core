@@ -4,6 +4,7 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable
 
 @ConfigSerializable
 data class VelocityCoreConfig(
+    val teamDomain: String = "team.castcrafter.de",
     val blockedDomains: List<String> = listOf(
         "proxy01.castcrafter.de",
         "proxy02.castcrafter.de",

@@ -140,6 +140,6 @@ object VelocityServerListener {
             spacer("Es wurde kein anderer Proxy Server gefunden, zu dem du wechseln könntest.")
         },
         {
-            primary("discord.gg/castcrafter")
+            appendDiscordLink()
         })
 }

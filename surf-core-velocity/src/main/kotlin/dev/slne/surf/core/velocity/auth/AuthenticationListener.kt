@@ -15,6 +15,7 @@ import dev.slne.surf.api.core.messages.adventure.buildText
 import dev.slne.surf.api.core.messages.adventure.sendText
 import dev.slne.surf.api.core.util.mutableObjectSetOf
 import dev.slne.surf.api.core.util.random
+import dev.slne.surf.core.velocity.permission.PermissionList
 import dev.slne.surf.core.velocity.plugin
 import dev.slne.surf.core.velocity.velocityCoreConfigManager
 import java.util.*
@@ -27,18 +28,18 @@ object AuthenticationListener {
     fun onLogin(event: LoginEvent, continuation: Continuation) {
         if (event.player.handshakeIntent != HandshakeIntent.TRANSFER) {
             val domain = event.player.virtualHost.getOrNull()?.hostString
-            val isTeamDomain = domain == "team.castcrafter.de"
+            val isTeamDomain = domain == velocityCoreConfigManager.config.teamDomain
             val isBlockedDomain =
                 isTeamDomain || (domain != null && velocityCoreConfigManager.config.blockedDomains
                     .any { it.equals(domain, true) })
 
-            if (isTeamDomain && event.player.hasPermission("surf.core.team")) {
+            if (isTeamDomain && event.player.hasPermission(PermissionList.TEAM_PERMISSION)) {
                 continuation.resume()
                 return
             }
 
             if (isBlockedDomain) {
-                if (event.player.hasPermission("surf.core.bypass")) {
+                if (event.player.hasPermission(PermissionList.BYPASS_PERMISSION)) {
                     continuation.resume()
                     event.player.sendText {
                         appendWarningPrefix()

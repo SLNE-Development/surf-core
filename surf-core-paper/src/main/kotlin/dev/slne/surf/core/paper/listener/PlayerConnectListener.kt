@@ -148,9 +148,6 @@ object PlayerConnectListener : Listener {
                 appendNewline(3)
                 spacer("Beim laden deiner Spielerdaten ist ein interner Fehler aufgetreten.")
             },
-            {
-                spacer("Sollte das Problem weiterhin bestehen, wende dich bitte an den Support.")
-                appendNewline(2)
-                primary("discord.gg/castcrafter")
-            })
+            issue = true
+        )
 }

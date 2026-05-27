@@ -28,7 +28,7 @@ class PaperShutdownHandler : ServerShutdownHandler {
                 }
             },
             {
-                primary("discord.gg/castcrafter")
+                appendDiscordLink()
             }
         )
 

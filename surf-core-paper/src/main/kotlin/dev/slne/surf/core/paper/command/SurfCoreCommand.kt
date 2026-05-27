@@ -17,7 +17,7 @@ import dev.slne.surf.core.paper.PaperBootstrap
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.core.paper.plugin
 
-fun surfCoreCommand() = commandTree("core") {
+fun surfCoreCommand() = commandTree("surfcore") {
     withPermission(PermissionRegistry.COMMAND_CORE)
     literalArgument("reload") {
         anyExecutor { executor, _ ->

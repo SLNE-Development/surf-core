@@ -7,6 +7,7 @@ import com.velocitypowered.api.command.VelocityBrigadierMessage
 import dev.jorel.commandapi.CommandAPICommand
 import dev.jorel.commandapi.CommandTree
 import dev.jorel.commandapi.arguments.Argument
+import dev.jorel.commandapi.arguments.ArgumentSuggestions
 import dev.jorel.commandapi.arguments.CommandAPIArgumentType
 import dev.jorel.commandapi.executors.CommandArguments
 import dev.slne.surf.api.core.messages.adventure.buildText
@@ -36,6 +37,16 @@ open class SurfPlayerArgument(nodeName: String) :
                 }
             )
         ).create()
+
+
+    init {
+        replaceSuggestions(
+            ArgumentSuggestions.stringCollection { _ ->
+                SurfCoreApi.getOnlinePlayers()
+                    .mapNotNull { it.lastKnownName }
+            }
+        )
+    }
 }
 
 inline fun CommandTree.surfPlayerArgument(

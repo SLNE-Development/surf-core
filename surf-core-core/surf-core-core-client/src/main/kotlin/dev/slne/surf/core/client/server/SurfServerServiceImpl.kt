@@ -7,8 +7,11 @@ import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.common.server.state.SurfServerState
 import dev.slne.surf.core.client.ClientCoreInstance
+import dev.slne.surf.core.core.common.redis.request.ExecuteCommandServerRequest
+import dev.slne.surf.core.core.common.redis.request.ShutdownServerRequest
 import dev.slne.surf.core.core.common.server.SurfServerService
 import it.unimi.dsi.fastutil.objects.ObjectSet
+import net.kyori.adventure.text.Component
 import java.util.*
 
 @AutoService(SurfServerService::class)
@@ -54,6 +57,14 @@ class SurfServerServiceImpl : SurfServerService {
             is SurfServer -> _servers.put(updatedServer.name, updatedServer)
         }
     }
+
+    override suspend fun shutdown(commonSurfServer: CommonSurfServer, reason: Component?) =
+        ShutdownServerRequest.createRequest(commonSurfServer, reason).status
+
+    override suspend fun executeCommand(
+        commonSurfServer: CommonSurfServer,
+        command: String
+    ) = ExecuteCommandServerRequest.createRequest(commonSurfServer, command).status
 
     override fun getServerByName(name: String) = servers.find { it.name == name }
     override fun getServerByCategory(category: String) =

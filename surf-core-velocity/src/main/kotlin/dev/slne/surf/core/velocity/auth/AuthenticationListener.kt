@@ -15,6 +15,7 @@ import dev.slne.surf.api.core.messages.adventure.buildText
 import dev.slne.surf.api.core.messages.adventure.sendText
 import dev.slne.surf.api.core.util.mutableObjectSetOf
 import dev.slne.surf.api.core.util.random
+import dev.slne.surf.core.velocity.permission.PermissionList
 import dev.slne.surf.core.velocity.plugin
 import dev.slne.surf.core.velocity.velocityCoreConfigManager
 import java.util.*
@@ -26,36 +27,40 @@ object AuthenticationListener {
     @Subscribe
     fun onLogin(event: LoginEvent, continuation: Continuation) {
         if (event.player.handshakeIntent != HandshakeIntent.TRANSFER) {
-            if (event.player.hasPermission("surf.core.bypass")) {
+            val domain = event.player.virtualHost.getOrNull()?.hostString
+            val isTeamDomain = domain == velocityCoreConfigManager.config.teamDomain
+            val isBlockedDomain =
+                isTeamDomain || (domain != null && velocityCoreConfigManager.config.blockedDomains
+                    .any { it.equals(domain, true) })
+
+            if (isTeamDomain && event.player.hasPermission(PermissionList.TEAM_PERMISSION)) {
                 continuation.resume()
-                event.player.sendText {
-                    appendWarningPrefix()
-                    error("Du verbindest dich über eine inoffizielle Methode, hast aber die Berechtigung zum Umgehen.")
-                }
                 return
             }
 
-            event.player.virtualHost.getOrNull()?.hostString?.let { domain ->
-                if (velocityCoreConfigManager.config.blockedDomains.any {
-                        it.equals(
-                            domain,
-                            true
-                        )
-                    }) {
+            if (isBlockedDomain) {
+                if (event.player.hasPermission(PermissionList.BYPASS_PERMISSION)) {
                     continuation.resume()
-                    event.result = ResultedEvent.ComponentResult.denied(buildText {
-                        CommonComponents.renderDisconnectMessage(
-                            this,
-                            "INOFFIZIELLE DOMAIN",
-                            {
-                                error("Bitte verbinde dich über die offizielle Domain.")
-                                appendNewline()
-                                variableValue("castcrafter.de")
-                            }
-                        )
-                    })
+                    event.player.sendText {
+                        appendWarningPrefix()
+                        error("Du verbindest dich über eine inoffizielle Methode, hast aber die Berechtigung zum Umgehen.")
+                    }
                     return
                 }
+
+                continuation.resume()
+                event.result = ResultedEvent.ComponentResult.denied(buildText {
+                    CommonComponents.renderDisconnectMessage(
+                        this,
+                        "INOFFIZIELLE DOMAIN",
+                        {
+                            error("Bitte verbinde dich über die offizielle Domain.")
+                            appendNewline()
+                            variableValue("castcrafter.de")
+                        }
+                    )
+                })
+                return
             }
 
             continuation.resume()

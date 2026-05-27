@@ -2,8 +2,11 @@ package dev.slne.surf.core.paper.listener
 
 import com.github.shynixn.mccoroutine.folia.launch
 import com.github.shynixn.mccoroutine.folia.scope
+import dev.slne.surf.api.core.messages.CommonComponents
 import dev.slne.surf.api.core.messages.adventure.*
+import dev.slne.surf.api.core.messages.builder.SurfComponentBuilder
 import dev.slne.surf.api.paper.command.util.idOrThrow
+import dev.slne.surf.api.paper.util.getPrefixedName
 import dev.slne.surf.core.api.common.server.connection.SurfProxyServerConnectionResult
 import dev.slne.surf.core.api.paper.util.surfPlayer
 import dev.slne.surf.core.core.CoreInstance
@@ -128,23 +131,23 @@ object PlayerConnectListener : Listener {
         }
     }
 
-    private fun buildDisconnectComponent(errorCode: String) = buildText {
-        appendNewline(2)
-        primary("CASTCRAFTER")
-        appendNewline()
-        primary("COMMUNITY SERVER")
-        appendNewline(2)
-        error("DEINE SPIELERDATEN KONNTEN NICHT GELADEN WERDEN.")
-        appendNewline()
-        spacer("Fehlercode: ")
-        niceRed(errorCode)
-        appendNewline()
-        error("Internal Server error. Data Transmitter or holder may be down?")
-        appendNewline(3)
-        spacer("Beim laden deiner Spielerdaten ist ein interner Fehler aufgetreten.")
-        appendNewline()
-        spacer("Sollte das Problem weiterhin bestehen, wende dich bitte an den Support.")
-        appendNewline(2)
-        primary("discord.gg/castcrafter")
+    @EventHandler
+    fun onJoin(event: PlayerJoinEvent) {
+        event.player.displayName(event.player.getPrefixedName())
     }
+
+    private fun buildDisconnectComponent(errorCode: String) =
+        CommonComponents.renderDisconnectMessage(
+            SurfComponentBuilder(),
+            "DEINE SPIELERDATEN KONNTEN NICHT GELADEN WERDEN.",
+            {
+                spacer("Fehlercode: ")
+                niceRed(errorCode)
+                appendNewline()
+                error("Internal Server error. Data Transmitter or holder may be down?")
+                appendNewline(3)
+                spacer("Beim laden deiner Spielerdaten ist ein interner Fehler aufgetreten.")
+            },
+            issue = true
+        )
 }

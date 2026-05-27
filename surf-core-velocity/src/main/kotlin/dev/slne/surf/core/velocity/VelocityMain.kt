@@ -27,6 +27,7 @@ import dev.slne.surf.core.core.common.util.appendCorePrefix
 import dev.slne.surf.core.core.common.util.niceRed
 import dev.slne.surf.core.velocity.auth.AuthenticationListener
 import dev.slne.surf.core.velocity.auth.AuthenticationService
+import dev.slne.surf.core.velocity.command.coreCommand
 import dev.slne.surf.core.velocity.config.VelocityCoreConfigManager
 import dev.slne.surf.core.velocity.listener.ConnectionListener
 import dev.slne.surf.core.velocity.listener.VelocityServerListener
@@ -98,6 +99,8 @@ class VelocityMain @Inject constructor(
         eventManager.registerSuspend(this, ConnectionListener)
 
         SurfServerService.changeState(SurfProxyServer.current(), SurfServerState.RUNNING)
+
+        coreCommand()
 
         surfPlayerSyncTask.start()
     }

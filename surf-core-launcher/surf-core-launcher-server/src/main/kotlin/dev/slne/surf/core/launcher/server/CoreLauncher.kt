@@ -117,6 +117,8 @@ object CoreLauncher {
             return
         }
 
+        serverOnline.value = true
+
         println("$LOG_PREFIX Shutting down launcher/server...")
         println("$LOG_PREFIX Disconnecting Redis instance...")
 

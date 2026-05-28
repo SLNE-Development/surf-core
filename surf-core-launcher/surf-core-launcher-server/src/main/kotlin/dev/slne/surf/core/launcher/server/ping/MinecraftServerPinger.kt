@@ -44,6 +44,10 @@ object MinecraftServerPinger {
             while (process.isAlive && !CoreLauncher.isShuttingDown()) {
                 delay(3.seconds)
 
+                if (!CoreLauncher.serverOnline.value) {
+                    continue
+                }
+
                 val reachable = withContext(Dispatchers.IO) {
                     isMinecraftReady(CoreLauncherEnvironment.SERVER_PORT)
                 }

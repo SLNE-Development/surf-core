@@ -23,6 +23,7 @@ object PluginUpdater {
         val plugins = scanner.findPlugins()
 
         if (plugins.isEmpty()) {
+            println("$LOG_PREFIX (Updater) No plugins found for update checking.")
             return
         }
 

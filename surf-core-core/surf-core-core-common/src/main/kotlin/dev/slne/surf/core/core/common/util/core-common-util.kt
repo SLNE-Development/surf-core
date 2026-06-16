@@ -32,12 +32,11 @@ fun Long.formatTimeMillis(): String =
 fun SurfComponentBuilder.appendCorePrefix() = append {
     spacer("»")
     appendSpace()
-    note("CC")
+    note("HXO")
     appendSpace()
     darkSpacer("|")
     appendSpace()
 }
-
 
 fun OffsetDateTime.formatDateTime(
     formatter: DateTimeFormatter = dateTimeFormatter

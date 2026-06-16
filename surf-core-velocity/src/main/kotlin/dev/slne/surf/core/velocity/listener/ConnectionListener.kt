@@ -11,9 +11,6 @@ import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent
 import com.velocitypowered.api.event.player.ServerConnectedEvent
 import com.velocitypowered.api.proxy.Player
 import com.velocitypowered.api.util.GameProfile
-import dev.slne.surf.api.core.messages.CommonComponents
-import dev.slne.surf.api.core.messages.adventure.appendNewline
-import dev.slne.surf.api.core.messages.builder.SurfComponentBuilder
 import dev.slne.surf.core.api.common.event.SurfPlayerConnectEvent
 import dev.slne.surf.core.api.common.event.SurfPlayerDisconnectEvent
 import dev.slne.surf.core.api.common.server.SurfProxyServer
@@ -23,7 +20,6 @@ import dev.slne.surf.core.core.common.player.error.SurfPlayerErrorService
 import dev.slne.surf.core.core.common.player.history.SurfPlayerIpAddressHistoryService
 import dev.slne.surf.core.core.common.player.history.SurfPlayerNameHistoryService
 import dev.slne.surf.core.core.common.player.history.SurfPlayerTextureHistoryService
-import dev.slne.surf.core.core.common.util.niceRed
 import dev.slne.surf.core.velocity.auth.AuthenticationListener
 import dev.slne.surf.core.velocity.plugin
 import kotlinx.coroutines.withTimeoutOrNull
@@ -32,6 +28,9 @@ import java.time.OffsetDateTime
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 import kotlin.time.Duration.Companion.seconds
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextDecoration
 
 object ConnectionListener {
     @Subscribe(priority = Short.MIN_VALUE)
@@ -236,32 +235,50 @@ object ConnectionListener {
 
 
     private fun failedToLoadDataComponent(message: String, errorCode: String) =
-        CommonComponents.renderDisconnectMessage(
-            SurfComponentBuilder(),
-            "DEINE SPIELERDATEN KONNTEN NICHT GELADEN WERDEN.",
-            {
-                spacer("Fehlercode: ")
-                niceRed(errorCode)
-                appendNewline()
-                error(message)
-                appendNewline(3)
-                spacer("Beim Laden deiner Spielerdaten ist ein interner Fehler aufgetreten.")
-            },
-            issue = true
-        )
+        Component.text()
+            .append(Component.text("Hexoria Network").color(NamedTextColor.GREEN))
+            .decorate(TextDecoration.BOLD)
+            .appendNewline()
+            .appendNewline()
+            .append(
+                Component.text("DEINE SPIELERDATEN KONNTEN NICHT GELADEN WERDEN.")
+                    .color(NamedTextColor.RED)
+                    .decorate(TextDecoration.BOLD)
+            )
+            .appendNewline()
+            .append(Component.text("Fehlercode: ").color(NamedTextColor.GRAY))
+            .append(Component.text(errorCode).color(NamedTextColor.RED))
+            .appendNewline()
+            .append(Component.text(message).color(NamedTextColor.RED))
+            .appendNewline()
+            .appendNewline()
+            .appendNewline()
+            .append(
+                Component.text("Beim Laden deiner Spielerdaten ist ein interner Fehler aufgetreten.")
+                    .color(NamedTextColor.GRAY)
+            )
+            .build()
 
     private fun failedToConnectComponent(message: String, errorCode: String) =
-        CommonComponents.renderDisconnectMessage(
-            SurfComponentBuilder(),
-            "DEINE VERBINDUNG KONNTE NICHT HERGESTELLT WERDEN.",
-            {
-                spacer("Fehlercode: ")
-                niceRed(errorCode)
-                appendNewline()
-                error(message)
-                appendNewline(3)
-                spacer("Beim Herstellen der Verbindung ist ein interner Fehler aufgetreten.")
-            },
-            issue = true
-        )
+        Component.text()
+            .append(Component.text("Hexoria Network").color(NamedTextColor.AQUA))
+            .appendNewline()
+            .append(
+                Component.text("DEINE VERBINDUNG KONNTE NICHT HERGESTELLT WERDEN.")
+                    .color(NamedTextColor.RED)
+                    .decorate(TextDecoration.BOLD)
+            )
+            .appendNewline()
+            .append(Component.text("Fehlercode: ").color(NamedTextColor.GRAY))
+            .append(Component.text(errorCode).color(NamedTextColor.RED))
+            .appendNewline()
+            .append(Component.text(message).color(NamedTextColor.RED))
+            .appendNewline()
+            .appendNewline()
+            .appendNewline()
+            .append(
+                Component.text("Beim Herstellen der Verbindung ist ein interner Fehler aufgetreten.")
+                    .color(NamedTextColor.GRAY)
+            )
+            .build()
 }

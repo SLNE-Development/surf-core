@@ -2,9 +2,7 @@ package dev.slne.surf.core.paper.listener
 
 import com.github.shynixn.mccoroutine.folia.launch
 import com.github.shynixn.mccoroutine.folia.scope
-import dev.slne.surf.api.core.messages.CommonComponents
 import dev.slne.surf.api.core.messages.adventure.*
-import dev.slne.surf.api.core.messages.builder.SurfComponentBuilder
 import dev.slne.surf.api.paper.command.util.idOrThrow
 import dev.slne.surf.api.paper.util.getPrefixedName
 import dev.slne.surf.core.api.common.server.connection.SurfProxyServerConnectionResult
@@ -16,7 +14,6 @@ import dev.slne.surf.core.core.common.redis.request.SendPlayerToProxyRequest
 import dev.slne.surf.core.core.common.redis.watcher.PlayerProxyConnectionResultWatcher
 import dev.slne.surf.core.core.common.util.appendCorePrefix
 import dev.slne.surf.core.core.common.util.formatMillis
-import dev.slne.surf.core.core.common.util.niceRed
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.core.paper.plugin
 import io.papermc.paper.event.connection.configuration.AsyncPlayerConnectionConfigureEvent
@@ -27,6 +24,9 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerKickEvent
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextDecoration
 
 object PlayerConnectListener : Listener {
     private val luckperms by lazy {
@@ -137,17 +137,30 @@ object PlayerConnectListener : Listener {
     }
 
     private fun buildDisconnectComponent(errorCode: String) =
-        CommonComponents.renderDisconnectMessage(
-            SurfComponentBuilder(),
-            "DEINE SPIELERDATEN KONNTEN NICHT GELADEN WERDEN.",
-            {
-                spacer("Fehlercode: ")
-                niceRed(errorCode)
-                appendNewline()
-                error("Internal Server error. Data Transmitter or holder may be down?")
-                appendNewline(3)
-                spacer("Beim laden deiner Spielerdaten ist ein interner Fehler aufgetreten.")
-            },
-            issue = true
-        )
+        Component.text()
+            .append(Component.text("Hexoria Network").color(NamedTextColor.GREEN))
+            .decorate(TextDecoration.BOLD)
+            .appendNewline()
+            .appendNewline()
+            .append(
+                Component.text("DEINE SPIELERDATEN KONNTEN NICHT GELADEN WERDEN.")
+                    .color(NamedTextColor.RED)
+                    .decorate(TextDecoration.BOLD)
+            )
+            .appendNewline()
+            .append(Component.text("Fehlercode: ").color(NamedTextColor.GRAY))
+            .append(Component.text(errorCode).color(NamedTextColor.RED))
+            .appendNewline()
+            .append(
+                Component.text("Internal Server error. Data Transmitter or holder may be down?")
+                    .color(NamedTextColor.RED)
+            )
+            .appendNewline()
+            .appendNewline()
+            .appendNewline()
+            .append(
+                Component.text("Beim laden deiner Spielerdaten ist ein interner Fehler aufgetreten.")
+                    .color(NamedTextColor.GRAY)
+            )
+            .build()
 }

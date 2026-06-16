@@ -10,8 +10,6 @@ import com.velocitypowered.api.event.connection.PreTransferEvent
 import com.velocitypowered.api.event.player.CookieReceiveEvent
 import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent
 import com.velocitypowered.api.network.HandshakeIntent
-import dev.slne.surf.api.core.messages.CommonComponents
-import dev.slne.surf.api.core.messages.adventure.buildText
 import dev.slne.surf.api.core.messages.adventure.sendText
 import dev.slne.surf.api.core.util.mutableObjectSetOf
 import dev.slne.surf.api.core.util.random
@@ -20,6 +18,9 @@ import dev.slne.surf.core.velocity.plugin
 import dev.slne.surf.core.velocity.velocityCoreConfigManager
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextDecoration
 
 object AuthenticationListener {
     val transfers = mutableObjectSetOf<UUID>()
@@ -49,17 +50,24 @@ object AuthenticationListener {
                 }
 
                 continuation.resume()
-                event.result = ResultedEvent.ComponentResult.denied(buildText {
-                    CommonComponents.renderDisconnectMessage(
-                        this,
-                        "INOFFIZIELLE DOMAIN",
-                        {
-                            error("Bitte verbinde dich über die offizielle Domain.")
-                            appendNewline()
-                            variableValue("castcrafter.de")
-                        }
-                    )
-                })
+                event.result = ResultedEvent.ComponentResult.denied(
+                    Component.text()
+                        .append(Component.text("Hexoria Network").color(NamedTextColor.AQUA))
+                        .appendNewline()
+                        .append(
+                            Component.text("INOFFIZIELLE DOMAIN")
+                                .color(NamedTextColor.RED)
+                                .decorate(TextDecoration.BOLD)
+                        )
+                        .appendNewline()
+                        .append(
+                            Component.text("Bitte verbinde dich über die offizielle Domain.")
+                                .color(NamedTextColor.RED)
+                        )
+                        .appendNewline()
+                        .append(Component.text("play.Hexoria.net").color(NamedTextColor.GOLD))
+                        .build()
+                )
                 return
             }
 

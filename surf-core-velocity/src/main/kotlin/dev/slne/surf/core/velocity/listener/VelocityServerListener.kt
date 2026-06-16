@@ -133,13 +133,24 @@ object VelocityServerListener {
         }
     }
 
-    private fun buildDisconnectComponent() = CommonComponents.renderDisconnectMessage(
-        SurfComponentBuilder(),
-        "DER PROXY WIRD HERUNTERGEFAHREN.",
-        {
-            spacer("Es wurde kein anderer Proxy Server gefunden, zu dem du wechseln könntest.")
-        },
-        {
-            appendDiscordLink()
-        })
+    private fun buildDisconnectComponent() = net.kyori.adventure.text.Component.text()
+        .append(
+            net.kyori.adventure.text.Component.text("Hexoria Network")
+                .color(net.kyori.adventure.text.format.NamedTextColor.GREEN)
+                .decoration(TextDecoration.BOLD, true)
+        )
+        .appendNewline()
+        .appendNewline()
+        .append(
+            net.kyori.adventure.text.Component.text("DER PROXY WIRD HERUNTERGEFAHREN.")
+                .color(net.kyori.adventure.text.format.NamedTextColor.RED)
+                .decorate(TextDecoration.BOLD)
+        )
+        .appendNewline()
+        .appendNewline()
+        .append(
+            net.kyori.adventure.text.Component.text("Es wurde kein anderer Proxy Server gefunden, zu dem du wechseln könntest.")
+                .color(net.kyori.adventure.text.format.NamedTextColor.GRAY)
+        )
+        .build()
 }

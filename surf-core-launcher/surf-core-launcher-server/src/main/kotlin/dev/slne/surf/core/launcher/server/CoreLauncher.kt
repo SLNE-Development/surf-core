@@ -69,7 +69,7 @@ object CoreLauncher {
 
                 PluginUpdater.start()
             }
-                ?: println("$LOG_PREFIX Plugin update check timed out after 30 seconds, continuing with server startup")
+                ?: println("$LOG_PREFIX Plugin update check timed out after 20 seconds, continuing with server startup")
         }
 
         println("$LOG_PREFIX Starting Minecraft Server...")

@@ -38,6 +38,9 @@ class GitHubClient(private val token: String?) {
     private fun openConnection(url: String, accept: String): HttpURLConnection {
         val connection = URI(url).toURL().openConnection() as HttpURLConnection
         connection.setRequestProperty("Accept", accept)
+        connection.setRequestProperty("User-Agent", "surf-core-launcher")
+        connection.connectTimeout = 10_000
+        connection.readTimeout = 20_000
         token?.let { connection.setRequestProperty("Authorization", "Bearer $it") }
         return connection
     }

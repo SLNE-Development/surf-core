@@ -69,7 +69,7 @@ object VelocityRedisListener {
                     appendCorePrefix()
                     error("Der Server ")
                     variableValue(event.serviceName)
-                    error(" hat derzeit Verbindungsprobleme! Check server logs. (x$cachedAmount $status)")
+                    error(" hat derzeit Verbindungsprobleme! Check server logs. (x${cachedAmount + 1} $status)")
                 }
             }
         }

@@ -37,9 +37,9 @@ object VelocityRedisListener {
     @OnRedisEvent
     fun onServiceStatus(event: ServiceStatusRedisEvent) {
         val status = event.status
-        val cachedAmount =
-            instableConnectionCache.asMap().values.filter { it.status == status }.size
-
+        val cachedAmount = instableConnectionCache.asMap().values.count {
+            it.status == status && it.serviceName == event.serviceName
+        }
         if (cachedAmount < 2) {
             plugin.proxy.allPlayers.filter { it.hasPermission("surf.core.servernotify") }.forEach {
                 if (ignoringPlayers.contains(it.uniqueId)) {

@@ -20,20 +20,29 @@ fun hubCommand() = commandTree("hub") {
             info("Du wirst zum Hub gesendet...")
         }
 
-        val server = SurfCoreApi.getServerWithLeastPlayers("lobby")
+        val servers = SurfCoreApi.getServerByCategory("lobby")
+            .sortedBy { it.getPlayerCount() }
 
-        if (server == null) {
+        if (servers.isEmpty()) {
             player.sendText {
                 appendCorePrefix()
-                error("Es konnte kein Hub-Server gefunden werden.")
+                error("Es konnte kein passender Hub-Server gefunden werden.")
             }
             return@playerExecutor
         }
 
         plugin.launch {
-            val result = SurfCoreApi.sendPlayerAwaiting(player.surfPlayer, server)
+            var success = false
 
-            if (result.isSuccessful()) {
+            for (server in servers) {
+                val result = SurfCoreApi.sendPlayerAwaiting(player.surfPlayer, server)
+                if (result.isSuccessful()) {
+                    success = true
+                    break
+                }
+            }
+
+            if (success) {
                 player.sendText {
                     appendCorePrefix()
                     success("Du wurdest erfolgreich zum Hub gesendet.")
@@ -41,16 +50,7 @@ fun hubCommand() = commandTree("hub") {
             } else {
                 player.sendText {
                     appendCorePrefix()
-                    error("Es gab ein Problem beim Senden zum Hub")
-
-                    result.velocityMessage.let {
-                        if (it != null) {
-                            error(": ")
-                            append(it)
-                        } else {
-                            error(".")
-                        }
-                    }
+                    error("Es konnte kein passender Hub-Server gefunden werden.")
                 }
             }
         }

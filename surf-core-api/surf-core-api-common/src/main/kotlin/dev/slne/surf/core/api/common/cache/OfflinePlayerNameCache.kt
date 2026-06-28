@@ -1,12 +1,15 @@
 package dev.slne.surf.core.api.common.cache
 
 import dev.slne.surf.api.core.serializer.java.uuid.SerializableUUID
+import dev.slne.surf.api.core.util.logger
 import dev.slne.surf.core.api.common.SurfCoreApi
 import kotlinx.coroutines.*
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.minutes
 
 object OfflinePlayerNameCache {
+    private val logger = logger()
+
     @Volatile
     private var sortedNames: List<String> = emptyList()
     private val CACHE_REFRESH_INTERVAL = 5.minutes
@@ -38,7 +41,11 @@ object OfflinePlayerNameCache {
 
     fun startPulling(instanceScope: CoroutineScope) = instanceScope.launch(Dispatchers.IO) {
         while (isActive) {
-            refresh()
+            runCatching {
+                refresh()
+            }.onFailure {
+                logger.atFine().log("Failed to refresh offline player name cache: ${it.message}")
+            }
             delay(CACHE_REFRESH_INTERVAL)
         }
     }

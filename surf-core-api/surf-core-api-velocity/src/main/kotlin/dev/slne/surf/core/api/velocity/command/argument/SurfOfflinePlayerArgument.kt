@@ -16,7 +16,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.future.asDeferred
 import kotlinx.coroutines.future.future
 
-private const val MIN_PREFIX_LENGTH = 0
 private const val SUGGESTION_LIMIT = 500
 
 @Suppress("UNCHECKED_CAST")
@@ -47,10 +46,6 @@ open class SurfOfflinePlayerArgument(nodeName: String) :
                     val onlineNames = SurfCoreApi.getOnlinePlayers()
                         .mapNotNull { it.lastKnownName }
                         .filter { input.isEmpty() || it.startsWith(input, ignoreCase = true) }
-
-                    if (input.length < MIN_PREFIX_LENGTH) {
-                        return@future onlineNames
-                    }
 
                     val onlinePlayerNames = onlineNames.toHashSet()
                     val offlinePlayerNames = OfflinePlayerNameCache.findByPrefix(input)

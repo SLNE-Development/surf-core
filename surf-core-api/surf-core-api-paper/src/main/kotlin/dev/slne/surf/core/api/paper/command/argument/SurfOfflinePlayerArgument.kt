@@ -15,7 +15,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.future.asDeferred
 import kotlinx.coroutines.future.future
 
-private const val MIN_PREFIX_LENGTH = 1
+private const val MIN_PREFIX_LENGTH = 0
 private const val SUGGESTION_LIMIT = 500
 
 class SurfOfflinePlayerArgument(nodeName: String) :

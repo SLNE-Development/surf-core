@@ -8,11 +8,15 @@ import dev.jorel.commandapi.arguments.CustomArgument
 import dev.jorel.commandapi.arguments.StringArgument
 import dev.slne.surf.api.core.util.logger
 import dev.slne.surf.core.api.common.SurfCoreApi
+import dev.slne.surf.core.api.common.cache.OfflinePlayerNameCache
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.paper.CorePlayerStatusAccess
 import kotlinx.coroutines.*
 import kotlinx.coroutines.future.asDeferred
 import kotlinx.coroutines.future.future
+
+private const val MIN_PREFIX_LENGTH = 3
+private const val SUGGESTION_LIMIT = 500
 
 class SurfOfflinePlayerArgument(nodeName: String) :
     CustomArgument<Deferred<SurfPlayer?>, String>(StringArgument(nodeName), { info ->
@@ -21,11 +25,24 @@ class SurfOfflinePlayerArgument(nodeName: String) :
         }.asDeferred()
     }) {
     init {
-        this.replaceSuggestions(
-            ArgumentSuggestions.stringCollection { viewerInfo ->
-                SurfCoreApi.getOnlinePlayers()
-                    .filter { CorePlayerStatusAccess.hasAccess(viewerInfo.sender, it) }
-                    .mapNotNull { it.lastKnownName }
+        replaceSuggestions(
+            ArgumentSuggestions.stringCollectionAsync { viewerInfo ->
+                scope.future {
+                    val input = viewerInfo.currentArg ?: ""
+
+                    val onlineNames = SurfCoreApi.getOnlinePlayers()
+                        .filter { CorePlayerStatusAccess.hasAccess(viewerInfo.sender, it) }
+                        .mapNotNull { it.lastKnownName }
+                        .filter { input.isEmpty() || it.startsWith(input, ignoreCase = true) }
+
+                    if (input.length < MIN_PREFIX_LENGTH) return@future onlineNames
+
+                    val onlineSet = onlineNames.toHashSet()
+                    val offlineMatches = OfflinePlayerNameCache.findByPrefix(input)
+                        .filter { it !in onlineSet }
+
+                    (onlineNames + offlineMatches).take(SUGGESTION_LIMIT)
+                }
             }
         )
     }

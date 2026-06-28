@@ -1,6 +1,7 @@
 package dev.slne.surf.core.api.common
 
 import dev.slne.surf.api.core.util.requiredService
+import dev.slne.surf.core.api.common.cache.OfflinePlayerNameCache
 import dev.slne.surf.core.api.common.event.SurfEvent
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.server.CommonSurfServer
@@ -45,6 +46,8 @@ interface SurfCoreApi {
     fun registerListener(listener: Any)
     fun fireEvent(event: SurfEvent)
     fun subscribe(eventClass: KClass<out SurfEvent>, handler: (SurfEvent) -> Unit)
+
+    suspend fun loadOfflinePlayerNameEntries(): List<OfflinePlayerNameCache.Entry>
 
     /**
      * Sends a request to connect the specified player to the given server and awaits the result.

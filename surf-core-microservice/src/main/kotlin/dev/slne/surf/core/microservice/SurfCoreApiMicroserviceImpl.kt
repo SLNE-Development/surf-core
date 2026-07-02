@@ -9,4 +9,6 @@ class SurfCoreApiMicroserviceImpl : SurfCoreApiImpl() {
     override fun getCurrentServerName() = "surf-core"
     override fun getCurrentServerDisplayName() = "surf-core"
     override fun getCurrentServerCategory() = "microservice"
+
+    override suspend fun loadOfflinePlayerNameEntries() = error("Not available on microservice")
 }

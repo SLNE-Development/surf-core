@@ -1,9 +1,11 @@
 package dev.slne.surf.core.paper
 
 import com.github.shynixn.mccoroutine.folia.SuspendingJavaPlugin
+import com.github.shynixn.mccoroutine.folia.scope
 import dev.slne.surf.api.core.luckperms.LuckPermsAccess
 import dev.slne.surf.api.paper.event.register
 import dev.slne.surf.api.paper.util.getPrefixedName
+import dev.slne.surf.core.api.common.cache.OfflinePlayerNameCache
 import dev.slne.surf.core.api.common.event.SurfServerOnlineEvent
 import dev.slne.surf.core.api.common.event.SurfServerStoppingEvent
 import dev.slne.surf.core.api.common.server.SurfServer
@@ -54,6 +56,7 @@ class PaperMain : SuspendingJavaPlugin() {
         luckPerms()
 
         surfServerInformationSyncTask.start()
+        OfflinePlayerNameCache.startPulling(plugin.scope)
     }
 
     override suspend fun onDisableAsync() {

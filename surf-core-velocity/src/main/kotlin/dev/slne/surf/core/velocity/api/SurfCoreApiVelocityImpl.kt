@@ -5,7 +5,7 @@ import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.common.server.connection.SurfServerConnectResult
-import dev.slne.surf.core.core.common.SurfCoreApiImpl
+import dev.slne.surf.core.client.SurfCoreApiClientImpl
 import dev.slne.surf.core.velocity.plugin
 import dev.slne.surf.core.velocity.redis.handler.convertResult
 import dev.slne.surf.core.velocity.surfServerConfig
@@ -14,7 +14,7 @@ import net.kyori.adventure.util.Services
 import kotlin.jvm.optionals.getOrNull
 
 @AutoService(SurfCoreApi::class)
-class SurfCoreApiVelocityImpl : SurfCoreApiImpl(), Services.Fallback {
+class SurfCoreApiVelocityImpl : SurfCoreApiClientImpl(), Services.Fallback {
     override fun getCurrentServerName() = surfServerConfig.serverName
     override fun getCurrentServerCategory() = surfServerConfig.serverCategory
     override fun getCurrentServerDisplayName() = surfServerConfig.serverDisplayName
@@ -32,7 +32,7 @@ class SurfCoreApiVelocityImpl : SurfCoreApiImpl(), Services.Fallback {
                     SurfServerConnectResult.Status.SERVER_NOT_FOUND,
                     null
                 )
-            
+
             return player.createConnectionRequest(velocityServer)
                 .connect()
                 .await()

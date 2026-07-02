@@ -10,10 +10,13 @@ import dev.jorel.commandapi.arguments.CommandAPIArgumentType
 import dev.jorel.commandapi.executors.CommandArguments
 import dev.slne.surf.api.core.util.logger
 import dev.slne.surf.core.api.common.SurfCoreApi
+import dev.slne.surf.core.api.common.cache.OfflinePlayerNameCache
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import kotlinx.coroutines.*
 import kotlinx.coroutines.future.asDeferred
 import kotlinx.coroutines.future.future
+
+private const val SUGGESTION_LIMIT = 500
 
 @Suppress("UNCHECKED_CAST")
 open class SurfOfflinePlayerArgument(nodeName: String) :
@@ -36,9 +39,20 @@ open class SurfOfflinePlayerArgument(nodeName: String) :
 
     init {
         replaceSuggestions(
-            ArgumentSuggestions.stringCollection { _ ->
-                SurfCoreApi.getOnlinePlayers()
-                    .mapNotNull { it.lastKnownName }
+            ArgumentSuggestions.stringCollectionAsync { viewerInfo ->
+                scope.future {
+                    val input = viewerInfo.currentArg ?: ""
+
+                    val onlineNames = SurfCoreApi.getOnlinePlayers()
+                        .mapNotNull { it.lastKnownName }
+                        .filter { input.isEmpty() || it.startsWith(input, ignoreCase = true) }
+
+                    val onlinePlayerNames = onlineNames.toHashSet()
+                    val offlinePlayerNames = OfflinePlayerNameCache.findByPrefix(input)
+                        .filter { it !in onlinePlayerNames }
+
+                    (onlineNames + offlinePlayerNames).take(SUGGESTION_LIMIT)
+                }
             }
         )
     }

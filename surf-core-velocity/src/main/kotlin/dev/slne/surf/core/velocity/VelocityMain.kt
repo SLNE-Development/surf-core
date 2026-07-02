@@ -2,6 +2,7 @@ package dev.slne.surf.core.velocity
 
 import com.github.shynixn.mccoroutine.velocity.SuspendingPluginContainer
 import com.github.shynixn.mccoroutine.velocity.registerSuspend
+import com.github.shynixn.mccoroutine.velocity.scope
 import com.google.inject.Inject
 import com.velocitypowered.api.event.EventManager
 import com.velocitypowered.api.event.Subscribe
@@ -13,6 +14,7 @@ import com.velocitypowered.api.plugin.annotation.DataDirectory
 import com.velocitypowered.api.proxy.ProxyServer
 import dev.slne.surf.api.core.messages.adventure.buildText
 import dev.slne.surf.core.api.common.SurfCoreApi
+import dev.slne.surf.core.api.common.cache.OfflinePlayerNameCache
 import dev.slne.surf.core.api.common.event.SurfServerOnlineEvent
 import dev.slne.surf.core.api.common.event.SurfServerStartEvent
 import dev.slne.surf.core.api.common.event.SurfServerStoppingEvent
@@ -107,6 +109,7 @@ class VelocityMain @Inject constructor(
         coreCommand()
 
         surfPlayerSyncTask.start()
+        OfflinePlayerNameCache.startPulling(pluginContainer.scope)
     }
 
     @Subscribe

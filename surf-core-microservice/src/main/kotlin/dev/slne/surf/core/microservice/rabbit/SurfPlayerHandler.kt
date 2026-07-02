@@ -1,6 +1,8 @@
 package dev.slne.surf.core.microservice.rabbit
 
+import dev.slne.surf.core.core.common.rabbit.packet.player.ManyOfflinePlayerNamesResponsePacket
 import dev.slne.surf.core.core.common.rabbit.packet.player.OptionalSurfPlayerResponsePacket
+import dev.slne.surf.core.core.common.rabbit.packet.player.load.LoadOfflinePlayerNameEntriesRequestPacket
 import dev.slne.surf.core.core.common.rabbit.packet.player.load.LoadPlayerByNameRequestPacket
 import dev.slne.surf.core.core.common.rabbit.packet.player.load.LoadPlayerByUuidRequestPacket
 import dev.slne.surf.core.core.common.rabbit.packet.player.save.SaveSurfPlayerRequestPacket
@@ -51,4 +53,14 @@ object SurfPlayerHandler {
             )
         }
     }
+
+    @RabbitHandler
+    fun handleLoadOfflinePlayerNameEntriesRequest(request: LoadOfflinePlayerNameEntriesRequestPacket) =
+        request.launch {
+            request.respond(
+                ManyOfflinePlayerNamesResponsePacket(
+                    SurfPlayerRepository.loadOfflinePlayerNameEntries()
+                )
+            )
+        }
 }

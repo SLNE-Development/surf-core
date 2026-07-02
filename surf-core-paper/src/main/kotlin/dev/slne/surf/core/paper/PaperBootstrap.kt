@@ -9,6 +9,7 @@ import dev.slne.surf.core.core.CoreInstance
 import dev.slne.surf.core.core.common.config.SurfServerConfiguration
 import dev.slne.surf.core.core.common.event.SurfEventBus
 import dev.slne.surf.core.core.common.server.SurfServerService
+import dev.slne.surf.core.launcher.api.LauncherConstants
 import dev.slne.surf.core.paper.api.DefaultCorePlayerInfoProvider
 import dev.slne.surf.core.paper.redis.listener.PaperRedisListener
 import dev.slne.surf.core.paper.teleport.TeleportRedisListener
@@ -46,9 +47,12 @@ class PaperBootstrap : PluginBootstrap {
             startedAt = OffsetDateTime.now()
         )
 
-        SurfEventBus.fire(SurfServerStartEvent(surfServerConfig.serverName))
-        SurfServerService.addServer(server)
 
+        if (System.getProperty(LauncherConstants.PROPERTY_LAUNCHED_BY_CORE) == null) {
+            SurfEventBus.fire(SurfServerStartEvent(surfServerConfig.serverName))
+        }
+
+        SurfServerService.addServer(server)
         CorePlayerInfoProvider.setInstance(DefaultCorePlayerInfoProvider)
     }
 

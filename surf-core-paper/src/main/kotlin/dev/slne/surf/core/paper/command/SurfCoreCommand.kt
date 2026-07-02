@@ -48,6 +48,38 @@ fun surfCoreCommand() = commandTree("surfcore") {
         }
     }
 
+//    literalArgument("crash") {
+//        withRequirement {
+//            SurfServer.current().name.contains("dev")
+//        }
+//
+//        anyExecutor { executor, _ ->
+//            executor.sendText {
+//                appendCorePrefix()
+//                error("Der Server wird nun absichtlich zum Testen von Crash-Handling-Funktionen abstürzen...")
+//            }
+//
+//            Runtime.getRuntime().halt(1)
+//        }
+//    }
+//
+//    literalArgument("unreachable") {
+//        withRequirement {
+//            SurfServer.current().name.contains("dev")
+//        }
+//
+//        anyExecutor { executor, _ ->
+//            executor.sendText {
+//                appendCorePrefix()
+//                error("Der Server wird nun absichtlich unerreichbar gemacht, um die Handhabung von Verbindungsproblemen zu testen... o7")
+//            }
+//
+//            while (true) {
+//                Thread.sleep(1000)
+//            }
+//        }
+//    }
+
     literalArgument("testawaitingsend") {
         literalArgument("server") {
             surfBackendServerArgument("backend") {

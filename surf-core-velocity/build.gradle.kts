@@ -17,4 +17,5 @@ velocityPluginFile {
 
 dependencies {
     api(projects.surfCoreCore.surfCoreCoreVelocity)
+    implementation(projects.surfCoreLauncher.surfCoreLauncherApi)
 }

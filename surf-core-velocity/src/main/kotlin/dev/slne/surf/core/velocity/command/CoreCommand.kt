@@ -20,8 +20,10 @@ import dev.slne.surf.core.core.common.player.SurfPlayerService
 import dev.slne.surf.core.core.common.server.SurfServerService
 import dev.slne.surf.core.core.common.util.appendCorePrefix
 import dev.slne.surf.core.core.common.util.niceRed
+import dev.slne.surf.core.launcher.api.LauncherConstants
 import dev.slne.surf.core.velocity.permission.PermissionList
 import dev.slne.surf.core.velocity.plugin
+import dev.slne.surf.core.velocity.redis.listener.VelocityRedisListener
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.TextDecoration
@@ -52,6 +54,33 @@ fun coreCommand() = commandTree("core") {
             info(" by ")
             variableValue(vendor)
             info(".")
+
+            if (System.getProperty(LauncherConstants.PROPERTY_LAUNCHED_BY_CORE) != null) {
+                spacer(" (and is launched by the core launcher)")
+            }
+        }
+    }
+
+    literalArgument("togglecoreservicestatusmessages") {
+        withPermission(PermissionList.CORE_COMMAND_TOGGLE_SERVICE_STATUS_MESSAGES)
+
+        playerExecutor { player, _ ->
+            val current = VelocityRedisListener.ignoringPlayers.contains(player.uniqueId)
+
+            if (current) {
+                VelocityRedisListener.ignoringPlayers.remove(player.uniqueId)
+            } else {
+                VelocityRedisListener.ignoringPlayers.add(player.uniqueId)
+            }
+
+            player.sendText {
+                appendCorePrefix()
+                if (current) {
+                    success("Du erhältst nun wieder Service Statusnachrichten.")
+                } else {
+                    success("Du erhältst nun keine Service Statusnachrichten mehr.")
+                }
+            }
         }
     }
 

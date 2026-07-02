@@ -27,6 +27,7 @@ import dev.slne.surf.core.core.common.event.SurfEventBus
 import dev.slne.surf.core.core.common.server.SurfServerService
 import dev.slne.surf.core.core.common.util.appendCorePrefix
 import dev.slne.surf.core.core.common.util.niceRed
+import dev.slne.surf.core.launcher.api.LauncherConstants
 import dev.slne.surf.core.velocity.auth.AuthenticationListener
 import dev.slne.surf.core.velocity.auth.AuthenticationService
 import dev.slne.surf.core.velocity.command.coreCommand
@@ -85,7 +86,10 @@ class VelocityMain @Inject constructor(
             )
         )
 
-        SurfEventBus.fire(SurfServerStartEvent(surfServerConfig.serverName))
+        if (System.getProperty(LauncherConstants.PROPERTY_LAUNCHED_BY_CORE) == null) {
+            SurfEventBus.fire(SurfServerStartEvent(surfServerConfig.serverName))
+        }
+
         SurfServerService.addServer(server)
     }
 

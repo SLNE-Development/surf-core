@@ -27,4 +27,5 @@ surfPaperPluginApi {
 dependencies {
     api(projects.surfCoreCore.surfCoreCorePaper)
     compileOnly("net.luckperms:api:5.4")
+    implementation(projects.surfCoreLauncher.surfCoreLauncherApi)
 }

@@ -181,24 +181,28 @@ object CoreLauncher {
         }
     }
 
+    private val pluginMappings = mapOf(
+        "ModernPluginLoadingStrategy" to "Plugin Loader"
+    )
+
     private fun extractStartupErrorPlugin(line: String): String? {
         val match = errorLineRegex.find(line) ?: return null
-        return match.groupValues.getOrNull(1)?.takeIf { it.isNotBlank() } ?: "Server"
+        val pluginName = match.groupValues.getOrNull(1)?.takeIf { it.isNotBlank() }
+        return pluginName?.let { pluginMappings[it] ?: it } ?: "Server"
     }
 
     private fun printStartupErrorReport() {
         if (startupErrorCounts.isEmpty()) {
-            println("$LOG_PREFIX Start abgeschlossen ohne Fehler.")
             return
         }
 
         val total = startupErrorCounts.values.sum()
-        println("$LOG_PREFIX Start abgeschlossen mit $total Fehler(n):")
+        println("$LOG_PREFIX Started with $total error(s):")
 
         startupErrorCounts.entries
             .sortedByDescending { it.value }
             .forEach { (plugin, count) ->
-                println("$LOG_PREFIX   - $plugin: $count Fehler")
+                println("$LOG_PREFIX   - $plugin: $count Errors")
             }
     }
 }

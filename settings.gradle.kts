@@ -30,6 +30,7 @@ include("surf-core-velocity")
 // Microservice
 include("surf-core-microservice")
 
+// Launcher
 include("surf-core-launcher")
 include("surf-core-launcher:surf-core-launcher-api")
 include("surf-core-launcher:surf-core-launcher-server")

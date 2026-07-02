@@ -8,6 +8,10 @@ surfCoreApi {
     withSurfRedis()
 }
 
+dependencies {
+    api(projects.surfCoreApi.surfCoreApiCommon)
+}
+
 publishing {
     repositories {
         slneReleases()

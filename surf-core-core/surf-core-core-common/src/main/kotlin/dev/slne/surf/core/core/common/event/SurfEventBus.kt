@@ -2,8 +2,8 @@ package dev.slne.surf.core.core.common.event
 
 import dev.slne.surf.core.api.common.event.SurfEvent
 import dev.slne.surf.core.api.common.event.SurfEventHandler
+import dev.slne.surf.core.api.common.event.redis.SurfEventFireRedisEvent
 import dev.slne.surf.core.core.CoreInstance
-import dev.slne.surf.core.core.common.redis.event.SurfEventFireRedisEvent
 import kotlin.reflect.KClass
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.findAnnotation

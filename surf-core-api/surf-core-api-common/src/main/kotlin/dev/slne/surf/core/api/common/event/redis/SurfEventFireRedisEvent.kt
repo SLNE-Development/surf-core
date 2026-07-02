@@ -1,4 +1,4 @@
-package dev.slne.surf.core.core.common.redis.event
+package dev.slne.surf.core.api.common.event.redis
 
 import dev.slne.surf.core.api.common.event.SurfEvent
 import dev.slne.surf.redis.event.RedisEvent

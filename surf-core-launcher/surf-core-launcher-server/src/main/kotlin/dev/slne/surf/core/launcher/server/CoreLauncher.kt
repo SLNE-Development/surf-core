@@ -42,11 +42,16 @@ object CoreLauncher {
 
     val serverOnline = MutableStateFlow(false)
 
+    private val startupErrorCounts = mutableMapOf<String, Int>()
+    private val errorLineRegex = Regex("""\[[^]]*ERROR[^]]*]:\s*(?:\[([^]]+)])?""")
+
     val config by lazy {
         CoreLauncherConfig.getConfig()
     }
 
     suspend fun launch() = withContext(Dispatchers.IO) {
+        startupErrorCounts.clear()
+
         SurfApiStandaloneBootstrap.bootstrap()
         SurfApiStandaloneBootstrap.enable()
 
@@ -97,6 +102,12 @@ object CoreLauncher {
                 serverProcess.inputStream.bufferedReader().forEachLine { line ->
                     println(line)
 
+                    if (!serverOnline.value) {
+                        extractStartupErrorPlugin(line)?.let { plugin ->
+                            startupErrorCounts.merge(plugin, 1, Int::plus)
+                        }
+                    }
+
                     if (line.contains(
                             config.startedMessage,
                             ignoreCase = true
@@ -104,6 +115,7 @@ object CoreLauncher {
                     ) {
                         serverOnline.value = true
                         println("$LOG_PREFIX Server is now online.")
+                        printStartupErrorReport()
                     }
                 }
             }
@@ -167,6 +179,27 @@ object CoreLauncher {
         return possiblePaths.firstOrNull { path ->
             path.toFile().exists()
         }
+    }
+
+    private fun extractStartupErrorPlugin(line: String): String? {
+        val match = errorLineRegex.find(line) ?: return null
+        return match.groupValues.getOrNull(1)?.takeIf { it.isNotBlank() } ?: "Server"
+    }
+
+    private fun printStartupErrorReport() {
+        if (startupErrorCounts.isEmpty()) {
+            println("$LOG_PREFIX Start abgeschlossen ohne Fehler.")
+            return
+        }
+
+        val total = startupErrorCounts.values.sum()
+        println("$LOG_PREFIX Start abgeschlossen mit $total Fehler(n):")
+
+        startupErrorCounts.entries
+            .sortedByDescending { it.value }
+            .forEach { (plugin, count) ->
+                println("$LOG_PREFIX   - $plugin: $count Fehler")
+            }
     }
 }
 

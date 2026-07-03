@@ -53,9 +53,15 @@ object PluginUpdater {
             return@withContext
         }
 
-        val release = gitHubClient.fetchLatestRelease(plugin) ?: return@withContext
+        val release = gitHubClient.fetchLatestRelease(plugin)
+        val latestVersion = release?.get("tag_name")?.toString()?.trimStart('v')
 
-        val latestVersion = release["tag_name"]?.toString()?.trimStart('v') ?: return@withContext
+        if (latestVersion == null) {
+            if (CoreLauncher.config.logGithubReleaseFetchFailures) {
+                println("$LOG_PREFIX Missing, invalid or incomplete latest release for ${plugin.name} (${plugin.latestReleaseUrl})")
+            }
+            return@withContext
+        }
 
         if (!isNewer(latestVersion, plugin.currentVersion)) {
             return@withContext
@@ -66,7 +72,7 @@ object PluginUpdater {
 
         val expectedPrefix = buildString {
             append("surf-")
-            append(plugin.findPluginName())
+            append(plugin.findPluginName(false))
 
             plugin.findPluginType()?.let {
                 append("-")
@@ -80,7 +86,7 @@ object PluginUpdater {
             assetName.endsWith(".jar") &&
                     assetName.startsWith(expectedPrefix)
         } ?: run {
-            println("$LOG_PREFIX (Updater) No matching asset found for ${plugin.name} in release $latestVersion")
+            println("$LOG_PREFIX (Updater) No matching asset found for ${plugin.name}: $expectedPrefix in release $latestVersion")
             return@withContext
         }
 

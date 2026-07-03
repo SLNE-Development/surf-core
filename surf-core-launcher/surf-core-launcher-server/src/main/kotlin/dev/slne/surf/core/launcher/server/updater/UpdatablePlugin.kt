@@ -8,10 +8,6 @@ private val specialPluginNames = mapOf(
     "surf-death-messages" to "deathmessages"
 )
 
-val specialAssetNames = mapOf(
-    "a" to "b"
-)
-
 /**
  * Represents a plugin that can be updated.
  *

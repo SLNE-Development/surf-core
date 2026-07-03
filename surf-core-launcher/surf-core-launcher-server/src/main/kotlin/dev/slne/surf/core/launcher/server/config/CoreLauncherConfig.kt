@@ -16,7 +16,8 @@ data class CoreLauncherConfig(
     val serverUuid: SerializableUUID = UUID.randomUUID(),
     val autoUpdateSurfPlugins: Boolean = true,
     val personalAccessToken: String = "",
-    val autoUpdateIgnoredPlugins: List<String> = listOf("surf-example-paper")
+    val autoUpdateIgnoredPlugins: List<String> = listOf("surf-example-paper"),
+    val logGithubReleaseFetchFailures: Boolean = false,
 ) {
     companion object : SpongeYmlConfigClass<CoreLauncherConfig>(
         CoreLauncherConfig::class.java,

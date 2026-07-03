@@ -2,6 +2,15 @@ package dev.slne.surf.core.launcher.server.updater
 
 import java.nio.file.Path
 
+private val specialPluginNames = mapOf(
+    "surf-paper-api" to "api",
+    "surf-skill-paper" to "skills",
+    "surf-death-messages" to "deathmessages"
+)
+
+val specialAssetNames = mapOf(
+    "a" to "b"
+)
 
 /**
  * Represents a plugin that can be updated.
@@ -17,14 +26,11 @@ data class UpdatablePlugin(
     /**
      * The Plugin name, e.g. core, captcha or api
      */
-    fun findPluginName(): String {
-        if (name == "surf-paper-api") { // Special case for the old API plugin name
-            return "api"
-        }
-
-        return name.substringAfter("surf-").substringBefore("-paper").substringBefore("-velocity")
+    fun findPluginName(mapped: Boolean = true) =
+        specialPluginNames[name]?.takeIf { mapped } ?: name.substringAfter("surf-")
+            .substringBefore("-paper")
+            .substringBefore("-velocity")
             .replace("-server", "").replace("-api", "")
-    }
 
     fun findPluginType() = when {
         name.contains("-paper") -> "paper"

@@ -116,6 +116,9 @@ object CoreLauncher {
                         serverOnline.value = true
                         println("$LOG_PREFIX Server is now online.")
                         printStartupErrorReport()
+                        launch {
+                            PluginUpdater.gitHubClient.checkForCoreLauncherUpdate()
+                        }
                     }
                 }
             }

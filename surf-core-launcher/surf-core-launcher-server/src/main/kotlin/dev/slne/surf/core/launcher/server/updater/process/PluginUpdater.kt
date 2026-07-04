@@ -16,7 +16,7 @@ object PluginUpdater {
     private val oldPath = pluginsPath.resolve(".old")
 
     private val scanner = PluginScanner(pluginsPath)
-    private val gitHubClient = GitHubClient(CoreLauncher.config.personalAccessToken)
+    internal val gitHubClient = GitHubClient(CoreLauncher.config.personalAccessToken)
     private val cooldownTracker = UpdateCooldownTracker(pluginsPath.resolve(".last-updates"))
 
     suspend fun start() {
@@ -53,7 +53,7 @@ object PluginUpdater {
             return@withContext
         }
 
-        val release = gitHubClient.fetchLatestRelease(plugin)
+        val release = gitHubClient.fetchLatestRelease(plugin.latestReleaseUrl)
         val latestVersion = release?.get("tag_name")?.toString()?.trimStart('v')
 
         if (latestVersion == null) {

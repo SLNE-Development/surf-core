@@ -3,6 +3,7 @@ package dev.slne.surf.core.launcher.server.updater.github
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import dev.slne.surf.core.launcher.api.LauncherConstants
+import dev.slne.surf.core.launcher.server.CoreLauncher
 import dev.slne.surf.core.launcher.server.LOG_PREFIX
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -25,7 +26,9 @@ class GitHubClient(private val token: String?) {
             connection.connect()
 
             if (connection.responseCode != 200) {
-                println("$LOG_PREFIX (GitHubClient) Failed to fetch latest release from $url, response code: ${connection.responseCode}")
+                if (CoreLauncher.config.logGithubReleaseFetchFailures) {
+                    println("$LOG_PREFIX (GitHubClient) Failed to fetch latest release from $url, response code: ${connection.responseCode}")
+                }
                 return@withContext null
             }
 

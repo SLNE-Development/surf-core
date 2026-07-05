@@ -49,7 +49,7 @@ object PluginUpdater {
     }
 
 
-    private val assetMappings = mapOf("surf-paper-paper" to "surf-paper-api")
+    private val assetMappings = mapOf("surf-paper-paper" to "surf-api-paper")
 
     private suspend fun checkAndUpdate(plugin: UpdatablePlugin) = withContext(Dispatchers.IO) {
         if (cooldownTracker.isOnCooldown(plugin.name)) {

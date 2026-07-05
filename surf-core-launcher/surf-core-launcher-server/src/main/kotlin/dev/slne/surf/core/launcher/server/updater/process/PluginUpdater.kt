@@ -48,6 +48,9 @@ object PluginUpdater {
         println("$LOG_PREFIX (Updater) Update check completed in ${duration}ms")
     }
 
+
+    private val assetMappings = mapOf("surf-paper-paper" to "surf-paper-api")
+
     private suspend fun checkAndUpdate(plugin: UpdatablePlugin) = withContext(Dispatchers.IO) {
         if (cooldownTracker.isOnCooldown(plugin.name)) {
             return@withContext
@@ -70,7 +73,7 @@ object PluginUpdater {
         @Suppress("UNCHECKED_CAST")
         val assets = release["assets"] as? List<Map<String, Any>> ?: return@withContext
 
-        val expectedPrefix = buildString {
+        val buildedPrefix = buildString {
             append("surf-")
             append(plugin.findPluginName(false))
 
@@ -80,13 +83,15 @@ object PluginUpdater {
             }
         }
 
+        val mappedPrefix = assetMappings[buildedPrefix] ?: buildedPrefix
+
         val matchingAsset = assets.firstOrNull { asset ->
             val assetName = asset["name"]?.toString() ?: return@firstOrNull false
 
             assetName.endsWith(".jar") &&
-                    assetName.startsWith(expectedPrefix)
+                    assetName.startsWith(mappedPrefix)
         } ?: run {
-            println("$LOG_PREFIX (Updater) No matching asset found for ${plugin.name}: $expectedPrefix in release $latestVersion")
+            println("$LOG_PREFIX (Updater) No matching asset found for ${plugin.name}: $mappedPrefix in release $latestVersion")
             return@withContext
         }
 

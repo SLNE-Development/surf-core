@@ -12,6 +12,7 @@ dependencies {
 tasks.jar {
     manifest {
         attributes["Main-Class"] = "dev.slne.surf.core.launcher.server.CoreLauncherKt"
+        attributes["Implementation-Version"] = project.version
     }
 }
 

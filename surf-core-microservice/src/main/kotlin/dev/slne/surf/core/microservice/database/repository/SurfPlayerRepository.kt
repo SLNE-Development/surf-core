@@ -40,7 +40,7 @@ object SurfPlayerRepository {
         latestServer: String?,
         latestProxy: String?,
     ) = suspendTransaction {
-        SurfPlayersTable.upsert {
+        SurfPlayersTable.upsert(SurfPlayersTable.uuid) {
             it[this.uuid] = uuid
             it[this.name] = name
             it[this.firstSeen] = firstSeen

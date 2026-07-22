@@ -6,7 +6,8 @@ dependencies {
     api(projects.surfCoreLauncher.surfCoreLauncherApi)
     implementation(projects.surfCoreApi.surfCoreApiCommon)
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.2")
-    implementation("dev.slne.surf.redis:surf-redis-standalone:1.6.1")
+    implementation("dev.slne.surf.redis:surf-redis-standalone:1.10.0")
+    implementation("org.kohsuke:github-api:1.330")
 }
 
 tasks.jar {

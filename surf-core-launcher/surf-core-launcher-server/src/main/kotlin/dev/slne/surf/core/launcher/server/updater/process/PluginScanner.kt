@@ -1,67 +1,116 @@
 package dev.slne.surf.core.launcher.server.updater.process
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import dev.slne.surf.core.launcher.server.CoreLauncher
 import dev.slne.surf.core.launcher.server.updater.UpdatablePlugin
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
+import org.yaml.snakeyaml.LoaderOptions
 import org.yaml.snakeyaml.Yaml
+import org.yaml.snakeyaml.constructor.SafeConstructor
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.jar.JarFile
-import kotlin.io.path.extension
-import kotlin.io.path.name
 
-class PluginScanner(private val pluginsPath: Path) {
-    private val yaml = Yaml()
+class PluginScanner(
+    private val pluginsPath: Path,
+    private val ignoredPluginIds: Set<String> = emptySet(),
+    private val warning: (String) -> Unit = {},
+    private val diagnostic: (String) -> Unit = {}
+) {
+    private val jsonMapper: ObjectMapper = jacksonObjectMapper()
+    private val yaml = Yaml(SafeConstructor(LoaderOptions()))
 
     suspend fun findPlugins(): List<UpdatablePlugin> = withContext(Dispatchers.IO) {
-        if (!Files.exists(pluginsPath)) {
+        if (!Files.isDirectory(pluginsPath)) {
             return@withContext emptyList()
         }
 
-        Files.list(pluginsPath).use { stream ->
+        val candidates = Files.list(pluginsPath).use { stream ->
             stream
-                .filter { it.extension == "jar" }
-                .filter { it.name.startsWith("surf-") }
-                .toList()
-                .mapNotNull { readPlugin(it) }
-                .filter { it.name !in CoreLauncher.config.autoUpdateIgnoredPlugins }
+                .filter(Files::isRegularFile)
+                .filter(::hasJarExtension)
+                .filter { it.fileName.toString().startsWith("surf-", ignoreCase = true) }
+                .sorted()
                 .toList()
         }
+        val scannedPlugins = buildList {
+            candidates.forEach { jarPath ->
+                coroutineContext.ensureActive()
+                readPlugin(jarPath)?.let(::add)
+            }
+        }.filterNot { plugin -> ignoredPluginIds.any { it.equals(plugin.name, ignoreCase = true) } }
+
+        val duplicates = scannedPlugins
+            .groupBy { it.name.lowercase() }
+            .filterValues { it.size > 1 }
+        duplicates.forEach { (pluginId, plugins) ->
+            warning(
+                "Duplicate plugin id $pluginId in " +
+                        plugins.joinToString { it.jarPath.toString() } +
+                        "; skipping all duplicates"
+            )
+        }
+
+        scannedPlugins.filter { it.name.lowercase() !in duplicates }
     }
 
-    private fun readPlugin(jarPath: Path): UpdatablePlugin? = runCatching {
+    private fun readPlugin(jarPath: Path): UpdatablePlugin? = try {
         JarFile(jarPath.toFile()).use { jar ->
-            val entry = jar.entries().asSequence().firstOrNull {
-                it.name == "velocity-plugin.json" ||
-                        it.name == "paper-plugin.yml" ||
-                        it.name == "plugin.yml"
-            } ?: return null
+            val descriptor = DESCRIPTOR_PRIORITY.firstNotNullOfOrNull(jar::getJarEntry)
+                ?: error("no supported plugin descriptor found")
 
-            jar.getInputStream(entry).use { input ->
-                val data: Map<String, Any> = when (entry.name) {
-                    "velocity-plugin.json" -> jacksonObjectMapper().readValue(
-                        input,
-                        Map::class.java
-                    ) as Map<String, Any>
+            jar.getInputStream(descriptor).use { input ->
+                val (name, version) = when (descriptor.name) {
+                    VELOCITY_DESCRIPTOR -> {
+                        val data = jsonMapper.readValue(input, VelocityDescriptor::class.java)
+                        data.id to data.version
+                    }
 
-                    else -> yaml.load(input) ?: return null
+                    else -> {
+                        val data = yaml.load<Map<String, Any?>>(input)
+                            ?: error("empty YAML descriptor")
+                        data["name"]?.toString() to data["version"]?.toString()
+                    }
                 }
 
-                val version = data["version"]?.toString() ?: return null
-
-                val name = when (entry.name) {
-                    "velocity-plugin.json" -> data["id"]?.toString()
-                    else -> data["name"]?.toString()
-                } ?: return null
-
                 UpdatablePlugin(
-                    name = name,
-                    currentVersion = version,
+                    name = name?.takeIf(String::isNotBlank)
+                        ?: error("descriptor has no plugin id/name"),
+                    currentVersion = version?.takeIf(String::isNotBlank)
+                        ?: error("descriptor has no version"),
                     jarPath = jarPath
                 )
             }
         }
-    }.getOrNull()
+    } catch (exception: CancellationException) {
+        throw exception
+    } catch (exception: Exception) {
+        diagnostic(
+            "Could not scan $jarPath: " +
+                    (exception.message ?: exception::class.simpleName.orEmpty())
+        )
+        null
+    }
+
+    private fun hasJarExtension(path: Path) = path.fileName
+        .toString()
+        .substringAfterLast('.', missingDelimiterValue = "")
+        .equals("jar", ignoreCase = true)
+
+    private data class VelocityDescriptor(
+        val id: String? = null,
+        val version: String? = null
+    )
+
+    companion object {
+        private const val VELOCITY_DESCRIPTOR = "velocity-plugin.json"
+        private val DESCRIPTOR_PRIORITY = listOf(
+            "paper-plugin.yml",
+            "plugin.yml",
+            VELOCITY_DESCRIPTOR
+        )
+    }
 }

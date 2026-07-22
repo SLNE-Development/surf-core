@@ -1,149 +1,208 @@
 package dev.slne.surf.core.launcher.server.updater.process
 
+import dev.slne.surf.core.launcher.api.LauncherConstants
 import dev.slne.surf.core.launcher.server.CoreLauncher
 import dev.slne.surf.core.launcher.server.LOG_PREFIX
-import dev.slne.surf.core.launcher.server.updater.UpdatablePlugin
+import dev.slne.surf.core.launcher.server.updater.GITHUB_ORGANIZATION
+import dev.slne.surf.core.launcher.server.updater.GitHubRepositoryCoordinates
 import dev.slne.surf.core.launcher.server.updater.cooldown.UpdateCooldownTracker
-import dev.slne.surf.core.launcher.server.updater.github.GitHubClient
-import kotlinx.coroutines.*
-import java.nio.file.Files
+import dev.slne.surf.core.launcher.server.updater.github.GitHubReleaseClient
+import dev.slne.surf.core.launcher.server.updater.github.LatestReleaseResult
+import dev.slne.surf.core.launcher.server.updater.install.PluginInstaller
+import dev.slne.surf.core.launcher.server.updater.version.Version
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
 import java.nio.file.Path
-import java.nio.file.StandardCopyOption
-import kotlin.system.measureTimeMillis
+import java.util.concurrent.ConcurrentLinkedQueue
+import kotlin.time.TimeSource
 
 object PluginUpdater {
     private val pluginsPath = Path.of("plugins")
-    private val oldPath = pluginsPath.resolve(".old")
-
-    private val scanner = PluginScanner(pluginsPath)
-    internal val gitHubClient = GitHubClient(CoreLauncher.config.personalAccessToken)
-    private val cooldownTracker = UpdateCooldownTracker(pluginsPath.resolve(".last-updates"))
-
-    suspend fun start() {
-        val plugins = scanner.findPlugins()
-
-        if (plugins.isEmpty()) {
-            println("$LOG_PREFIX (Updater) No plugins found for update checking.")
-            return
-        }
-
-        withContext(Dispatchers.IO) {
-            if (!Files.exists(oldPath)) {
-                Files.createDirectories(oldPath)
-            }
-        }
-
-        println("$LOG_PREFIX (Updater) Checking plugin updates for ${plugins.size} plugins...")
-
-        val duration = measureTimeMillis {
-            coroutineScope {
-                plugins.map { plugin ->
-                    async(Dispatchers.IO) {
-                        checkAndUpdate(plugin)
-                    }
-                }.awaitAll()
-            }
-        }
-
-        println("$LOG_PREFIX (Updater) Update check completed in ${duration}ms")
+    private val githubToken by lazy {
+        resolveGitHubToken(
+            environmentToken = System.getenv(GITHUB_TOKEN_ENVIRONMENT_VARIABLE),
+            configuredToken = CoreLauncher.config.personalAccessToken
+        )
     }
-
-
-    private val assetMappings = mapOf("surf-paper-paper" to "surf-api-paper")
-
-    private suspend fun checkAndUpdate(plugin: UpdatablePlugin) = withContext(Dispatchers.IO) {
-        if (cooldownTracker.isOnCooldown(plugin.name)) {
-            return@withContext
-        }
-
-        val release = gitHubClient.fetchLatestRelease(plugin.latestReleaseUrl)
-        val latestVersion = release?.get("tag_name")?.toString()?.trimStart('v')
-
-        if (latestVersion == null) {
-            if (CoreLauncher.config.logGithubReleaseFetchFailures) {
-                println("$LOG_PREFIX Missing, invalid or incomplete latest release for ${plugin.name} (${plugin.latestReleaseUrl})")
-            }
-            return@withContext
-        }
-
-        if (!isNewer(latestVersion, plugin.currentVersion)) {
-            return@withContext
-        }
-
-        @Suppress("UNCHECKED_CAST")
-        val assets = release["assets"] as? List<Map<String, Any>> ?: return@withContext
-
-        val buildedPrefix = buildString {
-            append("surf-")
-            append(plugin.findPluginName(false))
-
-            plugin.findPluginType()?.let {
-                append("-")
-                append(plugin.findPluginType())
-            }
-        }
-
-        val mappedPrefix = assetMappings[buildedPrefix] ?: buildedPrefix
-
-        val matchingAsset = assets.firstOrNull { asset ->
-            val assetName = asset["name"]?.toString() ?: return@firstOrNull false
-
-            assetName.endsWith(".jar") &&
-                    assetName.startsWith(mappedPrefix)
-        } ?: run {
-            println("$LOG_PREFIX (Updater) No matching asset found for ${plugin.name}: $mappedPrefix in release $latestVersion")
-            return@withContext
-        }
-
-        val downloadUrl = matchingAsset["browser_download_url"]?.toString() ?: return@withContext
-        val assetName = matchingAsset["name"]?.toString() ?: return@withContext
-
-        backupOldJar(plugin)
-
-        gitHubClient.downloadAsset(downloadUrl, pluginsPath.resolve(assetName))
-        cooldownTracker.markUpdated(plugin.name)
-
-        println("$LOG_PREFIX (Updater) Updated ${plugin.name} from ${plugin.currentVersion} to $latestVersion")
+    private val githubClient by lazy { GitHubReleaseClient(githubToken) }
+    private val cooldownTracker by lazy {
+        UpdateCooldownTracker(
+            persistencePath = pluginsPath.resolve(".last-updates"),
+            diagnostic = { message -> diagnostic("(Cooldown) $message") }
+        )
     }
-
-    private fun backupOldJar(plugin: UpdatablePlugin) {
-        if (!Files.exists(plugin.jarPath)) {
-            return
-        }
-
-        Files.move(
-            plugin.jarPath,
-            oldPath.resolve("${plugin.name}-${plugin.currentVersion}.jar"),
-            StandardCopyOption.REPLACE_EXISTING
+    private val scanner by lazy {
+        PluginScanner(
+            pluginsPath = pluginsPath,
+            ignoredPluginIds = CoreLauncher.config.autoUpdateIgnoredPlugins.toSet(),
+            warning = { message -> scannerLog(message) },
+            diagnostic = { message -> diagnostic(message, SCANNER_COMPONENT) }
+        )
+    }
+    private val updateService by lazy {
+        PluginUpdateService(
+            cooldownTracker = cooldownTracker,
+            installer = PluginInstaller(pluginsPath),
+            fetchLatestRelease = githubClient::fetchLatestRelease,
+            downloadAsset = githubClient::downloadAsset,
+            diagnostic = { message -> diagnostic(message) }
         )
     }
 
-    private fun isNewer(latest: String, current: String): Boolean {
-        fun split(v: String): Pair<List<Int>, String?> {
-            val parts = v.split("-", limit = 2)
-            val nums = parts[0].split(".").map { it.toIntOrNull() ?: 0 }
-            val suffix = parts.getOrNull(1)?.uppercase()
-            return nums to suffix
+    val hasConfiguredToken: Boolean
+        get() = githubToken != null
+
+    suspend fun start() {
+        val started = TimeSource.Monotonic.markNow()
+        val completedResults = ConcurrentLinkedQueue<PluginUpdateResult>()
+        var checkedPluginCount = 0
+
+        try {
+            val plugins = scanner.findPlugins()
+            checkedPluginCount = plugins.size
+            if (plugins.isEmpty()) {
+                updaterLog("No plugins found for update checking")
+                return
+            }
+
+            updaterLog("Checking updates for ${plugins.size} plugins")
+            updateService.update(plugins) { result ->
+                completedResults += result
+                logResult(result)
+            }
+        } finally {
+            withContext(NonCancellable + Dispatchers.IO) {
+                try {
+                    cooldownTracker.persist()
+                } catch (exception: Exception) {
+                    updaterLog(
+                        "Could not persist update cooldowns: " +
+                                (exception.message ?: exception::class.simpleName.orEmpty())
+                    )
+                }
+            }
+
+            val summary = PluginUpdateSummary.from(
+                checkedPluginCount = checkedPluginCount,
+                results = completedResults,
+                durationMs = started.elapsedNow().inWholeMilliseconds
+            )
+            updaterLog(
+                "Summary: checked=${summary.checkedPluginCount}, updated=${summary.updatedCount}, " +
+                        "up-to-date=${summary.upToDateCount}, skipped=${summary.skippedCount}, " +
+                        "failed=${summary.failedCount}, duration=${summary.durationMs}ms"
+            )
+        }
+    }
+
+    suspend fun checkForCoreLauncherUpdate() {
+        val currentVersionText = LauncherConstants::class.java.`package`?.implementationVersion
+            ?: return
+        val currentVersion = Version.parse(currentVersionText)
+        if (currentVersion == null) {
+            diagnostic("Installed launcher version '$currentVersionText' is malformed", GITHUB_COMPONENT)
+            return
         }
 
-        fun rank(suffix: String?): Int {
-            if (suffix == null) return 3
-            return when {
-                suffix.contains("SNAPSHOT") -> 0
-                suffix.contains("ALPHA") -> 1
-                suffix.contains("BETA") -> 2
-                else -> 1
+        when (val result = githubClient.fetchLatestRelease(CORE_REPOSITORY)) {
+            is LatestReleaseResult.Found -> {
+                val latestVersion = Version.parse(result.value.tagName)
+                if (latestVersion == null) {
+                    diagnostic(
+                        "Core launcher release tag '${result.value.tagName}' is malformed",
+                        GITHUB_COMPONENT
+                    )
+                    return
+                }
+                if (latestVersion <= currentVersion) {
+                    return
+                }
+
+                val releaseUrl = result.value.release.htmlUrl.toExternalForm()
+                githubLog("*".repeat(80))
+                githubLog(
+                    "A new CoreLauncher version is available " +
+                            "(${currentVersion.normalized} -> ${latestVersion.normalized})"
+                )
+                githubLog("Release: $releaseUrl")
+                githubLog("*".repeat(80))
+            }
+
+            is LatestReleaseResult.RepositoryUnavailable -> diagnostic(
+                "Core repository was not found or the token lacks access",
+                GITHUB_COMPONENT
+            )
+
+            is LatestReleaseResult.NoPublishedRelease -> diagnostic(
+                "Core repository has no published release",
+                GITHUB_COMPONENT
+            )
+
+            is LatestReleaseResult.Failed -> diagnostic(
+                buildString {
+                    append("Core update check failed: repository=${result.repository}, operation=${result.operation}")
+                    result.status?.let { append(", http=$it") }
+                    append(", message=${result.message}")
+                    result.rateLimit?.let { append(", rate-limit=$it") }
+                },
+                GITHUB_COMPONENT
+            )
+        }
+    }
+
+    private fun logResult(result: PluginUpdateResult) {
+        when (result) {
+            is PluginUpdateResult.UpToDate -> updaterLog(
+                "${result.plugin.name} is current at ${result.latestVersion}"
+            )
+
+            is PluginUpdateResult.Updated -> updaterLog(
+                "Updated ${result.plugin.name} from ${result.previousVersion} " +
+                        "to ${result.installedVersion}"
+            )
+
+            is PluginUpdateResult.Skipped -> updaterLog(
+                "Skipped ${result.plugin.name}: ${result.message}"
+            )
+
+            is PluginUpdateResult.Failed -> {
+                updaterLog(
+                    buildString {
+                        append("Failed ${result.plugin.name}: operation=${result.operation}")
+                        result.repository?.let { append(", repository=$it") }
+                        result.status?.let { append(", http=$it") }
+                        result.assetName?.let { append(", asset=$it") }
+                        append(", message=${result.message}")
+                        result.rateLimit?.let { append(", rate-limit=$it") }
+                    }
+                )
+                if (CoreLauncher.config.logGithubReleaseFetchFailures) {
+                    result.cause?.printStackTrace()
+                }
             }
         }
-
-        val (lNums, lSuffix) = split(latest)
-        val (cNums, cSuffix) = split(current)
-
-        for (i in 0 until maxOf(lNums.size, cNums.size)) {
-            val diff = lNums.getOrElse(i) { 0 } - cNums.getOrElse(i) { 0 }
-            if (diff != 0) return diff > 0
-        }
-
-        return rank(lSuffix) > rank(cSuffix)
     }
+
+    private fun updaterLog(message: String) = println("$LOG_PREFIX $UPDATER_COMPONENT $message")
+
+    private fun githubLog(message: String) = println("$LOG_PREFIX $GITHUB_COMPONENT $message")
+
+    private fun scannerLog(message: String) = println("$LOG_PREFIX $SCANNER_COMPONENT $message")
+
+    private fun diagnostic(message: String, component: String = UPDATER_COMPONENT) {
+        if (CoreLauncher.config.logGithubReleaseFetchFailures) {
+            println("$LOG_PREFIX $component $message")
+        }
+    }
+
+    private val CORE_REPOSITORY = GitHubRepositoryCoordinates(GITHUB_ORGANIZATION, "surf-core")
+    private const val GITHUB_TOKEN_ENVIRONMENT_VARIABLE = "SURF_GITHUB_TOKEN"
+    private const val UPDATER_COMPONENT = "(Updater)"
+    private const val GITHUB_COMPONENT = "(GitHub)"
+    private const val SCANNER_COMPONENT = "(Scanner)"
 }
+
+internal fun resolveGitHubToken(environmentToken: String?, configuredToken: String?): String? =
+    environmentToken?.trim()?.takeIf(String::isNotEmpty)
+        ?: configuredToken?.trim()?.takeIf(String::isNotEmpty)

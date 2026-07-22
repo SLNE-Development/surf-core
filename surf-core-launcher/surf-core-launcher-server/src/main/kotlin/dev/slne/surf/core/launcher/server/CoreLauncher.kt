@@ -64,17 +64,35 @@ object CoreLauncher {
         println("$LOG_PREFIX Redis instance initialized and connected")
 
         if (config.autoUpdateSurfPlugins) {
-            println("$LOG_PREFIX Searching plugin updates...")
+            println("$LOG_PREFIX (Updater) Searching for plugin updates")
 
-            withTimeoutOrNull(20.seconds) {
-                if (config.personalAccessToken.isBlank()) {
-                    println("$LOG_PREFIX No GitHub personal access token provided, skipping plugin update check")
-                    return@withTimeoutOrNull
+            if (!PluginUpdater.hasConfiguredToken) {
+                println(
+                    "$LOG_PREFIX (Updater) No GitHub token configured in SURF_GITHUB_TOKEN " +
+                            "or personalAccessToken; skipping plugin update check"
+                )
+            } else {
+                try {
+                    withTimeoutOrNull(20.seconds) {
+                        PluginUpdater.start()
+                        true
+                    } ?: println(
+                        "$LOG_PREFIX (Updater) Plugin update check timed out after 20 seconds; " +
+                                "continuing with server startup"
+                    )
+                } catch (exception: CancellationException) {
+                    throw exception
+                } catch (exception: Exception) {
+                    println(
+                        "$LOG_PREFIX (Updater) Plugin update check failed: " +
+                                "${exception.message ?: exception::class.simpleName}; " +
+                                "continuing with server startup"
+                    )
+                    if (config.logGithubReleaseFetchFailures) {
+                        exception.printStackTrace()
+                    }
                 }
-
-                PluginUpdater.start()
             }
-                ?: println("$LOG_PREFIX Plugin update check timed out after 20 seconds, continuing with server startup")
         }
 
         println("$LOG_PREFIX Starting Minecraft Server...")
@@ -117,7 +135,19 @@ object CoreLauncher {
                         println("$LOG_PREFIX Server is now online.")
                         printStartupErrorReport()
                         launch {
-                            PluginUpdater.gitHubClient.checkForCoreLauncherUpdate()
+                            try {
+                                PluginUpdater.checkForCoreLauncherUpdate()
+                            } catch (exception: CancellationException) {
+                                throw exception
+                            } catch (exception: Exception) {
+                                println(
+                                    "$LOG_PREFIX (GitHub) Core launcher update check failed: " +
+                                            (exception.message ?: exception::class.simpleName.orEmpty())
+                                )
+                                if (config.logGithubReleaseFetchFailures) {
+                                    exception.printStackTrace()
+                                }
+                            }
                         }
                     }
                 }

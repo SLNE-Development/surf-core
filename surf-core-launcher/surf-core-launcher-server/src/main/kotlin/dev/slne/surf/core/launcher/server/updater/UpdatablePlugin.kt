@@ -36,7 +36,7 @@ object PluginRepositoryMappings {
     )
 
     private val assetPrefixOverrides = mapOf(
-        "surf-paper-paper" to "surf-api-paper"
+        "surf-paper-api" to "surf-api-paper-server"
     )
 
     fun resolve(plugin: UpdatablePlugin): PluginUpdateTarget {
@@ -62,7 +62,7 @@ object PluginRepositoryMappings {
                 owner = GITHUB_ORGANIZATION,
                 name = "surf-$repositoryName"
             ),
-            assetPrefix = assetPrefixOverrides[derivedAssetPrefix] ?: derivedAssetPrefix
+            assetPrefix = assetPrefixOverrides[plugin.name] ?: derivedAssetPrefix
         )
     }
 

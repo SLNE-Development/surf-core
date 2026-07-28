@@ -12,8 +12,8 @@ import com.velocitypowered.api.event.player.ServerConnectedEvent
 import com.velocitypowered.api.proxy.Player
 import com.velocitypowered.api.util.GameProfile
 import dev.slne.surf.api.core.messages.CommonComponents
-import dev.slne.surf.api.core.messages.adventure.appendNewline
 import dev.slne.surf.api.core.messages.builder.SurfComponentBuilder
+import dev.slne.surf.api.core.util.logger
 import dev.slne.surf.core.api.common.event.SurfPlayerConnectEvent
 import dev.slne.surf.core.api.common.event.SurfPlayerDisconnectEvent
 import dev.slne.surf.core.api.common.server.SurfProxyServer
@@ -34,6 +34,8 @@ import kotlin.jvm.optionals.getOrNull
 import kotlin.time.Duration.Companion.seconds
 
 object ConnectionListener {
+    private val log = logger()
+
     @Subscribe(priority = Short.MIN_VALUE)
     suspend fun onLogin(event: LoginEvent) {
         withTimeoutOrNull(5.seconds) {
@@ -44,20 +46,24 @@ object ConnectionListener {
                 initialServer = event.player.currentServer.getOrNull()?.serverInfo?.name,
                 gameProfile = event.player.gameProfile
             )
-        } ?: {
-            println("[connection timeout] ${event.player.username} (${event.player.remoteAddress}) took too long to log in")
+        } ?: run {
+            log.atWarning()
+                .log(
+                    "[connection timeout %s (%s) took too long to log in",
+                    event.player.username,
+                    event.player.remoteAddress
+                )
 
-            event.result =
-                ResultedEvent.ComponentResult.denied(
-                    failedToLoadDataComponent(
-                        "Internal server error: Timeout while loading player data.",
-                        SurfPlayerErrorService.saveError(
-                            playerUuid = event.player.uniqueId,
-                            staffMessage = "Player timed out while logging in, most likely a internal database issue. Is rabbit or microservice down?",
-                            scope = plugin.pluginContainer.scope
-                        )
+            event.result = ResultedEvent.ComponentResult.denied(
+                failedToLoadDataComponent(
+                    "Internal server error: Timeout while loading player data.",
+                    SurfPlayerErrorService.saveError(
+                        playerUuid = event.player.uniqueId,
+                        staffMessage = "Player timed out while logging in, most likely a internal database issue. Is rabbit or microservice down?",
+                        scope = plugin.pluginContainer.scope
                     )
                 )
+            )
         }
     }
 

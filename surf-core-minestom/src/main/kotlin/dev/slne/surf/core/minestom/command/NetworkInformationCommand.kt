@@ -16,11 +16,11 @@ class NetworkInformationCommand : SurfCoreMinestomCommand() {
 
     @Command("ninfo player")
     @CommandPermission(CorePermissions.COMMAND_INFO_PLAYER)
-    fun playerInformation(actor: MinestomCommandActor, player: SurfPlayer) =
-        NetworkInformationCommandHandler.sendPlayerInformation(actor.sender(), player)
+    fun playerInformation(actor: MinestomCommandActor, target: SurfPlayer) =
+        NetworkInformationCommandHandler.sendPlayerInformation(actor.sender(), target)
 
     @Command("ninfo server")
     @CommandPermission(CorePermissions.COMMAND_INFO_SERVER)
-    fun serverInformation(actor: MinestomCommandActor, server: CommonSurfServer) =
-        NetworkInformationCommandHandler.sendServerInformation(actor.sender(), server)
+    fun serverInformation(actor: MinestomCommandActor, theServer: CommonSurfServer) =
+        NetworkInformationCommandHandler.sendServerInformation(actor.sender(), theServer)
 }

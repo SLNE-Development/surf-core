@@ -34,19 +34,19 @@ class SurfCoreCommand : SurfCoreMinestomCommand() {
 
     @Command("surfcore testawaitingsend server")
     @CommandPermission(CorePermissions.COMMAND_CORE)
-    fun testServer(actor: MinestomCommandActor, server: SurfServer) {
+    fun testServer(actor: MinestomCommandActor, targetServer: SurfServer) {
         val player = actor.requirePlayer()
         minestomScope.launch {
-            NetworkSendCommandHandler.sendSelf(player, player.surfPlayer, server)
+            NetworkSendCommandHandler.sendSelf(player, player.surfPlayer, targetServer)
         }
     }
 
     @Command("surfcore testawaitingsend proxy")
     @CommandPermission(CorePermissions.COMMAND_CORE)
-    fun testProxy(actor: MinestomCommandActor, proxy: SurfProxyServer) {
+    fun testProxy(actor: MinestomCommandActor, targetProxy: SurfProxyServer) {
         val player = actor.requirePlayer()
         minestomScope.launch {
-            NetworkSendCommandHandler.sendSelf(player, player.surfPlayer, proxy)
+            NetworkSendCommandHandler.sendSelf(player, player.surfPlayer, targetProxy)
         }
     }
 }

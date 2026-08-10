@@ -15,9 +15,13 @@ import revxrsal.commands.minestom.actor.MinestomCommandActor
 class NetworkSendCommand : SurfCoreMinestomCommand() {
     @Command("nsend player")
     @CommandPermission(CorePermissions.COMMAND_NETWORK_SEND)
-    fun sendPlayer(actor: MinestomCommandActor, player: SurfPlayer, server: CommonSurfServer) {
+    fun sendPlayer(
+        actor: MinestomCommandActor,
+        targetPlayer: SurfPlayer,
+        targetServer: CommonSurfServer,
+    ) {
         minestomScope.launch {
-            NetworkSendCommandHandler.sendPlayer(actor.sender(), player, server)
+            NetworkSendCommandHandler.sendPlayer(actor.sender(), targetPlayer, targetServer)
         }
     }
 

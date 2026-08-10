@@ -1,12 +1,13 @@
 package dev.slne.surf.core.minestom
 
 import com.google.auto.service.AutoService
+import dev.slne.minestom.lobby.api.extension.CommandManager
+import dev.slne.minestom.lobby.api.extension.ConnectionManager
 import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.core.common.redis.listener.ServerShutdownHandler
+import dev.slne.surf.core.core.common.server.ServerShutdownMessage
 import net.kyori.adventure.text.Component
-import net.minestom.server.MinecraftServer
-import kotlin.concurrent.thread
 
 @AutoService(ServerShutdownHandler::class)
 class MinestomShutdownHandler : ServerShutdownHandler {
@@ -15,13 +16,12 @@ class MinestomShutdownHandler : ServerShutdownHandler {
             return null
         }
 
-        MinecraftServer.getConnectionManager().onlinePlayers.toList().forEach { player ->
-            player.kick(reason ?: Component.text("The server is shutting down."))
+        val message = ServerShutdownMessage.create(reason)
+        ConnectionManager.onlinePlayers.forEach { player ->
+            player.kick(message)
         }
 
-        thread(isDaemon = false, name = "surf-core-minestom-shutdown") {
-            MinecraftServer.stopCleanly()
-        }
+        CommandManager.executeServerCommand("stop")
         return true
     }
 }

@@ -1,28 +1,29 @@
 package dev.slne.surf.core.paper.permission
 
 import dev.slne.surf.api.paper.permission.PermissionRegistry
+import dev.slne.surf.core.core.common.permission.CorePermissions
 
 object PermissionRegistry : PermissionRegistry() {
-    const val BASE = "surf.core"
-    const val BASE_COMMAND = "$BASE.command"
+    const val BASE = CorePermissions.BASE
+    const val BASE_COMMAND = CorePermissions.BASE_COMMAND
 
-    val COMMAND_LAST_SEEN = create("$BASE_COMMAND.lastseen")
-    val COMMAND_NETWORK_LIST = create("$BASE_COMMAND.networklist")
-    val COMMAND_NETWORK_TELEPORT = create("$BASE_COMMAND.networkteleport")
-    val COMMAND_WHERE_AM_I = create("$BASE_COMMAND.whereami")
-    val COMMAND_NETWORK_SERVER = create("$BASE_COMMAND.networkserver")
-    val COMMAND_NETWORK_BROADCAST = create("$BASE_COMMAND.networkbroadcast")
-    val COMMAND_NETWORK_SEND = create("$BASE_COMMAND.networksend")
-    val COMMAND_NETWORK_SERVER_MAX_PLAYERS = create("$BASE_COMMAND.nservermaxplayers")
-    val COMMAND_HUB = create("$BASE_COMMAND.hub")
+    val COMMAND_LAST_SEEN = create(CorePermissions.COMMAND_LAST_SEEN)
+    val COMMAND_NETWORK_LIST = create(CorePermissions.COMMAND_NETWORK_LIST)
+    val COMMAND_NETWORK_TELEPORT = create(CorePermissions.COMMAND_NETWORK_TELEPORT)
+    val COMMAND_WHERE_AM_I = create(CorePermissions.COMMAND_WHERE_AM_I)
+    val COMMAND_NETWORK_SERVER = create(CorePermissions.COMMAND_NETWORK_SERVER)
+    val COMMAND_NETWORK_BROADCAST = create(CorePermissions.COMMAND_NETWORK_BROADCAST)
+    val COMMAND_NETWORK_SEND = create(CorePermissions.COMMAND_NETWORK_SEND)
+    val COMMAND_NETWORK_SERVER_MAX_PLAYERS = create(CorePermissions.COMMAND_NETWORK_SERVER_MAX_PLAYERS)
+    val COMMAND_HUB = create(CorePermissions.COMMAND_HUB)
 
-    val BYPASS_MAX_PLAYERS = create("$BASE.bypassmaxplayers")
+    val BYPASS_MAX_PLAYERS = create(CorePermissions.BYPASS_MAX_PLAYERS)
 
-    val COMMAND_INFO = create("$BASE_COMMAND.info")
-    val COMMAND_INFO_PLAYER = create("$BASE_COMMAND.info.player")
-    val COMMAND_INFO_SERVER = create("$BASE_COMMAND.info.server")
+    val COMMAND_INFO = create(CorePermissions.COMMAND_INFO)
+    val COMMAND_INFO_PLAYER = create(CorePermissions.COMMAND_INFO_PLAYER)
+    val COMMAND_INFO_SERVER = create(CorePermissions.COMMAND_INFO_SERVER)
 
-    val COMMAND_CORE = create("$BASE_COMMAND.core")
+    val COMMAND_CORE = create(CorePermissions.COMMAND_CORE)
 
-    val JOIN_WHERE_AM_I = create("$BASE.whereamijoin")
+    val JOIN_WHERE_AM_I = create(CorePermissions.JOIN_WHERE_AM_I)
 }

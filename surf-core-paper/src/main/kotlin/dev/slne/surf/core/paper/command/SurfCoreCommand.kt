@@ -2,17 +2,13 @@ package dev.slne.surf.core.paper.command
 
 import com.github.shynixn.mccoroutine.folia.launch
 import dev.jorel.commandapi.kotlindsl.*
-import dev.slne.surf.api.core.messages.adventure.sendText
-import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.paper.command.argument.surfBackendServerArgument
 import dev.slne.surf.core.api.paper.command.argument.surfProxyServerArgument
 import dev.slne.surf.core.api.paper.util.surfPlayer
-import dev.slne.surf.core.core.CoreInstance
-import dev.slne.surf.core.core.common.player.SurfPlayerService
-import dev.slne.surf.core.core.common.redis.event.SurfPlayerResyncRedisEvent
-import dev.slne.surf.core.core.common.util.appendCorePrefix
+import dev.slne.surf.core.core.common.command.NetworkSendCommandHandler
+import dev.slne.surf.core.core.common.command.SurfCoreCommandHandler
 import dev.slne.surf.core.paper.PaperBootstrap
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.core.paper.plugin
@@ -22,29 +18,13 @@ fun surfCoreCommand() = commandTree("surfcore") {
     literalArgument("reload") {
         anyExecutor { executor, _ ->
             PaperBootstrap.surfServerConfiguration.reload()
-
-            executor.sendText {
-                appendCorePrefix()
-                success("Die Konfiguration wurde neu geladen.")
-            }
+            SurfCoreCommandHandler.configReloaded(executor)
         }
     }
 
     literalArgument("clearinternalplayercache") {
         anyExecutor { executor, _ ->
-            SurfPlayerService.clearPlayers()
-
-            executor.sendText {
-                appendCorePrefix()
-                success("Die Spieler-Caches wurden geleert.")
-            }
-
-            CoreInstance.redisApi.publishEvent(SurfPlayerResyncRedisEvent)
-
-            executor.sendText {
-                appendCorePrefix()
-                info("Die Spieler werden nun auf allen Servern neu synchronisiert.")
-            }
+            SurfCoreCommandHandler.clearInternalPlayerCache(executor)
         }
     }
 
@@ -87,27 +67,8 @@ fun surfCoreCommand() = commandTree("surfcore") {
                     val surfPlayer = player.surfPlayer
                     val backend: SurfServer by args
 
-                    player.sendText {
-                        appendCorePrefix()
-                        info("Du wirst auf den Server gesendet...")
-                    }
-
                     plugin.launch {
-                        val result = SurfCoreApi.sendPlayerAwaiting(surfPlayer, backend)
-
-                        if (result.isSuccessful()) {
-                            player.sendText {
-                                appendCorePrefix()
-                                success("Du wurdest erfolgreich zum Server ")
-                                variableValue(backend.name)
-                                success(" gesendet.")
-                            }
-                        } else {
-                            player.sendText {
-                                appendCorePrefix()
-                                error("Es gab ein Problem beim Senden zum Server: ${result.status.name}")
-                            }
-                        }
+                        NetworkSendCommandHandler.sendSelf(player, surfPlayer, backend)
                     }
                 }
             }
@@ -119,27 +80,8 @@ fun surfCoreCommand() = commandTree("surfcore") {
                     val surfPlayer = player.surfPlayer
                     val proxy: SurfProxyServer by args
 
-                    player.sendText {
-                        appendCorePrefix()
-                        info("Du wirst zum Proxy gesendet...")
-                    }
-
                     plugin.launch {
-                        val result = SurfCoreApi.sendPlayerAwaiting(surfPlayer, proxy)
-
-                        if (result.isSuccessful()) {
-                            player.sendText {
-                                appendCorePrefix()
-                                success("Du wurdest erfolgreich zum Proxy ")
-                                variableValue(proxy.name)
-                                success(" gesendet.")
-                            }
-                        } else {
-                            player.sendText {
-                                appendCorePrefix()
-                                error("Es gab ein Problem beim Senden zum Proxy: ${result.status.name}")
-                            }
-                        }
+                        NetworkSendCommandHandler.sendSelf(player, surfPlayer, proxy)
                     }
                 }
             }

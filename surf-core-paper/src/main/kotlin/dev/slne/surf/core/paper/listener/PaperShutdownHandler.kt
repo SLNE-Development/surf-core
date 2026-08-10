@@ -1,12 +1,11 @@
 package dev.slne.surf.core.paper.listener
 
 import com.google.auto.service.AutoService
-import dev.slne.surf.api.core.messages.CommonComponents
-import dev.slne.surf.api.core.messages.builder.SurfComponentBuilder
 import dev.slne.surf.api.paper.util.forEachPlayer
 import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.core.common.redis.listener.ServerShutdownHandler
+import dev.slne.surf.core.core.common.server.ServerShutdownMessage
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 
@@ -17,20 +16,7 @@ class PaperShutdownHandler : ServerShutdownHandler {
             return null
         }
 
-        val msg = CommonComponents.renderDisconnectMessage(
-            SurfComponentBuilder(),
-            "DER SERVER WIRD HERUNTERGEFAHREN.",
-            {
-                spacer("Der Server wurde gestoppt. Bitte versuche es später erneut.")
-                reason?.let {
-                    spacer("Grund: ")
-                    append(it)
-                }
-            },
-            {
-                appendDiscordLink()
-            }
-        )
+        val msg = ServerShutdownMessage.create(reason)
 
         forEachPlayer { player ->
             player.kick(msg)

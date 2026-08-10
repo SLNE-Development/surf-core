@@ -1,9 +1,8 @@
 package dev.slne.surf.core.paper.teleport
 
-import dev.slne.surf.api.core.messages.adventure.sendText
 import dev.slne.surf.core.api.paper.util.bukkitPlayer
 import dev.slne.surf.core.core.common.redis.event.SurfPlayerTeleportRequestRedisEvent
-import dev.slne.surf.core.core.common.util.appendCorePrefix
+import dev.slne.surf.core.core.common.command.NetworkTeleportCommandHandler
 import dev.slne.surf.redis.event.OnRedisEvent
 
 object TeleportRedisListener {
@@ -13,12 +12,7 @@ object TeleportRedisListener {
         val targetBukkitPlayer = event.target.bukkitPlayer ?: return
 
         bukkitPlayer.teleportAsync(targetBukkitPlayer.location).thenRun {
-            bukkitPlayer.sendText {
-                appendCorePrefix()
-                success("Du wurdest zu ")
-                variableValue(targetBukkitPlayer.name)
-                success(" teleportiert.")
-            }
+            NetworkTeleportCommandHandler.sendSuccess(bukkitPlayer, targetBukkitPlayer.name)
         }
     }
 }

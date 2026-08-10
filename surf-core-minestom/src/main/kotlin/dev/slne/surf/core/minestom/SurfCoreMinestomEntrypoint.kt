@@ -12,9 +12,11 @@ import dev.slne.surf.core.api.common.event.SurfServerStoppingEvent
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.common.server.state.SurfServerState
 import dev.slne.surf.core.client.ClientCoreInstance
+import dev.slne.surf.core.core.CoreInstance
 import dev.slne.surf.core.core.common.config.SurfServerConfiguration
 import dev.slne.surf.core.core.common.event.SurfEventBus
 import dev.slne.surf.core.core.common.server.SurfServerService
+import dev.slne.surf.core.minestom.config.MinestomCoreConfigManager
 import java.nio.file.Path
 import java.time.OffsetDateTime
 
@@ -26,6 +28,7 @@ class SurfCoreMinestomEntrypoint @Inject constructor(
     init {
         dataPath = path
         surfServerConfiguration = SurfServerConfiguration(path)
+        minestomCoreConfigManager = MinestomCoreConfigManager(path)
     }
 
     override suspend fun start() {
@@ -33,6 +36,10 @@ class SurfCoreMinestomEntrypoint @Inject constructor(
 
         ClientCoreInstance.clientLoader.onBootstrap()
         ClientCoreInstance.clientLoader.onLoad()
+
+        SurfEventBus.registerListener(MinestomSurfServerEventListener)
+        CoreInstance.redisApi.subscribeToEvents(MinestomTeleportRedisListener)
+        ClientCoreInstance.clientLoader.withListener(MinestomRedisListener)
         ClientCoreInstance.clientLoader.connectRedis()
 
         val server = SurfServer(
@@ -40,7 +47,7 @@ class SurfCoreMinestomEntrypoint @Inject constructor(
             displayName = surfServerConfig.serverDisplayName,
             category = surfServerConfig.serverCategory,
             state = SurfServerState.STARTING,
-            maxPlayers = 0,
+            maxPlayers = minestomCoreConfig.maxPlayers,
             uuid = surfServerConfig.serverUuid,
             startedAt = OffsetDateTime.now(),
         )
@@ -49,6 +56,7 @@ class SurfCoreMinestomEntrypoint @Inject constructor(
         SurfServerService.addServer(server)
 
         ClientCoreInstance.clientLoader.onEnable()
+        MinestomPlayerDisplayNameService.start()
 
         SurfEventBus.fire(SurfServerOnlineEvent(server.name))
         SurfServerService.changeState(server, SurfServerState.RUNNING)
@@ -56,6 +64,7 @@ class SurfCoreMinestomEntrypoint @Inject constructor(
     }
 
     override suspend fun stop() {
+        MinestomPlayerDisplayNameService.stop()
         val server = SurfServerService.getServerByName(surfServerConfig.serverName)
 
         if (server != null) {
@@ -77,6 +86,9 @@ class SurfCoreMinestomEntrypoint @Inject constructor(
         require(!surfServerConfig.serverCategory.isUnknown()) {
             "The Minestom surf-core server category must be configured"
         }
+        require(minestomCoreConfig.maxPlayers > 0) {
+            "The Minestom surf-core max player count must be greater than zero"
+        }
     }
 
     companion object {
@@ -85,9 +97,13 @@ class SurfCoreMinestomEntrypoint @Inject constructor(
 
         lateinit var surfServerConfiguration: SurfServerConfiguration
             private set
+
+        lateinit var minestomCoreConfigManager: MinestomCoreConfigManager
+            private set
     }
 }
 
 private fun String.isUnknown() = isBlank() || equals("unknown", ignoreCase = true)
 
 val surfServerConfig get() = SurfCoreMinestomEntrypoint.surfServerConfiguration.config
+val minestomCoreConfig get() = SurfCoreMinestomEntrypoint.minestomCoreConfigManager.config

@@ -2,21 +2,18 @@ package dev.slne.surf.core.paper.listener
 
 import com.github.shynixn.mccoroutine.folia.launch
 import com.github.shynixn.mccoroutine.folia.scope
-import dev.slne.surf.api.core.messages.CommonComponents
 import dev.slne.surf.api.core.messages.adventure.*
-import dev.slne.surf.api.core.messages.builder.SurfComponentBuilder
 import dev.slne.surf.api.paper.command.util.idOrThrow
 import dev.slne.surf.api.paper.util.getPrefixedName
 import dev.slne.surf.core.api.common.server.connection.SurfProxyServerConnectionResult
 import dev.slne.surf.core.api.paper.util.surfPlayer
 import dev.slne.surf.core.core.CoreInstance
 import dev.slne.surf.core.core.common.player.SurfPlayerService
+import dev.slne.surf.core.core.common.player.PlayerConnectionMessages
+import dev.slne.surf.core.core.common.command.WhereAmICommandHandler
 import dev.slne.surf.core.core.common.player.error.SurfPlayerErrorService
 import dev.slne.surf.core.core.common.redis.request.SendPlayerToProxyRequest
 import dev.slne.surf.core.core.common.redis.watcher.PlayerProxyConnectionResultWatcher
-import dev.slne.surf.core.core.common.util.appendCorePrefix
-import dev.slne.surf.core.core.common.util.formatMillis
-import dev.slne.surf.core.core.common.util.niceRed
 import dev.slne.surf.core.paper.permission.PermissionRegistry
 import dev.slne.surf.core.paper.plugin
 import io.papermc.paper.event.connection.configuration.AsyncPlayerConnectionConfigureEvent
@@ -40,7 +37,7 @@ object PlayerConnectListener : Listener {
 
         if (surfPlayer == null) {
             player.kick(
-                buildDisconnectComponent(
+                PlayerConnectionMessages.dataLoadFailure(
                     SurfPlayerErrorService.saveError(
                         playerUuid = player.uniqueId,
                         staffMessage = "Player not found in redis after connecting to a server, most likely a redis issue. Is redis down?",
@@ -55,27 +52,7 @@ object PlayerConnectListener : Listener {
             return
         }
 
-        player.sendText {
-            appendCorePrefix()
-            info("Du, ")
-            append {
-                variableValue(player.name)
-                hoverEvent(buildText {
-                    variableValue(player.uniqueId.toString())
-                })
-                clickCopiesToClipboard(player.uniqueId.toString())
-            }
-            info(", befindest dich momentan, ")
-            append {
-                spacer("(${System.currentTimeMillis().formatMillis()})")
-                clickCopiesToClipboard(System.currentTimeMillis().toString())
-            }
-            info(", auf dem Server ")
-            variableValue(surfPlayer.currentServerName ?: "Unbekannt")
-            info(" auf dem Proxy ")
-            variableValue(surfPlayer.currentProxyName ?: "Unbekannt")
-            info(".")
-        }
+        WhereAmICommandHandler.send(player, player.uniqueId, player.name)
     }
 
     @Suppress("UnstableApiUsage")
@@ -87,7 +64,7 @@ object PlayerConnectListener : Listener {
         if (surfPlayer == null) {
             plugin.logger.severe("Failed to load player data for player with UUID ${event.connection.audience.uuidOrNull()}. The player will be disconnected.")
             event.connection.disconnect(
-                buildDisconnectComponent(
+                PlayerConnectionMessages.dataLoadFailure(
                     SurfPlayerErrorService.saveError(
                         playerUuid = uuid,
                         staffMessage = "Player not found in redis after connecting to a server, most likely a redis issue. Is redis down?",
@@ -136,18 +113,4 @@ object PlayerConnectListener : Listener {
         event.player.displayName(event.player.getPrefixedName())
     }
 
-    private fun buildDisconnectComponent(errorCode: String) =
-        CommonComponents.renderDisconnectMessage(
-            SurfComponentBuilder(),
-            "DEINE SPIELERDATEN KONNTEN NICHT GELADEN WERDEN.",
-            {
-                spacer("Fehlercode: ")
-                niceRed(errorCode)
-                appendNewline()
-                error("Internal Server error. Data Transmitter or holder may be down?")
-                appendNewline(3)
-                spacer("Beim laden deiner Spielerdaten ist ein interner Fehler aufgetreten.")
-            },
-            issue = true
-        )
 }

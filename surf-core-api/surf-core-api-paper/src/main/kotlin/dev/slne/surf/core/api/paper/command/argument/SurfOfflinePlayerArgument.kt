@@ -11,6 +11,7 @@ import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.cache.OfflinePlayerNameCache
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.paper.CorePlayerStatusAccess
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
 import kotlinx.coroutines.*
 import kotlinx.coroutines.future.asDeferred
 import kotlinx.coroutines.future.future
@@ -34,9 +35,9 @@ class SurfOfflinePlayerArgument(nodeName: String) :
                         .mapNotNull { it.lastKnownName }
                         .filter { input.isEmpty() || it.startsWith(input, ignoreCase = true) }
 
-                    val onlineSet = onlinePlayerNames.toHashSet()
+                    val onlineSet = onlinePlayerNames.mapTo(ObjectOpenHashSet(onlinePlayerNames.size)) { it.lowercase() }
                     val offlinePlayerNames = OfflinePlayerNameCache.findByPrefix(input)
-                        .filter { it !in onlineSet }
+                        .filterNot { it.lowercase() in onlineSet }
 
                     (onlinePlayerNames + offlinePlayerNames).take(SUGGESTION_LIMIT)
                 }

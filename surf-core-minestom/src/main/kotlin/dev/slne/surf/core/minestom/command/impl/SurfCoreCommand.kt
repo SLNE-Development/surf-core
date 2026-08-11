@@ -1,4 +1,4 @@
-package dev.slne.surf.core.minestom.command
+package dev.slne.surf.core.minestom.command.impl
 
 import dev.slne.minestom.lobby.api.command.CommandPermission
 import dev.slne.minestom.lobby.api.coroutine.minestomScope
@@ -10,6 +10,7 @@ import dev.slne.surf.core.core.common.command.SurfCoreCommandHandler
 import dev.slne.surf.core.core.common.permission.CorePermissions
 import dev.slne.surf.core.core.common.server.SurfServerService
 import dev.slne.surf.core.minestom.SurfCoreMinestomEntrypoint
+import dev.slne.surf.core.minestom.command.SurfCoreMinestomCommand
 import dev.slne.surf.core.minestom.minestomCoreConfig
 import kotlinx.coroutines.launch
 import revxrsal.commands.annotation.Command

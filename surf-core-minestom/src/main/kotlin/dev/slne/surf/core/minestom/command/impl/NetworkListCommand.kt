@@ -1,14 +1,13 @@
 package dev.slne.surf.core.minestom.command.impl
 
-import dev.slne.minestom.lobby.api.command.CommandPermission
+import dev.slne.minestom.lobby.api.command.commandapi.dsl.anyExecutor
+import dev.slne.minestom.lobby.api.command.commandapi.dsl.commandTree
 import dev.slne.surf.core.core.common.command.NetworkListCommandHandler
 import dev.slne.surf.core.core.common.permission.CorePermissions
-import dev.slne.surf.core.minestom.command.SurfCoreMinestomCommand
-import revxrsal.commands.annotation.Command
-import revxrsal.commands.minestom.actor.MinestomCommandActor
 
-class NetworkListCommand : SurfCoreMinestomCommand() {
-    @Command("nlist")
-    @CommandPermission(CorePermissions.COMMAND_NETWORK_LIST)
-    fun networkList(actor: MinestomCommandActor) = NetworkListCommandHandler.send(actor.sender())
+fun networkListCommand() = commandTree("nlist") {
+    withPermission(CorePermissions.COMMAND_NETWORK_LIST)
+    anyExecutor { executor, _ ->
+        NetworkListCommandHandler.send(executor)
+    }
 }

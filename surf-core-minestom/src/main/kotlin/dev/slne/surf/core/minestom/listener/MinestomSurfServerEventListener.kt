@@ -1,4 +1,4 @@
-package dev.slne.surf.core.minestom
+package dev.slne.surf.core.minestom.listener
 
 import dev.slne.minestom.lobby.api.extension.ConnectionManager
 import dev.slne.minestom.lobby.api.player.onlineLobbyPlayers

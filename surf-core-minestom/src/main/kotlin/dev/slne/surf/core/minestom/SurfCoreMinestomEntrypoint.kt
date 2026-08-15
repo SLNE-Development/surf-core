@@ -17,6 +17,7 @@ import dev.slne.surf.core.core.common.config.SurfServerConfiguration
 import dev.slne.surf.core.core.common.event.SurfEventBus
 import dev.slne.surf.core.core.common.server.SurfServerService
 import dev.slne.surf.core.minestom.config.MinestomCoreConfigManager
+import dev.slne.surf.core.minestom.listener.MinestomSurfServerEventListener
 import java.nio.file.Path
 import java.time.OffsetDateTime
 

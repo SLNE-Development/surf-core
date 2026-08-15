@@ -1,17 +1,24 @@
 package dev.slne.surf.core.minestom.command.impl
 
-import dev.slne.minestom.lobby.api.command.CommandPermission
-import dev.slne.surf.core.api.common.server.SurfServer
+import dev.slne.minestom.lobby.api.command.commandapi.dsl.anyExecutor
+import dev.slne.minestom.lobby.api.command.commandapi.dsl.commandTree
+import dev.slne.minestom.lobby.api.command.commandapi.dsl.integerArgument
+import dev.slne.surf.core.api.common.server.CommonSurfServer
+import dev.slne.surf.core.api.minestom.command.argument.surfBackendServerArgument
 import dev.slne.surf.core.core.common.command.NetworkServerCommandHandler
 import dev.slne.surf.core.core.common.permission.CorePermissions
-import dev.slne.surf.core.minestom.command.SurfCoreMinestomCommand
-import revxrsal.commands.annotation.Command
-import revxrsal.commands.minestom.actor.MinestomCommandActor
 
-class NetworkServerMaxPlayersCommand : SurfCoreMinestomCommand() {
-    @Command("nmaxplayers")
-    @CommandPermission(CorePermissions.COMMAND_NETWORK_SERVER_MAX_PLAYERS)
-    fun maxPlayers(actor: MinestomCommandActor, server: SurfServer, maxPlayers: Int) {
-        NetworkServerCommandHandler.changeMaxPlayers(actor.sender(), server, maxPlayers)
+fun networkServerMaxPlayersCommand() = commandTree("nmaxplayers") {
+    withPermission(CorePermissions.COMMAND_NETWORK_SERVER_MAX_PLAYERS)
+
+    surfBackendServerArgument("backend") {
+        integerArgument("maxPlayers") {
+            anyExecutor { sender, args ->
+                val backend: CommonSurfServer by args
+                val maxPlayers: Int by args
+
+                NetworkServerCommandHandler.changeMaxPlayers(sender, backend, maxPlayers)
+            }
+        }
     }
 }

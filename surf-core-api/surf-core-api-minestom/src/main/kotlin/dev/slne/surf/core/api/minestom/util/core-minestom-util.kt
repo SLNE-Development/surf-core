@@ -2,6 +2,7 @@ package dev.slne.surf.core.api.minestom.util
 
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.player.SurfPlayer
+import dev.slne.surf.core.api.common.server.CommonSurfServer
 import net.minestom.server.MinecraftServer
 import net.minestom.server.entity.Player
 
@@ -14,3 +15,5 @@ fun SurfPlayer.toPlayer(): Player? =
     MinecraftServer.getConnectionManager().getOnlinePlayerByUuid(uuid)
 
 val SurfPlayer.minestomPlayer get() = toPlayer()
+
+val CommonSurfServer.permission: String get() = "surf.core.server.${name}"

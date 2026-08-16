@@ -13,16 +13,16 @@ import com.velocitypowered.api.network.HandshakeIntent
 import dev.slne.surf.api.core.messages.CommonComponents
 import dev.slne.surf.api.core.messages.adventure.buildText
 import dev.slne.surf.api.core.messages.adventure.sendText
-import dev.slne.surf.api.core.util.mutableObjectSetOf
 import dev.slne.surf.api.core.util.random
 import dev.slne.surf.core.velocity.permission.PermissionList
 import dev.slne.surf.core.velocity.plugin
 import dev.slne.surf.core.velocity.velocityCoreConfigManager
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.jvm.optionals.getOrNull
 
 object AuthenticationListener {
-    val transfers = mutableObjectSetOf<UUID>()
+    val transfers: ConcurrentHashMap.KeySetView<UUID, Boolean> = ConcurrentHashMap.newKeySet()
 
     @Subscribe
     fun onLogin(event: LoginEvent, continuation: Continuation) {

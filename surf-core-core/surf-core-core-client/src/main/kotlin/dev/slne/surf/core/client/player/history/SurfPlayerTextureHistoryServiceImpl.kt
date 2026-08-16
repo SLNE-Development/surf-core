@@ -20,18 +20,16 @@ class SurfPlayerTextureHistoryServiceImpl : SurfPlayerTextureHistoryService {
         val skinHash = extractSkinHash(texture)
         val latestLogged = getTextureHistory(surfPlayer.uuid).getCurrentTexture()
 
-        if (latestLogged != null && latestLogged.hash == skinHash) {
-            return
-        }
-
-        ClientCoreInstance.rabbitApi.sendRequest(
-            SaveTextureHistoryRequestPacket(
-                uuid = surfPlayer.uuid,
-                texture = texture,
-                signature = signature,
-                skinHash = skinHash
+        if (latestLogged == null || latestLogged.hash != skinHash) {
+            ClientCoreInstance.rabbitApi.sendRequest(
+                SaveTextureHistoryRequestPacket(
+                    uuid = surfPlayer.uuid,
+                    texture = texture,
+                    signature = signature,
+                    skinHash = skinHash
+                )
             )
-        )
+        }
     }
 
     fun extractSkinHash(base64: String): String {

@@ -15,16 +15,14 @@ class SurfPlayerNameHistoryServiceImpl : SurfPlayerNameHistoryService {
         val currentName = surfPlayer.lastKnownName ?: return
         val latestLogged = getNameHistory(surfPlayer.uuid).getCurrentName()
 
-        if (latestLogged != null && latestLogged == currentName) {
-            return
-        }
-
-        ClientCoreInstance.rabbitApi.sendRequest(
-            SaveNameHistoryRequestPacket(
-                surfPlayer.uuid,
-                currentName
+        if(latestLogged == null || latestLogged != currentName) {
+            ClientCoreInstance.rabbitApi.sendRequest(
+                SaveNameHistoryRequestPacket(
+                    surfPlayer.uuid,
+                    currentName
+                )
             )
-        )
+        }
     }
 
     override suspend fun getNameHistory(uuid: UUID): NameHistory {

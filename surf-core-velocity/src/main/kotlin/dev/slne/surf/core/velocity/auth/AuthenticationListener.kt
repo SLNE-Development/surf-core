@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.jvm.optionals.getOrNull
 
 object AuthenticationListener {
-    val transfers: ConcurrentHashMap.KeySetView<UUID, Boolean> = ConcurrentHashMap.newKeySet()
+    val transfers: MutableSet<UUID> = ConcurrentHashMap.newKeySet()
 
     @Subscribe
     fun onLogin(event: LoginEvent, continuation: Continuation) {

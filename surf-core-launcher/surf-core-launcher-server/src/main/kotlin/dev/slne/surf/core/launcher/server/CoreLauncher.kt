@@ -1,6 +1,7 @@
 package dev.slne.surf.core.launcher.server
 
 import dev.slne.surf.api.standalone.SurfApiStandaloneBootstrap
+import dev.slne.surf.core.api.common.event.SurfServerOnlineEvent
 import dev.slne.surf.core.api.common.event.SurfServerStartEvent
 import dev.slne.surf.core.api.common.event.redis.SurfEventFireRedisEvent
 import dev.slne.surf.core.launcher.api.LauncherConstants
@@ -131,6 +132,14 @@ object CoreLauncher {
                             ignoreCase = true
                         )
                     ) {
+                        redisApi.publishEvent(
+                            SurfEventFireRedisEvent(
+                                SurfServerOnlineEvent(
+                                    serverName = config.serverName
+                                )
+                            )
+                        )
+
                         serverOnline.value = true
                         println("$LOG_PREFIX Server is now online.")
                         printStartupErrorReport()
@@ -142,7 +151,8 @@ object CoreLauncher {
                             } catch (exception: Exception) {
                                 println(
                                     "$LOG_PREFIX (GitHub) Core launcher update check failed: " +
-                                            (exception.message ?: exception::class.simpleName.orEmpty())
+                                            (exception.message
+                                                ?: exception::class.simpleName.orEmpty())
                                 )
                                 if (config.logGithubReleaseFetchFailures) {
                                     exception.printStackTrace()

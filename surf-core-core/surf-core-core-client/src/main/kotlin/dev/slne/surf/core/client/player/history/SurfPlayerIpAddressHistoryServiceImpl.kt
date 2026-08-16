@@ -15,16 +15,14 @@ class SurfPlayerIpAddressHistoryServiceImpl : SurfPlayerIpAddressHistoryService 
         val currentIpAddress = surfPlayer.lastKnownIpAddress ?: return
         val latestLogged = getIpAddressHistory(surfPlayer.uuid).getLatestIpAddress()
 
-        if (latestLogged != null && currentIpAddress == latestLogged) {
-            return
-        }
-
-        ClientCoreInstance.rabbitApi.sendRequest(
-            SaveIpAddressHistoryRequestPacket(
-                surfPlayer.uuid,
-                currentIpAddress
+        if (latestLogged == null || latestLogged != currentIpAddress) {
+            ClientCoreInstance.rabbitApi.sendRequest(
+                SaveIpAddressHistoryRequestPacket(
+                    surfPlayer.uuid,
+                    currentIpAddress
+                )
             )
-        )
+        }
     }
 
     override suspend fun getIpAddressHistory(uuid: UUID): IpAddressHistory {

@@ -13,6 +13,7 @@ import dev.slne.surf.core.api.common.server.state.SurfServerState
 import dev.slne.surf.core.client.ClientCoreInstance
 import dev.slne.surf.core.core.common.event.SurfEventBus
 import dev.slne.surf.core.core.common.server.SurfServerService
+import dev.slne.surf.core.launcher.api.LauncherConstants
 import dev.slne.surf.core.paper.command.*
 import dev.slne.surf.core.paper.event.SurfServerEventListener
 import dev.slne.surf.core.paper.listener.PlayerConnectListener
@@ -31,8 +32,11 @@ class PaperMain : SuspendingJavaPlugin() {
     override suspend fun onEnableAsync() {
         ClientCoreInstance.clientLoader.onEnable()
 
-        SurfEventBus.fire(SurfServerOnlineEvent(surfServerConfig.serverName))
         SurfServerService.changeState(SurfServer.current(), SurfServerState.RUNNING)
+
+        if (System.getProperty(LauncherConstants.PROPERTY_LAUNCHED_BY_CORE) == null) {
+            SurfEventBus.fire(SurfServerOnlineEvent(surfServerConfig.serverName))
+        }
 
         lastSeenCommand()
         networkListCommand()

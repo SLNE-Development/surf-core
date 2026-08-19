@@ -9,4 +9,6 @@ interface PlayerResourceService {
     suspend fun findPlayerResourceByUuid(playerUuid: SerializableUUID): PlayerResource?
     suspend fun findPlayerResourceByName(username: String): PlayerResource?
     suspend fun batchPlayerResources(list: List<SerializableUUID>): List<PlayerResource>
+    
+    suspend fun updatePlayerResource(playerResource: PlayerResource)
 }

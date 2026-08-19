@@ -4,14 +4,20 @@ import com.google.auto.service.AutoService
 import com.google.gson.JsonParser
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.player.history.texture.TextureHistory
+import dev.slne.surf.core.api.common.resource.PlayerResource
 import dev.slne.surf.core.client.ClientCoreInstance
 import dev.slne.surf.core.core.common.player.history.SurfPlayerTextureHistoryService
 import dev.slne.surf.core.core.common.rabbit.packet.player.history.texture.SaveTextureHistoryRequestPacket
 import dev.slne.surf.core.core.common.rabbit.packet.player.history.texture.TextureHistoryRequestPacket
+import dev.slne.surf.core.core.common.resource.PlayerResourceService
 import java.util.*
 
 @AutoService(SurfPlayerTextureHistoryService::class)
 class SurfPlayerTextureHistoryServiceImpl : SurfPlayerTextureHistoryService {
+    private val playerResourceService by lazy {
+        ClientCoreInstance.rabbitApi.createRpcService<PlayerResourceService>()
+    }
+
     override suspend fun handleNewTexture(
         surfPlayer: SurfPlayer,
         texture: String,
@@ -19,6 +25,15 @@ class SurfPlayerTextureHistoryServiceImpl : SurfPlayerTextureHistoryService {
     ) {
         val skinHash = extractSkinHash(texture)
         val latestLogged = getTextureHistory(surfPlayer.uuid).getCurrentTexture()
+
+        playerResourceService.updatePlayerResource(
+            PlayerResource(
+                surfPlayer.uuid,
+                surfPlayer.username,
+                texture
+            )
+        )
+
 
         if (latestLogged == null || latestLogged.hash != skinHash) {
             ClientCoreInstance.rabbitApi.sendRequest(

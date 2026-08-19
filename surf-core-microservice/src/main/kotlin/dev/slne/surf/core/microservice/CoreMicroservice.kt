@@ -1,8 +1,11 @@
 package dev.slne.surf.core.microservice
 
 import com.google.auto.service.AutoService
+import dev.slne.surf.core.core.common.resource.PlayerResourceService
 import dev.slne.surf.core.microservice.database.tables.*
 import dev.slne.surf.core.microservice.rabbit.*
+import dev.slne.surf.core.microservice.resource.PlayerResourceServiceImpl
+import dev.slne.surf.core.microservice.resource.database.SurfPlayerResourcesTable
 import dev.slne.surf.database.DatabaseApi
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.SchemaUtils
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.transactions.suspendTransaction
@@ -23,7 +26,8 @@ class CoreMicroservice : Microservice() {
                 SurfPlayerNameHistoriesTable,
                 SurfPlayersTable,
                 SurfPlayerTexturesHistoriesTable,
-                SurfPlayerErrorsTable
+                SurfPlayerErrorsTable,
+                SurfPlayerResourcesTable
             )
         }
 
@@ -32,6 +36,8 @@ class CoreMicroservice : Microservice() {
         rabbitApi.registerRequestHandler(SkinHistoryHandler)
         rabbitApi.registerRequestHandler(SurfPlayerHandler)
         rabbitApi.registerRequestHandler(SurfPlayerErrorHandler)
+
+        rabbitApi.registerRpcService<PlayerResourceService>(PlayerResourceServiceImpl)
 
         rabbitApi.freezeAndConnect()
     }

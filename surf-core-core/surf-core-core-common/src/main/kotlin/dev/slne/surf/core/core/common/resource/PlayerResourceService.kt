@@ -6,7 +6,7 @@ import dev.slne.surf.rabbitmq.api.rpc.RpcService
 
 @RpcService
 interface PlayerResourceService {
-    suspend fun findPlayerResource(playerUuid: SerializableUUID): PlayerResource?
-    suspend fun findPlayerResource(username: String): PlayerResource?
+    suspend fun findPlayerResourceByUuid(playerUuid: SerializableUUID): PlayerResource?
+    suspend fun findPlayerResourceByName(username: String): PlayerResource?
     suspend fun batchPlayerResources(list: List<SerializableUUID>): List<PlayerResource>
 }

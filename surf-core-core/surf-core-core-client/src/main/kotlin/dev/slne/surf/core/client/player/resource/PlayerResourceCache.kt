@@ -15,12 +15,12 @@ object PlayerResourceCache {
 
     private val textureCacheByUuid =
         Caffeine.newBuilder().asLoadingCache<UUID, PlayerResource?> { uuid ->
-            rpc.findPlayerResource(uuid)
+            rpc.findPlayerResourceByUuid(uuid)
         }
 
     private val textureCacheByName =
         Caffeine.newBuilder().asLoadingCache<String, PlayerResource?> { username ->
-            rpc.findPlayerResource(username)
+            rpc.findPlayerResourceByName(username)
         }
 
     suspend fun resourceFromUuid(playerUuid: SerializableUUID) =

@@ -1,6 +1,5 @@
 package dev.slne.surf.core.api.paper
 
-import dev.slne.surf.core.api.paper.CorePlayerInfoProvider.Companion.getServerInfo
 import java.util.*
 
 interface CorePlayerInfoProvider {
@@ -24,6 +23,7 @@ interface CorePlayerInfoProvider {
     )
 
     companion object {
+        @Volatile
         private lateinit var instance: CorePlayerInfoProvider
 
         fun setInstance(provider: CorePlayerInfoProvider) {

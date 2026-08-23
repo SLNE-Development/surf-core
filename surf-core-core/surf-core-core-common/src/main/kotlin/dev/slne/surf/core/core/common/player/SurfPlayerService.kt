@@ -2,6 +2,7 @@ package dev.slne.surf.core.core.common.player
 
 import dev.slne.surf.api.core.util.requiredService
 import dev.slne.surf.core.api.common.player.SurfPlayer
+import it.unimi.dsi.fastutil.objects.Object2IntMap
 import it.unimi.dsi.fastutil.objects.ObjectSet
 import org.jetbrains.annotations.UnmodifiableView
 import java.util.*
@@ -23,6 +24,16 @@ interface SurfPlayerService {
     suspend fun getOrLoadOrCreatePlayerByUuid(uuid: UUID): SurfPlayer
 
     suspend fun savePlayer(player: SurfPlayer)
+
+    /**
+     * Number of cached players per [SurfPlayer.currentServerName], players without a server skipped.
+     */
+    fun playerCountsByServer(): Object2IntMap<String>
+
+    /**
+     * Number of cached players per [SurfPlayer.currentProxyName], players without a proxy skipped.
+     */
+    fun playerCountsByProxy(): Object2IntMap<String>
 
     fun clearPlayers()
     fun cachePlayer(player: SurfPlayer)

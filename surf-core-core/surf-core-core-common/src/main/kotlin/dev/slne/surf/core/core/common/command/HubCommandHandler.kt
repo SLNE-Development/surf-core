@@ -3,6 +3,7 @@ package dev.slne.surf.core.core.common.command
 import dev.slne.surf.api.core.messages.adventure.sendText
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.player.SurfPlayer
+import dev.slne.surf.core.core.common.player.SurfPlayerService
 import dev.slne.surf.core.core.common.util.appendCorePrefix
 import net.kyori.adventure.audience.Audience
 
@@ -12,7 +13,9 @@ object HubCommandHandler {
             appendCorePrefix()
             info("Du wirst zum Hub gesendet...")
         }
-        val servers = SurfCoreApi.getServerByCategory("lobby").sortedBy { it.getPlayerCount() }
+        val playerCounts = SurfPlayerService.playerCountsByServer()
+        val servers = SurfCoreApi.getServerByCategory("lobby")
+            .sortedBy { playerCounts.getInt(it.name) }
         var success = false
         for (server in servers) {
             if (SurfCoreApi.sendPlayerAwaiting(player, server).isSuccessful()) {

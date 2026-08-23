@@ -11,10 +11,11 @@ import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.cache.OfflinePlayerNameCache
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.paper.CorePlayerStatusAccess
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
+import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import kotlinx.coroutines.*
 import kotlinx.coroutines.future.asDeferred
 import kotlinx.coroutines.future.future
+import java.util.TreeSet
 
 private const val SUGGESTION_LIMIT = 500
 
@@ -30,16 +31,33 @@ class SurfOfflinePlayerArgument(nodeName: String) :
                 scope.future {
                     val input = viewerInfo.currentArg ?: ""
 
-                    val onlinePlayerNames = SurfCoreApi.getOnlinePlayers()
-                        .filter { CorePlayerStatusAccess.hasAccess(viewerInfo.sender, it) }
-                        .mapNotNull { it.lastKnownName }
-                        .filter { input.isEmpty() || it.startsWith(input, ignoreCase = true) }
+                    val suggestions = ObjectArrayList<String>(SUGGESTION_LIMIT)
+                    val onlineNames = TreeSet(String.CASE_INSENSITIVE_ORDER)
 
-                    val onlineSet = onlinePlayerNames.mapTo(ObjectOpenHashSet(onlinePlayerNames.size)) { it.lowercase() }
-                    val offlinePlayerNames = OfflinePlayerNameCache.findByPrefix(input)
-                        .filterNot { it.lowercase() in onlineSet }
+                    for (player in SurfCoreApi.getOnlinePlayers()) {
+                        if (suggestions.size >= SUGGESTION_LIMIT) break
+                        val name = player.lastKnownName ?: continue
+                        if (input.isNotEmpty() && !name.startsWith(input, ignoreCase = true)) continue
+                        if (!CorePlayerStatusAccess.hasAccess(viewerInfo.sender, player)) continue
 
-                    (onlinePlayerNames + offlinePlayerNames).take(SUGGESTION_LIMIT)
+                        suggestions += name
+                        onlineNames += name
+                    }
+
+                    val remaining = SUGGESTION_LIMIT - suggestions.size
+                    if (remaining > 0) {
+                        for (name in OfflinePlayerNameCache.findByPrefix(
+                            input,
+                            remaining + onlineNames.size
+                        )) {
+                            if (suggestions.size >= SUGGESTION_LIMIT) break
+                            if (name in onlineNames) continue
+
+                            suggestions += name
+                        }
+                    }
+
+                    suggestions
                 }
             }
         )

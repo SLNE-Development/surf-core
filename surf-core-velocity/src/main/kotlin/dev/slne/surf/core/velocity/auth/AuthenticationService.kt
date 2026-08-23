@@ -2,10 +2,10 @@ package dev.slne.surf.core.velocity.auth
 
 import com.velocitypowered.api.event.Continuation
 import dev.slne.surf.api.core.messages.adventure.key
-import dev.slne.surf.api.core.util.mutableObject2ObjectMapOf
 import dev.slne.surf.core.core.CoreInstance
 import java.security.MessageDigest
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.Duration.Companion.seconds
 
 object AuthenticationService {
@@ -19,7 +19,7 @@ object AuthenticationService {
         5.seconds
     )
 
-    val continuations = mutableObject2ObjectMapOf<UUID, Continuation>()
+    val continuations = ConcurrentHashMap<UUID, Continuation>()
     val key = key("surf-core", "transfer-authentification")
 
     fun authenticate(uuid: UUID, token: ByteArray): Boolean {
@@ -37,8 +37,7 @@ object AuthenticationService {
             return false
         }
 
-        continuations[uuid]?.resume()
-        continuations.remove(uuid)
+        continuations.remove(uuid)?.resume()
 
         return true
     }

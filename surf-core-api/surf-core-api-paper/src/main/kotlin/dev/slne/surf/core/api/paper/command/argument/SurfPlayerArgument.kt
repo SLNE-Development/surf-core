@@ -10,6 +10,7 @@ import dev.slne.surf.api.core.messages.adventure.buildText
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.paper.CorePlayerStatusAccess
+import it.unimi.dsi.fastutil.objects.ObjectArrayList
 
 class SurfPlayerArgument(nodeName: String) :
     CustomArgument<SurfPlayer, String>(StringArgument(nodeName), { info ->
@@ -24,9 +25,16 @@ class SurfPlayerArgument(nodeName: String) :
     init {
         this.replaceSuggestions(
             ArgumentSuggestions.stringCollection { viewerInfo ->
-                SurfCoreApi.getOnlinePlayers()
-                    .filter { CorePlayerStatusAccess.hasAccess(viewerInfo.sender, it) }
-                    .mapNotNull { it.lastKnownName }
+                val names = ObjectArrayList<String>()
+
+                for (player in SurfCoreApi.getOnlinePlayers()) {
+                    val name = player.lastKnownName ?: continue
+                    if (!CorePlayerStatusAccess.hasAccess(viewerInfo.sender, player)) continue
+
+                    names += name
+                }
+
+                names
             }
         )
     }

@@ -241,6 +241,7 @@ fun coreCommand() = commandTree("core") {
         literalArgument("#list") {
             anyExecutor { source, _ ->
                 val services = SurfServerService.servers
+                val playerCounts = SurfPlayerService.playerCountsByServer()
 
                 if (services.isEmpty()) {
                     source.sendText {
@@ -264,7 +265,7 @@ fun coreCommand() = commandTree("core") {
                                 variableValue(service.uuid.toString())
                                 appendNewline()
                                 info("Spieler: ")
-                                variableValue("${service.getPlayerCount()}/${service.maxPlayers}")
+                                variableValue("${playerCounts.getInt(service.name)}/${service.maxPlayers}")
                             })
                         }
                     }

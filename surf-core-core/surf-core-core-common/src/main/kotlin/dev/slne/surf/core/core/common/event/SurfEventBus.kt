@@ -4,13 +4,16 @@ import dev.slne.surf.core.api.common.event.SurfEvent
 import dev.slne.surf.core.api.common.event.SurfEventHandler
 import dev.slne.surf.core.api.common.event.redis.SurfEventFireRedisEvent
 import dev.slne.surf.core.core.CoreInstance
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.reflect.KClass
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.jvm.isAccessible
 
 object SurfEventBus {
-    private val listeners = mutableMapOf<KClass<out SurfEvent>, MutableList<(SurfEvent) -> Unit>>()
+    private val listeners =
+        ConcurrentHashMap<KClass<out SurfEvent>, CopyOnWriteArrayList<(SurfEvent) -> Unit>>()
 
     fun registerListener(listener: Any) {
         val clazz = listener::class
@@ -41,13 +44,13 @@ object SurfEventBus {
                     }
                 }
 
-                listeners.computeIfAbsent(eventClass) { mutableListOf() }.add(executor)
+                handlersFor(eventClass).add(executor)
             }
         }
     }
 
     fun subscribe(eventClass: KClass<out SurfEvent>, handler: (SurfEvent) -> Unit) {
-        listeners.computeIfAbsent(eventClass) { mutableListOf() }.add(handler)
+        handlersFor(eventClass).add(handler)
     }
 
 
@@ -60,4 +63,7 @@ object SurfEventBus {
     fun fire(event: SurfEvent) {
         CoreInstance.redisApi.publishEvent(SurfEventFireRedisEvent(event))
     }
+
+    private fun handlersFor(eventClass: KClass<out SurfEvent>) =
+        listeners.computeIfAbsent(eventClass) { CopyOnWriteArrayList() }
 }

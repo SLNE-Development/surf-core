@@ -10,8 +10,9 @@ import dev.slne.surf.api.core.util.logger
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.cache.OfflinePlayerNameCache
 import dev.slne.surf.core.api.common.player.SurfPlayer
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
+import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import kotlinx.coroutines.*
+import java.util.TreeSet
 
 private const val SUGGESTION_LIMIT = 500
 
@@ -27,17 +28,32 @@ class SurfOfflinePlayerArgument(nodeName: String) :
             ArgumentSuggestions.stringCollection { viewerInfo ->
                 val input = viewerInfo.currentArg
 
-                val onlinePlayerNames = SurfCoreApi
-                    .getOnlinePlayers()
-                    .mapNotNull { it.lastKnownName }
-                    .filter { input.isEmpty() || it.startsWith(input, ignoreCase = true) }
+                val suggestions = ObjectArrayList<String>(SUGGESTION_LIMIT)
+                val onlineNames = TreeSet(String.CASE_INSENSITIVE_ORDER)
 
-                val onlineSet =
-                    onlinePlayerNames.mapTo(ObjectOpenHashSet(onlinePlayerNames.size)) { it.lowercase() }
-                val offlinePlayerNames = OfflinePlayerNameCache.findByPrefix(input)
-                    .filterNot { it.lowercase() in onlineSet }
+                for (player in SurfCoreApi.getOnlinePlayers()) {
+                    if (suggestions.size >= SUGGESTION_LIMIT) break
+                    val name = player.lastKnownName ?: continue
+                    if (input.isNotEmpty() && !name.startsWith(input, ignoreCase = true)) continue
 
-                (onlinePlayerNames + offlinePlayerNames).take(SUGGESTION_LIMIT)
+                    suggestions += name
+                    onlineNames += name
+                }
+
+                val remaining = SUGGESTION_LIMIT - suggestions.size
+                if (remaining > 0) {
+                    for (name in OfflinePlayerNameCache.findByPrefix(
+                        input,
+                        remaining + onlineNames.size
+                    )) {
+                        if (suggestions.size >= SUGGESTION_LIMIT) break
+                        if (name in onlineNames) continue
+
+                        suggestions += name
+                    }
+                }
+
+                suggestions
             }
         )
     }

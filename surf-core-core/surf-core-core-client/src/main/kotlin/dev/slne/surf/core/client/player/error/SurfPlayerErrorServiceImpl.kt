@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import net.kyori.adventure.util.Services
 import java.time.OffsetDateTime
 import java.util.*
+import kotlin.random.Random
 
 @AutoService(SurfPlayerErrorService::class)
 class SurfPlayerErrorServiceImpl : SurfPlayerErrorService, Services.Fallback {
@@ -52,10 +53,14 @@ class SurfPlayerErrorServiceImpl : SurfPlayerErrorService, Services.Fallback {
     }
 
 
-    fun generateErrorCode(): String {
-        val chars = ('A'..'Z') + ('0'..'9')
-        return (1..8)
-            .map { chars.random() }
-            .joinToString("")
+    fun generateErrorCode(): String = String(
+        CharArray(ERROR_CODE_LENGTH) {
+            ERROR_CODE_ALPHABET[Random.nextInt(ERROR_CODE_ALPHABET.size)]
+        }
+    )
+
+    companion object {
+        private val ERROR_CODE_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray()
+        private const val ERROR_CODE_LENGTH = 8
     }
 }

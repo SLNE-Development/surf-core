@@ -1,6 +1,7 @@
 package dev.slne.surf.core.client.player
 
 import com.google.auto.service.AutoService
+import dev.slne.surf.api.core.util.mutableObject2IntMapOf
 import dev.slne.surf.api.core.util.toObjectSet
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.client.ClientCoreInstance
@@ -9,6 +10,7 @@ import dev.slne.surf.core.core.common.player.SurfPlayerService
 import dev.slne.surf.core.core.common.rabbit.packet.player.load.LoadPlayerByNameRequestPacket
 import dev.slne.surf.core.core.common.rabbit.packet.player.load.LoadPlayerByUuidRequestPacket
 import dev.slne.surf.core.core.common.rabbit.packet.player.save.SaveSurfPlayerRequestPacket
+import it.unimi.dsi.fastutil.objects.Object2IntMap
 import java.util.*
 
 @AutoService(SurfPlayerService::class)
@@ -17,8 +19,15 @@ class SurfPlayerServiceImpl : SurfPlayerService {
         CoreInstance.redisApi.createSyncMap<UUID, SurfPlayer>("surf-core:surf-players")
     override val players get() = _players.snapshot().values.toObjectSet()
 
-    override fun findPlayerByName(name: String) =
-        players.firstOrNull { it.lastKnownName.equals(name, ignoreCase = true) }
+    override fun findPlayerByName(name: String): SurfPlayer? {
+        for (player in _players.snapshot().values) {
+            if (player.lastKnownName.equals(name, ignoreCase = true)) {
+                return player
+            }
+        }
+
+        return null
+    }
 
     override fun findPlayerByUuid(uuid: UUID) = _players[uuid]
 
@@ -56,6 +65,23 @@ class SurfPlayerServiceImpl : SurfPlayerService {
                 latestProxy = player.currentProxyName
             )
         )
+    }
+
+    override fun playerCountsByServer(): Object2IntMap<String> =
+        countPlayersBy(SurfPlayer::currentServerName)
+
+    override fun playerCountsByProxy(): Object2IntMap<String> =
+        countPlayersBy(SurfPlayer::currentProxyName)
+
+    private fun countPlayersBy(selector: (SurfPlayer) -> String?): Object2IntMap<String> {
+        val counts = mutableObject2IntMapOf<String>()
+
+        for (player in _players.snapshot().values) {
+            val key = selector(player) ?: continue
+            counts.addTo(key, 1)
+        }
+
+        return counts
     }
 
     override fun clearPlayers() {

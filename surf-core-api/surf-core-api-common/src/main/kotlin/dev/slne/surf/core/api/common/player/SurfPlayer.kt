@@ -25,7 +25,7 @@ data class SurfPlayer(
     val currentProxy: SurfProxyServer? get() = currentProxyName?.let(SurfCoreApi::getProxyServerByName)
 
     val username get() = lastKnownName ?: "#Unbekannt"
-    fun isOnline() = SurfCoreApi.getOnlinePlayers().any { it.uuid == uuid }
+    fun isOnline() = SurfCoreApi.getPlayer(uuid) != null
     suspend fun sendAwaiting(server: SurfServer) = SurfCoreApi.sendPlayerAwaiting(this, server)
     suspend fun sendAwaiting(proxy: SurfProxyServer) = SurfCoreApi.sendPlayerAwaiting(this, proxy)
 

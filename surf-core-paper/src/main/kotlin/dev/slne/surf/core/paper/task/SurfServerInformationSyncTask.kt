@@ -10,7 +10,10 @@ import java.util.concurrent.TimeUnit
 val surfServerInformationSyncTask = SurfServerInformationSyncTask()
 
 class SurfServerInformationSyncTask {
+    @Volatile
     lateinit var task: ScheduledTask
+
+    @Volatile
     private var latestMaxPlayers: Int = Bukkit.getMaxPlayers()
 
     fun start() {

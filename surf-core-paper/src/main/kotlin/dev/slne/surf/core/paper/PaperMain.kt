@@ -78,9 +78,10 @@ class PaperMain : SuspendingJavaPlugin() {
             plugin,
             UserDataRecalculateEvent::class.java
         ) { event ->
-            Bukkit.getPlayer(event.user.uniqueId)?.let {
-                it.displayName(it.getPrefixedName())
-            }
+            val player = Bukkit.getPlayer(event.user.uniqueId) ?: return@subscribe
+            player.scheduler.run(plugin, {
+                player.displayName(player.getPrefixedName())
+            }, null)
         }
     }
 }

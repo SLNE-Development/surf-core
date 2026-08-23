@@ -159,22 +159,16 @@ object ConnectionListener {
         initialServer: String?,
         gameProfile: GameProfile
     ) {
-        val player = SurfPlayerService.getOrLoadOrCreatePlayerByUuid(
-            playerUuid
-        ).apply {
-            if (firstSeen == null) {
-                firstSeen = OffsetDateTime.now()
-            }
-
-            lastSeen = OffsetDateTime.now()
-            lastKnownName = playerName
-            if (initialServer != null) {
-                currentServerName = initialServer
-            }
-            currentProxyName = SurfProxyServer.current().name
-            lastKnownIpAddress = inetAddress
+        val cached = SurfPlayerService.getOrLoadOrCreatePlayerByUuid(playerUuid)
+        val player = cached.copy(
+            lastKnownName = playerName,
+            firstSeen = cached.firstSeen ?: OffsetDateTime.now(),
+            lastSeen = OffsetDateTime.now(),
+            currentServerName = initialServer ?: cached.currentServerName,
+            currentProxyName = SurfProxyServer.current().name,
+            lastKnownIpAddress = inetAddress,
             transferred = AuthenticationListener.transfers.remove(playerUuid)
-        }
+        )
 
         SurfPlayerService.cachePlayer(player)
 
@@ -184,8 +178,9 @@ object ConnectionListener {
             )
         )
 
-        val playerTexture = gameProfile.properties.find { it.name == "textures" }?.value
-        val playerSignature = gameProfile.properties.find { it.name == "textures" }?.signature
+        val textureProperty = gameProfile.properties.find { it.name == "textures" }
+        val playerTexture = textureProperty?.value
+        val playerSignature = textureProperty?.signature
 
         SurfPlayerService.savePlayer(player)
 
@@ -206,7 +201,7 @@ object ConnectionListener {
     ) {
         println("[connection update] $playerName was redirected from '$fromServer' to '$toServer'")
 
-        val player = SurfPlayerService.players.firstOrNull { it.uuid == playerUuid }
+        val player = SurfPlayerService.findPlayerByUuid(playerUuid)
             ?.copy(currentServerName = toServer)
             ?: error("Player $playerName is not cached")
 
@@ -235,9 +230,7 @@ object ConnectionListener {
 
         SurfPlayerService.invalidatePlayer(player.uuid)
 
-        SurfPlayerService.savePlayer(player.apply {
-            lastSeen = OffsetDateTime.now()
-        })
+        SurfPlayerService.savePlayer(player.copy(lastSeen = OffsetDateTime.now()))
     }
 
 

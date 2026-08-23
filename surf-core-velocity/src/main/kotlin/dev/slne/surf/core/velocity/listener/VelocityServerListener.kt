@@ -12,6 +12,7 @@ import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.connection.SurfProxyServerConnectionResult
 import dev.slne.surf.core.api.common.util.sendText
 import dev.slne.surf.core.api.velocity.util.surfPlayer
+import dev.slne.surf.core.core.common.player.SurfPlayerService
 import dev.slne.surf.core.core.common.server.SurfServerService
 import dev.slne.surf.core.core.common.util.appendCorePrefix
 import dev.slne.surf.core.core.common.util.niceRed
@@ -40,9 +41,10 @@ object VelocityServerListener {
             }
         }
 
+        val initialProxyCounts = SurfPlayerService.playerCountsByProxy()
         val targetProxies = SurfServerService.proxyServers
             .filter { it.name != currentProxy.name }
-            .sortedBy { it.getPlayerCount() }
+            .sortedBy { initialProxyCounts.getInt(it.name) }
 
         val successCount = AtomicInteger(0)
         val failureMap =
@@ -57,8 +59,10 @@ object VelocityServerListener {
 
                     val jobs = players.map { player ->
                         async {
-                            val target =
-                                targetProxies.firstOrNull { it.getPlayerCount() < it.maxPlayers }
+                            val proxyCounts = SurfPlayerService.playerCountsByProxy()
+                            val target = targetProxies.firstOrNull {
+                                proxyCounts.getInt(it.name) < it.maxPlayers
+                            }
 
                             if (target == null) {
                                 failureMap.computeIfAbsent(

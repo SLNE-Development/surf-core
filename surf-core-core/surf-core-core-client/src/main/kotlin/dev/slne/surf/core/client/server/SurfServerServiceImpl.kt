@@ -1,6 +1,8 @@
 package dev.slne.surf.core.client.server
 
 import com.google.auto.service.AutoService
+import dev.slne.surf.api.core.util.freeze
+import dev.slne.surf.api.core.util.mutableObjectSetOf
 import dev.slne.surf.api.core.util.toObjectSet
 import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.common.server.SurfProxyServer
@@ -66,13 +68,40 @@ class SurfServerServiceImpl : SurfServerService {
         command: String
     ) = ExecuteCommandServerRequest.createRequest(commonSurfServer, command).status
 
-    override fun getServerByName(name: String) = servers.find { it.name == name }
-    override fun getServerByCategory(category: String) =
-        servers.filter { it.category == category }.toObjectSet()
+    override fun getServerByName(name: String) = _servers[name]
+    override fun getProxyServerByName(name: String) = _proxies[name]
 
-    override fun getProxyServerByName(name: String) = proxyServers.find { it.name == name }
-    override fun getProxyServerByCategory(category: String) =
-        proxyServers.filter { it.category == category }.toObjectSet()
+    override fun getServerByCategory(category: String): ObjectSet<SurfServer> {
+        val matches = mutableObjectSetOf<SurfServer>()
 
-    override fun getServerByUuid(uuid: UUID): CommonSurfServer? = servers.find { it.uuid == uuid }
+        for (server in _servers.snapshot().values) {
+            if (server.category == category) {
+                matches.add(server)
+            }
+        }
+
+        return matches.freeze()
+    }
+
+    override fun getProxyServerByCategory(category: String): ObjectSet<SurfProxyServer> {
+        val matches = mutableObjectSetOf<SurfProxyServer>()
+
+        for (proxy in _proxies.snapshot().values) {
+            if (proxy.category == category) {
+                matches.add(proxy)
+            }
+        }
+
+        return matches.freeze()
+    }
+
+    override fun getServerByUuid(uuid: UUID): CommonSurfServer? {
+        for (server in _servers.snapshot().values) {
+            if (server.uuid == uuid) {
+                return server
+            }
+        }
+
+        return null
+    }
 }

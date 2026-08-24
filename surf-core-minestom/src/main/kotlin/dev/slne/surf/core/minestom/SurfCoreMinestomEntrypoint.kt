@@ -3,6 +3,7 @@ package dev.slne.surf.core.minestom
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import dev.slne.minestom.lobby.api.coroutine.minestomScope
+import dev.slne.minestom.lobby.api.player.PlayerLimit
 import dev.slne.minestom.lobby.api.plugin.MinestomPluginEntrypoint
 import dev.slne.minestom.lobby.api.plugin.annotation.DataDirectory
 import dev.slne.surf.core.api.common.cache.OfflinePlayerNameCache
@@ -16,7 +17,6 @@ import dev.slne.surf.core.core.CoreInstance
 import dev.slne.surf.core.core.common.config.SurfServerConfiguration
 import dev.slne.surf.core.core.common.event.SurfEventBus
 import dev.slne.surf.core.core.common.server.SurfServerService
-import dev.slne.surf.core.minestom.config.MinestomCoreConfigManager
 import dev.slne.surf.core.minestom.listener.MinestomSurfServerEventListener
 import java.nio.file.Path
 import java.time.OffsetDateTime
@@ -24,12 +24,12 @@ import java.time.OffsetDateTime
 @Singleton
 class SurfCoreMinestomEntrypoint @Inject constructor(
     @DataDirectory path: Path,
+    private val playerLimit: PlayerLimit,
 ) : MinestomPluginEntrypoint {
 
     init {
         dataPath = path
         surfServerConfiguration = SurfServerConfiguration(path)
-        minestomCoreConfigManager = MinestomCoreConfigManager(path)
     }
 
     override suspend fun start() {
@@ -40,7 +40,7 @@ class SurfCoreMinestomEntrypoint @Inject constructor(
 
         SurfEventBus.registerListener(MinestomSurfServerEventListener)
         CoreInstance.redisApi.subscribeToEvents(MinestomTeleportRedisListener)
-        ClientCoreInstance.clientLoader.withListener(MinestomRedisListener)
+        ClientCoreInstance.clientLoader.withListener(MinestomRedisListener(playerLimit))
         ClientCoreInstance.clientLoader.connectRedis()
 
         val server = SurfServer(
@@ -48,7 +48,7 @@ class SurfCoreMinestomEntrypoint @Inject constructor(
             displayName = surfServerConfig.serverDisplayName,
             category = surfServerConfig.serverCategory,
             state = SurfServerState.STARTING,
-            maxPlayers = minestomCoreConfig.maxPlayers,
+            maxPlayers = playerLimit.maxPlayers,
             uuid = surfServerConfig.serverUuid,
             startedAt = OffsetDateTime.now(),
         )
@@ -87,9 +87,6 @@ class SurfCoreMinestomEntrypoint @Inject constructor(
         require(!surfServerConfig.serverCategory.isUnknown()) {
             "The Minestom surf-core server category must be configured"
         }
-        require(minestomCoreConfig.maxPlayers > 0) {
-            "The Minestom surf-core max player count must be greater than zero"
-        }
     }
 
     companion object {
@@ -98,13 +95,9 @@ class SurfCoreMinestomEntrypoint @Inject constructor(
 
         lateinit var surfServerConfiguration: SurfServerConfiguration
             private set
-
-        lateinit var minestomCoreConfigManager: MinestomCoreConfigManager
-            private set
     }
 }
 
 private fun String.isUnknown() = isBlank() || equals("unknown", ignoreCase = true)
 
 val surfServerConfig get() = SurfCoreMinestomEntrypoint.surfServerConfiguration.config
-val minestomCoreConfig get() = SurfCoreMinestomEntrypoint.minestomCoreConfigManager.config

@@ -12,19 +12,13 @@ import dev.slne.surf.core.api.minestom.util.surfPlayer
 import dev.slne.surf.core.core.common.command.NetworkSendCommandHandler
 import dev.slne.surf.core.core.common.command.SurfCoreCommandHandler
 import dev.slne.surf.core.core.common.permission.CorePermissions
-import dev.slne.surf.core.core.common.server.SurfServerService
 import dev.slne.surf.core.minestom.SurfCoreMinestomEntrypoint
-import dev.slne.surf.core.minestom.minestomCoreConfig
 
 fun surfCoreCommand() = commandTree("surfcore") {
     withPermission(CorePermissions.COMMAND_CORE)
     literalArgument("reload") {
         anyExecutor { executor, _ ->
             SurfCoreMinestomEntrypoint.surfServerConfiguration.reload()
-            SurfCoreMinestomEntrypoint.minestomCoreConfigManager.reload()
-            SurfServerService.addServer(
-                SurfServer.current().copy(maxPlayers = minestomCoreConfig.maxPlayers)
-            )
             SurfCoreCommandHandler.configReloaded(executor)
         }
     }

@@ -12,7 +12,7 @@ fun networkServerMaxPlayersCommand() = commandTree("nmaxplayers") {
     withPermission(CorePermissions.COMMAND_NETWORK_SERVER_MAX_PLAYERS)
 
     surfBackendServerArgument("backend") {
-        integerArgument("maxPlayers") {
+        integerArgument("maxPlayers", min = 1) {
             anyExecutor { sender, args ->
                 val backend: CommonSurfServer by args
                 val maxPlayers: Int by args

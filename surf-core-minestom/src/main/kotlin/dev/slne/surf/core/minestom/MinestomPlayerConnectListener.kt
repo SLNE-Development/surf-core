@@ -3,10 +3,9 @@ package dev.slne.surf.core.minestom
 import dev.slne.minestom.lobby.api.coroutine.minestomScope
 import dev.slne.minestom.lobby.api.event.EventRegistrar
 import dev.slne.minestom.lobby.api.extension.addListener
-import dev.slne.minestom.lobby.api.player.LobbyPlayer
+import dev.slne.minestom.lobby.api.player.event.PlayerLoginEvent
 import dev.slne.minestom.lobby.api.player.lobbyPlayer
 import dev.slne.surf.core.core.common.permission.CorePermissions
-import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.common.server.connection.SurfProxyServerConnectionResult
 import dev.slne.surf.core.core.CoreInstance
 import dev.slne.surf.core.core.common.command.WhereAmICommandHandler
@@ -20,13 +19,23 @@ import net.minestom.server.event.Event
 import net.minestom.server.event.EventNode
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent
 import net.minestom.server.event.player.PlayerSpawnEvent
-import net.minestom.server.MinecraftServer
-import net.kyori.adventure.text.Component
 
 class MinestomPlayerConnectListener : EventRegistrar {
     override fun register(node: EventNode<Event>) {
+        node.addListener<PlayerLoginEvent>(::onPlayerLogin)
         node.addListener<AsyncPlayerConfigurationEvent>(::onPlayerConfiguration)
         node.addListener<PlayerSpawnEvent>(::onPlayerSpawn)
+    }
+
+    /**
+     * Lets a player with [CorePermissions.BYPASS_MAX_PLAYERS] onto a full server. The limit itself
+     * belongs to the server, which refuses everyone else before they are configured.
+     */
+    private fun onPlayerLogin(event: PlayerLoginEvent) {
+        if (event.result != PlayerLoginEvent.Result.KICK_FULL) return
+        if (!event.lobbyPlayer.hasPermission(CorePermissions.BYPASS_MAX_PLAYERS)) return
+
+        event.allow()
     }
 
     private fun onPlayerConfiguration(event: AsyncPlayerConfigurationEvent) {
@@ -40,13 +49,6 @@ class MinestomPlayerConnectListener : EventRegistrar {
                 scope = minestomScope,
             )
             player.kick(PlayerConnectionMessages.dataLoadFailure(errorCode))
-            return
-        }
-
-        val hasBypass = (player as? LobbyPlayer)
-            ?.hasPermission(CorePermissions.BYPASS_MAX_PLAYERS) == true
-        if (!hasBypass && MinecraftServer.getConnectionManager().onlinePlayerCount >= SurfServer.current().maxPlayers) {
-            player.kick(Component.text("Der Server ist voll."))
         }
     }
 

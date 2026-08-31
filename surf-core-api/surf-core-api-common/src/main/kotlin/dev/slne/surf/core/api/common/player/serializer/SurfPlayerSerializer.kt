@@ -25,6 +25,7 @@ object SurfPlayerSerializer : KSerializer<SurfPlayer> {
         element<String?>("currentProxy", isOptional = true)
         element<String?>("lastKnownIpAddress", isOptional = true)
         element<Boolean>("transferred")
+        element<String?>("connectionSessionId", isOptional = true)
     }
 
     override fun serialize(encoder: Encoder, value: SurfPlayer) {
@@ -68,6 +69,12 @@ object SurfPlayerSerializer : KSerializer<SurfPlayer> {
             value.lastKnownIpAddress?.hostAddress
         )
         composite.encodeBooleanElement(descriptor, 7, value.transferred)
+        composite.encodeNullableSerializableElement(
+            descriptor,
+            8,
+            String.serializer(),
+            value.connectionSessionId?.toString(),
+        )
 
         composite.endStructure(descriptor)
     }
@@ -83,6 +90,7 @@ object SurfPlayerSerializer : KSerializer<SurfPlayer> {
         var currentProxyName: String? = null
         var lastKnownIpAddress: InetAddress? = null
         var transferred: Boolean = false
+        var connectionSessionId: UUID? = null
 
         loop@ while (true) {
             when (val index = dec.decodeElementIndex(descriptor)) {
@@ -108,6 +116,13 @@ object SurfPlayerSerializer : KSerializer<SurfPlayer> {
 
                 7 -> transferred = dec.decodeBooleanElement(descriptor, 7)
 
+                8 -> connectionSessionId =
+                    dec.decodeNullableSerializableElement(
+                        descriptor,
+                        8,
+                        String.serializer(),
+                    )?.let(UUID::fromString)
+
                 CompositeDecoder.DECODE_DONE -> break@loop
                 else -> error("Unknown index $index")
             }
@@ -123,7 +138,8 @@ object SurfPlayerSerializer : KSerializer<SurfPlayer> {
             currentServerName = currentServerName,
             currentProxyName = currentProxyName,
             lastKnownIpAddress = lastKnownIpAddress,
-            transferred = transferred
+            transferred = transferred,
+            connectionSessionId = connectionSessionId,
         )
     }
 }

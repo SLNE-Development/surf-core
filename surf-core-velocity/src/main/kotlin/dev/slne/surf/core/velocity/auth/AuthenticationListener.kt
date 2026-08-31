@@ -74,7 +74,7 @@ object AuthenticationListener {
     }
 
     @Subscribe
-    fun onCookieReceive(event: CookieReceiveEvent) {
+    suspend fun onCookieReceive(event: CookieReceiveEvent) {
         if (event.originalKey != AuthenticationService.key) return
 
         event.originalData?.let {
@@ -83,30 +83,48 @@ object AuthenticationListener {
     }
 
     @Subscribe
-    fun onInitialServer(event: PlayerChooseInitialServerEvent) {
+    suspend fun onInitialServer(event: PlayerChooseInitialServerEvent) {
         val player = event.player
-        val lastServerName = AuthenticationService.lastServerMap.remove(player.uniqueId) ?: return
 
-        if (event.player.handshakeIntent != HandshakeIntent.TRANSFER) {
+        if (player.handshakeIntent != HandshakeIntent.TRANSFER) {
             return
         }
 
-        plugin.proxy.getServer(lastServerName).getOrNull()?.let {
-            event.setInitialServer(it)
+        val uuid = player.uniqueId
+        val lastServerName = AuthenticationService.lastServerMap
+            .getRemote(uuid)
+            ?: return
+
+        if (!AuthenticationService.lastServerMap.removeIfEqualsAndAwait(uuid, lastServerName)) {
+            return
         }
+
+        plugin.proxy.getServer(lastServerName)
+            .ifPresent(event::setInitialServer)
     }
 
     @Subscribe
-    fun onPreTransfer(event: PreTransferEvent) {
+    suspend fun onPreTransfer(event: PreTransferEvent) {
         val player = event.player()
         val token = generateToken()
 
         AuthenticationService.preTransfer(player.uniqueId, token)
 
-        player.storeCookie(AuthenticationService.key, token)
-        player.currentServer.getOrNull()?.serverInfo?.name?.let {
-            AuthenticationService.lastServerMap[player.uniqueId] = it
-        }
+        player.currentServer
+            .getOrNull()
+            ?.serverInfo
+            ?.name
+            ?.let { serverName ->
+                AuthenticationService.lastServerMap.putAndAwait(
+                    player.uniqueId,
+                    serverName,
+                )
+            }
+
+        player.storeCookie(
+            AuthenticationService.key,
+            token,
+        )
     }
 
     private fun generateToken(): ByteArray {

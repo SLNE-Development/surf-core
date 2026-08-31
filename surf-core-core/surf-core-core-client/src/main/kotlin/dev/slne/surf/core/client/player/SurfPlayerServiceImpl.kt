@@ -31,6 +31,10 @@ class SurfPlayerServiceImpl : SurfPlayerService {
 
     override fun findPlayerByUuid(uuid: UUID) = _players[uuid]
 
+    override suspend fun findPlayerByUuidRemote(uuid: UUID): SurfPlayer? {
+        return _players.getRemote(uuid)
+    }
+
     override suspend fun loadPlayerByName(name: String): SurfPlayer? {
         return ClientCoreInstance.rabbitApi.sendRequest(LoadPlayerByNameRequestPacket(name)).player
     }
@@ -92,7 +96,30 @@ class SurfPlayerServiceImpl : SurfPlayerService {
         _players.put(player.uuid, player)
     }
 
+    override suspend fun cachePlayerAndAwait(player: SurfPlayer) {
+        _players.putAndAwait(player.uuid, player)
+    }
+
     override fun invalidatePlayer(uuid: UUID) {
         _players.remove(uuid)
+    }
+
+    override suspend fun replacePlayerIfEqualsAndAwait(
+        expected: SurfPlayer,
+        updated: SurfPlayer
+    ): Boolean {
+        require(expected.uuid == updated.uuid) {
+            "Cannot replace player ${expected.uuid} with ${updated.uuid}"
+        }
+
+        require(expected.connectionSessionId == updated.connectionSessionId) {
+            "A player connection session must not be changed through CAS update"
+        }
+
+        return _players.replaceIfEqualsAndAwait(expected.uuid, expected, updated)
+    }
+
+    override suspend fun invalidatePlayerIfEqualsAndAwait(player: SurfPlayer): Boolean {
+        return _players.removeIfEqualsAndAwait(player.uuid, player)
     }
 }

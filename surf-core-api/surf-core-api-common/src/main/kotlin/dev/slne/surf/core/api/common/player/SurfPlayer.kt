@@ -19,7 +19,8 @@ data class SurfPlayer(
     var currentServerName: String? = null,
     var currentProxyName: String? = null,
     var lastKnownIpAddress: @Contextual InetAddress? = null,
-    var transferred: Boolean
+    var transferred: Boolean,
+    val connectionSessionId: @Contextual UUID? = null,
 ) {
     val currentServer: SurfServer? get() = currentServerName?.let(SurfCoreApi::getServerByName)
     val currentProxy: SurfProxyServer? get() = currentProxyName?.let(SurfCoreApi::getProxyServerByName)

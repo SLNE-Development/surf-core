@@ -15,6 +15,8 @@ interface SurfPlayerService {
     fun findPlayerByName(name: String): SurfPlayer?
     fun findPlayerByUuid(uuid: UUID): SurfPlayer?
 
+    suspend fun findPlayerByUuidRemote(uuid: UUID): SurfPlayer?
+
     suspend fun loadPlayerByName(name: String): SurfPlayer?
     suspend fun loadPlayerByUuid(uuid: UUID): SurfPlayer?
 
@@ -36,8 +38,16 @@ interface SurfPlayerService {
     fun playerCountsByProxy(): Object2IntMap<String>
 
     fun clearPlayers()
+
+    @Deprecated("Use cachePlayerAndAwait instead", ReplaceWith("cachePlayerAndAwait(player)"))
     fun cachePlayer(player: SurfPlayer)
+    suspend fun cachePlayerAndAwait(player: SurfPlayer)
+    
+    @Deprecated("Use invalidatePlayerIfEqualsAndAwait instead", ReplaceWith("invalidatePlayerIfEqualsAndAwait(player)"))
     fun invalidatePlayer(uuid: UUID)
+
+    suspend fun replacePlayerIfEqualsAndAwait(expected: SurfPlayer, updated: SurfPlayer): Boolean
+    suspend fun invalidatePlayerIfEqualsAndAwait(player: SurfPlayer): Boolean
 
     companion object : SurfPlayerService by service {
         val INSTANCE get() = service

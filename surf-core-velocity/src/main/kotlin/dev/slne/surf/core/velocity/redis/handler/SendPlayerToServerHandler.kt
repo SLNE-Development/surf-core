@@ -2,6 +2,8 @@ package dev.slne.surf.core.velocity.redis.handler
 
 import com.github.shynixn.mccoroutine.velocity.launch
 import com.velocitypowered.api.proxy.ConnectionRequestBuilder
+import com.velocitypowered.api.proxy.Player
+import com.velocitypowered.api.proxy.server.RegisteredServer
 import dev.slne.surf.core.api.common.server.connection.SurfServerConnectResult
 import dev.slne.surf.core.core.CoreInstance
 import dev.slne.surf.core.core.common.redis.request.SendPlayerToServerRequest
@@ -9,6 +11,7 @@ import dev.slne.surf.core.velocity.plugin
 import dev.slne.surf.redis.request.HandleRedisRequest
 import dev.slne.surf.redis.request.RequestContext
 import kotlinx.coroutines.future.await
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.optionals.getOrNull
 
 object SendPlayerToServerHandler {
@@ -35,16 +38,24 @@ object SendPlayerToServerHandler {
                 CoreInstance.redisApi.publishEvent(
                     SendPlayerToServerRequest.Response(
                         request.requestId,
-                        player.createConnectionRequest(server)
-                            .connect()
-                            .await()
-                            .convertResult()
+                        player.connectAwaiting(server)
                     )
                 ).await()
             }
         }
     }
 
+}
+
+suspend fun Player.connectAwaiting(server: RegisteredServer): SurfServerConnectResult = try {
+    createConnectionRequest(server)
+        .connect()
+        .await()
+        .convertResult()
+} catch (e: Exception) {
+    if (e is CancellationException) throw e
+    plugin.logger.warn("Failed to connect player $username to server ${server.serverInfo.name}", e)
+    SurfServerConnectResult(SurfServerConnectResult.Status.UNKNOWN_ERROR, null)
 }
 
 fun ConnectionRequestBuilder.Result.convertResult(): SurfServerConnectResult {

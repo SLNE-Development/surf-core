@@ -26,6 +26,8 @@ import java.util.*
 import kotlin.reflect.KClass
 import kotlin.time.Duration.Companion.seconds
 
+private val SERVER_CONNECT_RESULT_TIMEOUT = 45.seconds
+
 abstract class SurfCoreApiImpl : SurfCoreApi {
     override fun getOnlinePlayers(): ObjectSet<SurfPlayer> = SurfPlayerService.players
     override fun getPlayer(name: String) = SurfPlayerService.findPlayerByName(name)
@@ -91,7 +93,12 @@ abstract class SurfCoreApiImpl : SurfCoreApi {
             )
         }
 
-        return awaitingResult.await()
+        return withTimeoutOrNull(SERVER_CONNECT_RESULT_TIMEOUT) {
+            awaitingResult.await()
+        }
+            ?: SurfServerConnectResult(SurfServerConnectResult.Status.UNKNOWN_ERROR, null).also {
+                PlayerServerConnectionResultWatcher.complete(requestId, it)
+            }
     }
 
     override suspend fun sendPlayerAwaiting(

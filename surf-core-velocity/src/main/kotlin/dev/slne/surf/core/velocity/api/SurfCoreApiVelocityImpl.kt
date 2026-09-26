@@ -7,9 +7,8 @@ import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.common.server.connection.SurfServerConnectResult
 import dev.slne.surf.core.client.SurfCoreApiClientImpl
 import dev.slne.surf.core.velocity.plugin
-import dev.slne.surf.core.velocity.redis.handler.convertResult
+import dev.slne.surf.core.velocity.redis.handler.connectAwaiting
 import dev.slne.surf.core.velocity.surfServerConfig
-import kotlinx.coroutines.future.await
 import net.kyori.adventure.util.Services
 import kotlin.jvm.optionals.getOrNull
 
@@ -33,10 +32,7 @@ class SurfCoreApiVelocityImpl : SurfCoreApiClientImpl(), Services.Fallback {
                     null
                 )
 
-            return player.createConnectionRequest(velocityServer)
-                .connect()
-                .await()
-                .convertResult()
+            return player.connectAwaiting(velocityServer)
         }
     }
 }

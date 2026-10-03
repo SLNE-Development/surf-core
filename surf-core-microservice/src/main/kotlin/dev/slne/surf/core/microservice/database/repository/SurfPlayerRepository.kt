@@ -4,7 +4,9 @@ import dev.slne.surf.core.api.common.cache.OfflinePlayerNameCache
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.microservice.database.tables.SurfPlayersTable
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.ResultRow
+import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.SortOrder
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.eq
+import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.core.lowerCase
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.select
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.selectAll
 import dev.slne.surf.database.libs.org.jetbrains.exposed.v1.r2dbc.transactions.suspendTransaction
@@ -19,9 +21,11 @@ object SurfPlayerRepository {
     suspend fun loadPlayerByName(
         name: String
     ): SurfPlayer? = suspendTransaction {
-        SurfPlayersTable.selectAll().where(SurfPlayersTable.name eq name).firstOrNull()?.let {
-            createPlayerByRow(it)
-        }
+        SurfPlayersTable.selectAll()
+            .where(SurfPlayersTable.name.lowerCase() eq name.lowercase())
+            .orderBy(SurfPlayersTable.lastSeen, SortOrder.DESC_NULLS_LAST)
+            .firstOrNull()
+            ?.let { createPlayerByRow(it) }
     }
 
     suspend fun loadPlayerByUuid(

@@ -1,7 +1,7 @@
-package dev.slne.surf.core.minestom
+package dev.slne.surf.core.minestom.remote
 
 import com.google.auto.service.AutoService
-import dev.slne.minestom.lobby.api.coroutine.MinestomDispatchers
+import dev.slne.surf.api.minestom.coroutine.MinestomDispatchers
 import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.core.common.redis.listener.RemoteCommandExecutor

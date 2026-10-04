@@ -8,6 +8,16 @@ surfMinestomApi {
     withSurfRedis()
 }
 
+minestomPluginFile {
+    main = "dev.slne.surf.core.minestom.SurfCoreMinestomPlugin"
+    authors = listOf("red")
+
+    pluginDependencies {
+        register("surf-redis-minestom")
+        register("surf-rabbitmq-minestom")
+    }
+}
+
 dependencies {
     api(projects.surfCoreCore.surfCoreCoreMinestom)
 }

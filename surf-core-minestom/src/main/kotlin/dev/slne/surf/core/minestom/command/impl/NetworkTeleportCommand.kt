@@ -1,7 +1,7 @@
 package dev.slne.surf.core.minestom.command.impl
 
-import dev.slne.minestom.lobby.api.command.commandapi.dsl.commandTree
-import dev.slne.minestom.lobby.api.command.commandapi.dsl.playerExecutorSuspend
+import dev.slne.surf.api.minestom.command.dsl.commandTree
+import dev.slne.surf.api.minestom.command.dsl.playerExecutorSuspend
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.minestom.command.argument.surfPlayerArgument
 import dev.slne.surf.core.api.minestom.util.minestomPlayer
@@ -17,6 +17,7 @@ fun networkTeleportCommand() = commandTree("ntp") {
             val target: SurfPlayer by args
             NetworkTeleportCommandHandler.teleport(player, player.surfPlayer, target) {
                 val targetPlayer = target.minestomPlayer ?: return@teleport false
+
                 player.teleport(targetPlayer.position).await()
                 NetworkTeleportCommandHandler.sendSuccess(player, targetPlayer.username)
                 true

@@ -1,7 +1,7 @@
 package dev.slne.surf.core.minestom.command.impl
 
-import dev.slne.minestom.lobby.api.command.commandapi.dsl.commandTree
-import dev.slne.minestom.lobby.api.command.commandapi.dsl.playerExecutor
+import dev.slne.surf.api.minestom.command.dsl.commandTree
+import dev.slne.surf.api.minestom.command.dsl.playerExecutor
 import dev.slne.surf.core.core.common.command.WhereAmICommandHandler
 import dev.slne.surf.core.core.common.permission.CorePermissions
 

@@ -1,14 +1,14 @@
 package dev.slne.surf.core.api.minestom.command.argument
 
-import dev.slne.minestom.lobby.api.command.commandapi.CommandAPI
-import dev.slne.minestom.lobby.api.command.commandapi.CommandAPICommand
-import dev.slne.minestom.lobby.api.command.commandapi.CommandTree
-import dev.slne.minestom.lobby.api.command.commandapi.argument.Argument
-import dev.slne.minestom.lobby.api.command.commandapi.argument.CustomArgument
-import dev.slne.minestom.lobby.api.command.commandapi.argument.StringArgument
-import dev.slne.minestom.lobby.api.command.commandapi.suggestion.ArgumentSuggestions
 import dev.slne.surf.api.core.messages.adventure.buildText
 import dev.slne.surf.api.core.messages.adventure.hasPermission
+import dev.slne.surf.api.minestom.command.CommandAPI
+import dev.slne.surf.api.minestom.command.CommandAPICommand
+import dev.slne.surf.api.minestom.command.CommandTree
+import dev.slne.surf.api.minestom.command.argument.Argument
+import dev.slne.surf.api.minestom.command.argument.CustomArgument
+import dev.slne.surf.api.minestom.command.argument.StringArgument
+import dev.slne.surf.api.minestom.command.suggestion.ArgumentSuggestions
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.minestom.util.permission
@@ -20,7 +20,7 @@ class PermissionSurfServerArgument(nodeName: String) :
             ?.takeIf {
                 info.sender.hasPermission(it.permission)
                         || info.sender.hasPermission("surf.core.server.*")
-            } ?: throw CommandAPI.failWithMessage(
+            } ?: CommandAPI.failWithMessage(
             buildText {
                 appendErrorPrefix()
                 error("Der Server wurde nicht gefunden.")

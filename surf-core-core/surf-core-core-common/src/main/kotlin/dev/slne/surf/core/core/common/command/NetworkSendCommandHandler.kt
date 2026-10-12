@@ -2,6 +2,7 @@ package dev.slne.surf.core.core.common.command
 
 import dev.slne.surf.api.core.messages.adventure.sendText
 import dev.slne.surf.core.api.common.SurfCoreApi
+import dev.slne.surf.core.api.common.join.SurfJoinCheckResult
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.common.server.SurfProxyServer
@@ -12,6 +13,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.JoinConfiguration
 
 object NetworkSendCommandHandler {
     suspend fun sendPlayer(audience: Audience, player: SurfPlayer, target: CommonSurfServer) {
@@ -114,12 +116,25 @@ object NetworkSendCommandHandler {
         target: CommonSurfServer,
     ): Component? = when (target) {
         is SurfProxyServer -> SurfCoreApi.sendPlayerAwaiting(player, target).let { result ->
-            if (result.isSuccessful()) null else Component.text(result.status.toString())
+            if (result.isSuccessful()) null
+            else result.joinCheck?.denialMessage() ?: Component.text(result.status.toString())
         }
 
         is SurfServer -> SurfCoreApi.sendPlayerAwaiting(player, target).let { result ->
             if (result.isSuccessful()) null
-            else result.velocityMessage ?: Component.text(result.status.toString())
+            else result.velocityMessage
+                ?: result.joinCheck?.denialMessage()
+                ?: Component.text(result.status.toString())
         }
+    }
+
+    private fun SurfJoinCheckResult.denialMessage(): Component? {
+        if (isAllowed()) return null
+        if (denials.isEmpty()) return Component.text(status.toString())
+
+        return Component.join(
+            JoinConfiguration.commas(true),
+            denials.map { it.reason ?: Component.text(it.listener) }
+        )
     }
 }

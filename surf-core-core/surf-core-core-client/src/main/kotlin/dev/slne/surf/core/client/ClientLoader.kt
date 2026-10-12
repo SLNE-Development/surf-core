@@ -5,6 +5,8 @@ package dev.slne.surf.core.client
 import dev.slne.surf.core.core.common.event.LocalSurfEventBusListener
 import dev.slne.surf.core.core.common.player.SurfPlayerService
 import dev.slne.surf.core.core.common.redis.listener.ExecuteCommandRedisListener
+import dev.slne.surf.core.core.common.redis.listener.PlayerJoinCheckHandler
+import dev.slne.surf.core.core.common.redis.listener.PlayerJoinCheckListener
 import dev.slne.surf.core.core.common.redis.listener.SendPlayerToProxyListener
 import dev.slne.surf.core.core.common.redis.listener.SendPlayerToServerListener
 import dev.slne.surf.core.core.common.redis.listener.ShutdownServerRedisListener
@@ -32,9 +34,11 @@ class ClientLoader(
         redisApi.subscribeToEvents(LocalSurfEventBusListener)
         withListener(SendPlayerToServerListener)
         withListener(SendPlayerToProxyListener)
+        withListener(PlayerJoinCheckListener)
 
         withRequestResponseHandler(ShutdownServerRedisListener)
         withRequestResponseHandler(ExecuteCommandRedisListener)
+        withRequestResponseHandler(PlayerJoinCheckHandler)
 
         // Initialize Redis Maps
         SurfPlayerService

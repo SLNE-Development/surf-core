@@ -2,6 +2,7 @@ package dev.slne.surf.core.api.common.player
 
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.player.serializer.SurfPlayerSerializer
+import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
 import kotlinx.serialization.Contextual
@@ -29,6 +30,13 @@ data class SurfPlayer(
     fun isOnline() = SurfCoreApi.getPlayer(uuid) != null
     suspend fun sendAwaiting(server: SurfServer) = SurfCoreApi.sendPlayerAwaiting(this, server)
     suspend fun sendAwaiting(proxy: SurfProxyServer) = SurfCoreApi.sendPlayerAwaiting(this, proxy)
+    suspend fun sendAwaiting(server: SurfServer, force: Boolean) =
+        SurfCoreApi.sendPlayerAwaiting(this, server, force)
+
+    suspend fun sendAwaiting(proxy: SurfProxyServer, force: Boolean) =
+        SurfCoreApi.sendPlayerAwaiting(this, proxy, force)
+
+    suspend fun checkJoin(server: CommonSurfServer) = SurfCoreApi.checkJoin(uuid, server)
 
     override fun toString(): String {
         return "SurfPlayer(uuid=$uuid, lastKnownName=$lastKnownName, firstSeen=$firstSeen, lastSeen=$lastSeen, currentServerName=$currentServerName, currentProxyName=$currentProxyName, lastKnownIpAddress=$lastKnownIpAddress)"

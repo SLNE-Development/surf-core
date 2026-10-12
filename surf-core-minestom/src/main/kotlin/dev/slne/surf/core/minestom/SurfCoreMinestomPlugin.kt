@@ -13,8 +13,11 @@ import dev.slne.surf.core.client.ClientCoreInstance
 import dev.slne.surf.core.core.CoreInstance
 import dev.slne.surf.core.core.common.config.SurfServerConfiguration
 import dev.slne.surf.core.core.common.event.SurfEventBus
+import dev.slne.surf.core.core.common.join.CoreJoinListenerRegistry
 import dev.slne.surf.core.core.common.server.SurfServerService
 import dev.slne.surf.core.minestom.command.impl.*
+import dev.slne.surf.core.minestom.join.MinestomAlreadyConnectedJoinListener
+import dev.slne.surf.core.minestom.join.MinestomMaxPlayersJoinListener
 import dev.slne.surf.core.minestom.listener.MinestomPlayerConnectListener
 import dev.slne.surf.core.minestom.listener.MinestomSurfServerEventListener
 import dev.slne.surf.core.minestom.listener.redis.MinestomRedisListener
@@ -68,6 +71,8 @@ object SurfCoreMinestomPlugin : SurfMinestomPlugin() {
         whereAmICommand()
 
         MinestomPlayerConnectListener.register(eventNode)
+        CoreJoinListenerRegistry.register(MinestomAlreadyConnectedJoinListener)
+        CoreJoinListenerRegistry.register(MinestomMaxPlayersJoinListener)
     }
 
     override suspend fun onDisable() {

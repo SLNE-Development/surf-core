@@ -14,6 +14,7 @@ import dev.slne.surf.core.api.common.server.connection.SurfServerConnectResult
 import dev.slne.surf.core.core.CoreInstance
 import dev.slne.surf.core.core.common.event.SurfEventBus
 import dev.slne.surf.core.core.common.join.CoreJoinListenerRegistry
+import dev.slne.surf.core.core.common.join.isOnlyAlreadyConnected
 import dev.slne.surf.core.core.common.player.SurfPlayerService
 import dev.slne.surf.core.core.common.redis.event.SurfPlayerMessageRedisEvent
 import dev.slne.surf.core.core.common.redis.request.PlayerJoinCheckRequest
@@ -125,6 +126,14 @@ abstract class SurfCoreApiImpl : SurfCoreApi {
     ): SurfServerConnectResult {
         val joinCheck = checkJoin(surfPlayer.uuid, surfServer, force)
 
+        if (joinCheck.isOnlyAlreadyConnected()) {
+            return SurfServerConnectResult(
+                SurfServerConnectResult.Status.ALREADY_CONNECTED,
+                null,
+                joinCheck
+            )
+        }
+
         if (!joinCheck.isAllowed() && !force) {
             return SurfServerConnectResult(
                 SurfServerConnectResult.Status.JOIN_DENIED,
@@ -175,6 +184,13 @@ abstract class SurfCoreApiImpl : SurfCoreApi {
         }
 
         val joinCheck = checkJoin(playerUuid, surfProxyServer, force)
+
+        if (joinCheck.isOnlyAlreadyConnected()) {
+            return SurfProxyServerConnectionResult(
+                SurfProxyServerConnectionResult.Status.ALREADY_CONNECTED,
+                joinCheck
+            )
+        }
 
         if (!joinCheck.isAllowed() && !force) {
             return SurfProxyServerConnectionResult(

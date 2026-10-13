@@ -16,6 +16,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
 import java.util.*
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.seconds
 
 object VelocityAvailableServerJoinListener : CoreJoinListener {
@@ -25,20 +26,13 @@ object VelocityAvailableServerJoinListener : CoreJoinListener {
 
     override suspend fun checkJoin(playerUuid: UUID): CoreJoinResult {
         val directServer = directServer(playerUuid)
-        val directResult = directServer?.let { check(playerUuid, listOf(it)) }.orEmpty()
+        val fallbackServers = fallbackServers().filter { it.name != directServer?.name }
+        val results = check(playerUuid, listOfNotNull(directServer) + fallbackServers)
 
-        if (directResult.any { (_, result) -> result.isJoinable() }) {
+        if (results.any { (_, result) -> result.isJoinable() }) {
             return CoreJoinResult.allowed()
         }
 
-        val fallbackResults =
-            check(playerUuid, fallbackServers().filter { it.name != directServer?.name })
-
-        if (fallbackResults.any { (_, result) -> result.isJoinable() }) {
-            return CoreJoinResult.allowed()
-        }
-
-        val results = directResult + fallbackResults
         if (results.isEmpty()) {
             return CoreJoinResult.denied(Component.text("Es ist kein Server verfügbar"))
         }
@@ -66,9 +60,25 @@ object VelocityAvailableServerJoinListener : CoreJoinListener {
     ): List<Pair<SurfServer, SurfJoinCheckResult>> = coroutineScope {
         servers.map { server ->
             async {
-                server to (withTimeoutOrNull(4.seconds) {
-                    SurfCoreApi.checkJoin(playerUuid, server)
-                } ?: SurfJoinCheckResult.TIMEOUT)
+                val result = try {
+                    withTimeoutOrNull(4.seconds) {
+                        SurfCoreApi.checkJoin(playerUuid, server)
+                    } ?: SurfJoinCheckResult.TIMEOUT
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    log.atWarning()
+                        .withCause(e)
+                        .log("Join check on %s failed for %s", server.name, playerUuid)
+                    SurfJoinCheckResult.TARGET_UNREACHABLE
+                }
+
+                if (!result.isJoinable()) {
+                    log.atInfo()
+                        .log("Server %s not joinable for %s: %s", server.name, playerUuid, result.status)
+                }
+
+                server to result
             }
         }.awaitAll()
     }

@@ -1,11 +1,13 @@
 package dev.slne.surf.core.velocity.join
 
+import dev.slne.surf.api.core.util.logger
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.join.CoreJoinListener
 import dev.slne.surf.core.api.common.join.CoreJoinResult
 import dev.slne.surf.core.api.common.join.SurfJoinCheckResult
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.core.common.join.isOnlyAlreadyConnected
+import dev.slne.surf.core.core.common.player.SurfPlayerService
 import dev.slne.surf.core.velocity.plugin
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -17,27 +19,28 @@ import java.util.*
 import kotlin.time.Duration.Companion.seconds
 
 object VelocityAvailableServerJoinListener : CoreJoinListener {
+    private val log = logger()
+
     override val name = "available-server"
 
     override suspend fun checkJoin(playerUuid: UUID): CoreJoinResult {
-        val candidates = candidateServers(playerUuid)
+        val directServer = directServer(playerUuid)
+        val directResult = directServer?.let { check(playerUuid, listOf(it)) }.orEmpty()
 
-        if (candidates.isEmpty()) {
-            return CoreJoinResult.denied(Component.text("Es ist kein Server verfügbar"))
-        }
-
-        val results = coroutineScope {
-            candidates.map { server ->
-                async {
-                    server to (withTimeoutOrNull(4.seconds) {
-                        SurfCoreApi.checkJoin(playerUuid, server)
-                    } ?: SurfJoinCheckResult.TIMEOUT)
-                }
-            }.awaitAll()
-        }
-
-        if (results.any { (_, result) -> result.isAllowed() || result.isOnlyAlreadyConnected() }) {
+        if (directResult.any { (_, result) -> result.isJoinable() }) {
             return CoreJoinResult.allowed()
+        }
+
+        val fallbackResults =
+            check(playerUuid, fallbackServers().filter { it.name != directServer?.name })
+
+        if (fallbackResults.any { (_, result) -> result.isJoinable() }) {
+            return CoreJoinResult.allowed()
+        }
+
+        val results = directResult + fallbackResults
+        if (results.isEmpty()) {
+            return CoreJoinResult.denied(Component.text("Es ist kein Server verfügbar"))
         }
 
         return CoreJoinResult.denied(
@@ -57,13 +60,50 @@ object VelocityAvailableServerJoinListener : CoreJoinListener {
         )
     }
 
-    private fun candidateServers(playerUuid: UUID): List<SurfServer> {
-        val names = linkedSetOf<String>()
-        SurfCoreApi.getPlayer(playerUuid)?.currentServerName?.let(names::add)
-        names += plugin.proxy.configuration.attemptConnectionOrder
+    private suspend fun check(
+        playerUuid: UUID,
+        servers: List<SurfServer>
+    ): List<Pair<SurfServer, SurfJoinCheckResult>> = coroutineScope {
+        servers.map { server ->
+            async {
+                server to (withTimeoutOrNull(4.seconds) {
+                    SurfCoreApi.checkJoin(playerUuid, server)
+                } ?: SurfJoinCheckResult.TIMEOUT)
+            }
+        }.awaitAll()
+    }
 
-        return names
+    private fun SurfJoinCheckResult.isJoinable() = isAllowed() || isOnlyAlreadyConnected()
+
+    private suspend fun directServer(playerUuid: UUID): SurfServer? {
+        val player = SurfPlayerService.findPlayerByUuidRemote(playerUuid)
+            ?: SurfCoreApi.getPlayer(playerUuid)
+        val name = player?.currentServerName
+
+        if (name == null) {
+            log.atWarning()
+                .log("No current server known for %s (player found: %s)", playerUuid, player != null)
+            return null
+        }
+
+        if (plugin.proxy.getServer(name).isEmpty) {
+            log.atWarning()
+                .log("Current server '%s' of %s is not registered on this proxy", name, playerUuid)
+            return null
+        }
+
+        val server = SurfCoreApi.getServerByName(name)
+        if (server == null) {
+            log.atWarning()
+                .log("Current server '%s' of %s is not registered as surf server", name, playerUuid)
+        }
+
+        return server
+    }
+
+    private fun fallbackServers(): List<SurfServer> =
+        plugin.proxy.configuration.attemptConnectionOrder
+            .distinct()
             .filter { plugin.proxy.getServer(it).isPresent }
             .mapNotNull(SurfCoreApi::getServerByName)
-    }
 }

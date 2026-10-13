@@ -75,7 +75,12 @@ object VelocityAvailableServerJoinListener : CoreJoinListener {
 
                 if (!result.isJoinable()) {
                     log.atInfo()
-                        .log("Server %s not joinable for %s: %s", server.name, playerUuid, result.status)
+                        .log(
+                            "Server %s not joinable for %s: %s",
+                            server.name,
+                            playerUuid,
+                            result.status
+                        )
                 }
 
                 server to result
@@ -88,17 +93,9 @@ object VelocityAvailableServerJoinListener : CoreJoinListener {
     private suspend fun directServer(playerUuid: UUID): SurfServer? {
         val player = SurfPlayerService.findPlayerByUuidRemote(playerUuid)
             ?: SurfCoreApi.getPlayer(playerUuid)
-        val name = player?.currentServerName
-
-        if (name == null) {
-            log.atWarning()
-                .log("No current server known for %s (player found: %s)", playerUuid, player != null)
-            return null
-        }
+        val name = player?.currentServerName ?: return null
 
         if (plugin.proxy.getServer(name).isEmpty) {
-            log.atWarning()
-                .log("Current server '%s' of %s is not registered on this proxy", name, playerUuid)
             return null
         }
 

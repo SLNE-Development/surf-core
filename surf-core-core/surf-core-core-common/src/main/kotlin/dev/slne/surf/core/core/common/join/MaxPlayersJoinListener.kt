@@ -37,8 +37,9 @@ abstract class MaxPlayersJoinListener : CoreJoinListener {
     }
 
     private suspend fun hasBypassPermission(playerUuid: UUID) = try {
-        LuckPermsAccess.loadUser(playerUuid)
-            .cachedData
+        val user = LuckPermsAccess.getUser(playerUuid) ?: LuckPermsAccess.loadUser(playerUuid)
+
+        user.cachedData
             .permissionData
             .checkPermission(CorePermissions.BYPASS_MAX_PLAYERS)
             .asBoolean()

@@ -3,6 +3,8 @@ package dev.slne.surf.core.core.common
 import dev.slne.surf.api.core.util.mutableObjectSetOf
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.event.SurfEvent
+import dev.slne.surf.core.api.common.join.CoreJoinListener
+import dev.slne.surf.core.api.common.join.SurfJoinCheckResult
 import dev.slne.surf.core.api.common.player.SurfPlayer
 import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.common.server.SurfProxyServer
@@ -11,10 +13,14 @@ import dev.slne.surf.core.api.common.server.connection.SurfProxyServerConnection
 import dev.slne.surf.core.api.common.server.connection.SurfServerConnectResult
 import dev.slne.surf.core.core.CoreInstance
 import dev.slne.surf.core.core.common.event.SurfEventBus
+import dev.slne.surf.core.core.common.join.CoreJoinListenerRegistry
+import dev.slne.surf.core.core.common.join.isOnlyAlreadyConnected
 import dev.slne.surf.core.core.common.player.SurfPlayerService
 import dev.slne.surf.core.core.common.redis.event.SurfPlayerMessageRedisEvent
+import dev.slne.surf.core.core.common.redis.request.PlayerJoinCheckRequest
 import dev.slne.surf.core.core.common.redis.request.SendPlayerToProxyRequest
 import dev.slne.surf.core.core.common.redis.request.SendPlayerToServerRequest
+import dev.slne.surf.core.core.common.redis.watcher.PlayerJoinCheckResultWatcher
 import dev.slne.surf.core.core.common.redis.watcher.PlayerProxyConnectionResultWatcher
 import dev.slne.surf.core.core.common.redis.watcher.PlayerServerConnectionResultWatcher
 import dev.slne.surf.core.core.common.server.SurfServerService
@@ -27,6 +33,7 @@ import kotlin.reflect.KClass
 import kotlin.time.Duration.Companion.seconds
 
 private val SERVER_CONNECT_RESULT_TIMEOUT = 45.seconds
+private val JOIN_CHECK_RESULT_TIMEOUT = 15.seconds
 
 abstract class SurfCoreApiImpl : SurfCoreApi {
     override fun getOnlinePlayers(): ObjectSet<SurfPlayer> = SurfPlayerService.players
@@ -78,7 +85,71 @@ abstract class SurfCoreApiImpl : SurfCoreApi {
     override fun registerListener(listener: Any) = SurfEventBus.registerListener(listener)
     override fun fireEvent(event: SurfEvent) = SurfEventBus.fire(event)
 
+    override fun registerJoinListener(listener: CoreJoinListener) =
+        CoreJoinListenerRegistry.register(listener)
+
+    override fun unregisterJoinListener(listener: CoreJoinListener) =
+        CoreJoinListenerRegistry.unregister(listener)
+
+    override suspend fun checkJoin(playerUuid: UUID, server: CommonSurfServer) =
+        checkJoin(playerUuid, server, false)
+
+    private suspend fun checkJoin(
+        playerUuid: UUID,
+        server: CommonSurfServer,
+        force: Boolean
+    ): SurfJoinCheckResult {
+        if (server.name == getCurrentServerName()) {
+            return CoreJoinListenerRegistry.check(playerUuid)
+        }
+
+        val requestId = UUID.randomUUID()
+        val awaitingResult = PlayerJoinCheckResultWatcher.watch(requestId)
+
+        try {
+            PlayerJoinCheckRequest.createRequest(playerUuid, server.name, requestId, force)
+        } catch (_: RequestTimeoutException) {
+            PlayerJoinCheckResultWatcher.complete(requestId, SurfJoinCheckResult.TARGET_UNREACHABLE)
+        }
+
+        return withTimeoutOrNull(JOIN_CHECK_RESULT_TIMEOUT) {
+            awaitingResult.await()
+        } ?: SurfJoinCheckResult.TIMEOUT.also {
+            PlayerJoinCheckResultWatcher.complete(requestId, it)
+        }
+    }
+
     override suspend fun sendPlayerAwaiting(
+        surfPlayer: SurfPlayer,
+        surfServer: SurfServer,
+        force: Boolean
+    ): SurfServerConnectResult {
+        val joinCheck = checkJoin(surfPlayer.uuid, surfServer, force)
+
+        if (joinCheck.isOnlyAlreadyConnected()) {
+            return SurfServerConnectResult(
+                SurfServerConnectResult.Status.ALREADY_CONNECTED,
+                null,
+                joinCheck
+            )
+        }
+
+        if (!joinCheck.isAllowed() && !force) {
+            return SurfServerConnectResult(
+                SurfServerConnectResult.Status.JOIN_DENIED,
+                null,
+                joinCheck
+            )
+        }
+
+        val result = connectPlayer(surfPlayer, surfServer)
+        return SurfServerConnectResult(result.status, result.velocityMessage, joinCheck)
+    }
+
+    /**
+     * Connects the player to the server without performing a join check.
+     */
+    protected open suspend fun connectPlayer(
         surfPlayer: SurfPlayer,
         surfServer: SurfServer
     ): SurfServerConnectResult {
@@ -103,12 +174,29 @@ abstract class SurfCoreApiImpl : SurfCoreApi {
 
     override suspend fun sendPlayerAwaiting(
         surfPlayer: SurfPlayer,
-        surfProxyServer: SurfProxyServer
+        surfProxyServer: SurfProxyServer,
+        force: Boolean
     ): SurfProxyServerConnectionResult {
         val playerUuid = surfPlayer.uuid
 
         if (surfPlayer.currentProxyName == surfProxyServer.name) {
             return SurfProxyServerConnectionResult(SurfProxyServerConnectionResult.Status.ALREADY_CONNECTED)
+        }
+
+        val joinCheck = checkJoin(playerUuid, surfProxyServer, force)
+
+        if (joinCheck.isOnlyAlreadyConnected()) {
+            return SurfProxyServerConnectionResult(
+                SurfProxyServerConnectionResult.Status.ALREADY_CONNECTED,
+                joinCheck
+            )
+        }
+
+        if (!joinCheck.isAllowed() && !force) {
+            return SurfProxyServerConnectionResult(
+                SurfProxyServerConnectionResult.Status.JOIN_DENIED,
+                joinCheck
+            )
         }
 
         val awaitingResult = PlayerProxyConnectionResultWatcher.watch(playerUuid)
@@ -125,7 +213,7 @@ abstract class SurfCoreApiImpl : SurfCoreApi {
             }
         }
 
-        return withTimeoutOrNull(15.seconds) {
+        val result = withTimeoutOrNull(15.seconds) {
             awaitingResult.await().also {
                 PlayerProxyConnectionResultWatcher.cleanUp(playerUuid)
             }
@@ -135,5 +223,7 @@ abstract class SurfCoreApiImpl : SurfCoreApi {
                 SurfProxyServerConnectionResult.Status.ERR_UNKNOWN
             )
         }
+
+        return SurfProxyServerConnectionResult(result.status, joinCheck)
     }
 }

@@ -9,6 +9,10 @@ dependencies {
     api(projects.surfCoreApi.surfCoreApiMinestom)
 }
 
+repositories {
+    mavenLocal()
+}
+
 publishing {
     repositories {
         slneReleases()

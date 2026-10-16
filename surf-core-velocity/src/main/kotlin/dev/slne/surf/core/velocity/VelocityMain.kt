@@ -24,6 +24,7 @@ import dev.slne.surf.core.api.common.util.sendText
 import dev.slne.surf.core.client.ClientCoreInstance
 import dev.slne.surf.core.core.common.config.SurfServerConfiguration
 import dev.slne.surf.core.core.common.event.SurfEventBus
+import dev.slne.surf.core.core.common.join.CoreJoinListenerRegistry
 import dev.slne.surf.core.core.common.server.SurfServerService
 import dev.slne.surf.core.core.common.util.appendCorePrefix
 import dev.slne.surf.core.core.common.util.niceRed
@@ -32,6 +33,9 @@ import dev.slne.surf.core.velocity.auth.AuthenticationListener
 import dev.slne.surf.core.velocity.auth.AuthenticationService
 import dev.slne.surf.core.velocity.command.coreCommand
 import dev.slne.surf.core.velocity.config.VelocityCoreConfigManager
+import dev.slne.surf.core.velocity.join.VelocityAlreadyConnectedJoinListener
+import dev.slne.surf.core.velocity.join.VelocityAvailableServerJoinListener
+import dev.slne.surf.core.velocity.join.VelocityMaxPlayersJoinListener
 import dev.slne.surf.core.velocity.listener.ConnectionListener
 import dev.slne.surf.core.velocity.listener.VelocityServerListener
 import dev.slne.surf.core.velocity.redis.handler.SendPlayerToProxyHandler
@@ -103,6 +107,10 @@ class VelocityMain @Inject constructor(
         eventManager.register(this, AuthenticationListener)
         eventManager.register(this, VelocityServerListener)
         eventManager.registerSuspend(this, ConnectionListener)
+
+        CoreJoinListenerRegistry.register(VelocityAlreadyConnectedJoinListener)
+        CoreJoinListenerRegistry.register(VelocityMaxPlayersJoinListener)
+        CoreJoinListenerRegistry.register(VelocityAvailableServerJoinListener)
 
         SurfServerService.changeState(SurfProxyServer.current(), SurfServerState.RUNNING)
 

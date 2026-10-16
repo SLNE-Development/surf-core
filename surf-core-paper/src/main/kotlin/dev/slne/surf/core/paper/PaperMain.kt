@@ -12,10 +12,14 @@ import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.common.server.state.SurfServerState
 import dev.slne.surf.core.client.ClientCoreInstance
 import dev.slne.surf.core.core.common.event.SurfEventBus
+import dev.slne.surf.core.core.common.join.CoreJoinListenerRegistry
 import dev.slne.surf.core.core.common.server.SurfServerService
 import dev.slne.surf.core.launcher.api.LauncherConstants
 import dev.slne.surf.core.paper.command.*
 import dev.slne.surf.core.paper.event.SurfServerEventListener
+import dev.slne.surf.core.paper.join.PaperAlreadyConnectedJoinListener
+import dev.slne.surf.core.paper.join.PaperMaxPlayersJoinListener
+import dev.slne.surf.core.paper.join.PaperWhitelistJoinListener
 import dev.slne.surf.core.paper.listener.PlayerConnectListener
 import dev.slne.surf.core.paper.task.surfServerInformationSyncTask
 import net.luckperms.api.event.user.UserDataRecalculateEvent
@@ -51,6 +55,10 @@ class PaperMain : SuspendingJavaPlugin() {
         hubCommand()
 
         PlayerConnectListener.register()
+
+        CoreJoinListenerRegistry.register(PaperAlreadyConnectedJoinListener)
+        CoreJoinListenerRegistry.register(PaperWhitelistJoinListener)
+        CoreJoinListenerRegistry.register(PaperMaxPlayersJoinListener)
 
         SurfServerService.addServer(
             SurfServer.current().copy(maxPlayers = Bukkit.getMaxPlayers())

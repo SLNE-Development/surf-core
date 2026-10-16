@@ -7,6 +7,9 @@ plugins {
 surfMinestomApi {
     withSurfRedis()
 }
+repositories {
+    mavenLocal()
+}
 
 minestomPluginFile {
     main = "dev.slne.surf.core.minestom.SurfCoreMinestomPlugin"

@@ -8,6 +8,10 @@ dependencies {
     api(projects.surfCoreApi.surfCoreApiCommon)
 }
 
+repositories {
+    mavenLocal()
+}
+
 publishing {
     repositories {
         slneReleases()

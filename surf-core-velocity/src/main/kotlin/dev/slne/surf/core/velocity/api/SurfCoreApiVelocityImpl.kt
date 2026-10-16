@@ -18,13 +18,13 @@ class SurfCoreApiVelocityImpl : SurfCoreApiClientImpl(), Services.Fallback {
     override fun getCurrentServerCategory() = surfServerConfig.serverCategory
     override fun getCurrentServerDisplayName() = surfServerConfig.serverDisplayName
 
-    override suspend fun sendPlayerAwaiting(
+    override suspend fun connectPlayer(
         surfPlayer: SurfPlayer,
         surfServer: SurfServer
     ): SurfServerConnectResult {
         val player = plugin.proxy.getPlayer(surfPlayer.uuid).getOrNull()
         if (player == null) {
-            return super.sendPlayerAwaiting(surfPlayer, surfServer)
+            return super.connectPlayer(surfPlayer, surfServer)
         } else {
             val velocityServer = plugin.proxy.getServer(surfServer.name).getOrNull()
                 ?: return SurfServerConnectResult(

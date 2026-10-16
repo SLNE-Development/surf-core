@@ -16,28 +16,28 @@ fun networkSendCommand() = commandTree("nsend") {
     withPermission(CorePermissions.COMMAND_NETWORK_SEND)
 
     literalArgument("player") {
-        surfPlayerArgument("player") {
-            surfServerArgument("server") {
+        surfPlayerArgument("target") {
+            surfServerArgument("targetServer") {
                 anyExecutorSuspend { executor, args ->
-                    val player: SurfPlayer by args
-                    val server: CommonSurfServer by args
-                    NetworkSendCommandHandler.sendPlayer(executor, player, server)
+                    val target: SurfPlayer by args
+                    val targetServer: CommonSurfServer by args
+                    NetworkSendCommandHandler.sendPlayer(executor, target, targetServer)
                 }
             }
         }
     }
 
     literalArgument("server") {
-        surfServerArgument("server") {
+        surfServerArgument("sourceServer") {
             surfServerArgument("targetServer") {
                 anyExecutorSuspend { executor, args ->
-                    val server: CommonSurfServer by args
+                    val sourceServer: CommonSurfServer by args
                     val targetServer: CommonSurfServer by args
                     NetworkSendCommandHandler.sendPlayers(
                         executor,
-                        server.getPlayers(),
+                        sourceServer.getPlayers(),
                         targetServer,
-                        server.name
+                        sourceServer.name
                     )
                 }
             }

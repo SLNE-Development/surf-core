@@ -1,7 +1,6 @@
 package dev.slne.surf.core.core.common.command
 
 import dev.slne.surf.api.core.messages.adventure.sendText
-import dev.slne.surf.api.core.minimessage.miniMessage
 import dev.slne.surf.core.api.common.SurfCoreApi
 import dev.slne.surf.core.api.common.util.sendText
 import dev.slne.surf.core.core.common.util.appendCorePrefix
@@ -11,8 +10,6 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.TextDecoration
 
 object NetworkBroadcastCommandHandler {
-    fun broadcast(audience: Audience, serializedMessage: String) =
-        broadcast(audience, miniMessage.deserialize(serializedMessage))
 
     fun broadcast(audience: Audience, message: Component) {
         val players = SurfCoreApi.getOnlinePlayers()

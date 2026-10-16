@@ -1,9 +1,9 @@
 package dev.slne.surf.core.minestom.command.impl
 
-import dev.slne.minestom.lobby.api.command.commandapi.dsl.anyExecutor
-import dev.slne.minestom.lobby.api.command.commandapi.dsl.commandTree
-import dev.slne.minestom.lobby.api.command.commandapi.dsl.literalArgument
-import dev.slne.minestom.lobby.api.command.commandapi.dsl.playerExecutorSuspend
+import dev.slne.surf.api.minestom.command.dsl.anyExecutor
+import dev.slne.surf.api.minestom.command.dsl.commandTree
+import dev.slne.surf.api.minestom.command.dsl.literalArgument
+import dev.slne.surf.api.minestom.command.dsl.playerExecutorSuspend
 import dev.slne.surf.core.api.common.server.SurfProxyServer
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.api.minestom.command.argument.surfBackendServerArgument
@@ -12,13 +12,13 @@ import dev.slne.surf.core.api.minestom.util.surfPlayer
 import dev.slne.surf.core.core.common.command.NetworkSendCommandHandler
 import dev.slne.surf.core.core.common.command.SurfCoreCommandHandler
 import dev.slne.surf.core.core.common.permission.CorePermissions
-import dev.slne.surf.core.minestom.SurfCoreMinestomEntrypoint
+import dev.slne.surf.core.minestom.SurfCoreMinestomPlugin
 
 fun surfCoreCommand() = commandTree("surfcore") {
     withPermission(CorePermissions.COMMAND_CORE)
     literalArgument("reload") {
         anyExecutor { executor, _ ->
-            SurfCoreMinestomEntrypoint.surfServerConfiguration.reload()
+            SurfCoreMinestomPlugin.surfServerConfiguration.reload()
             SurfCoreCommandHandler.configReloaded(executor)
         }
     }

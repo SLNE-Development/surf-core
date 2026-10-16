@@ -1,4 +1,4 @@
-package dev.slne.surf.core.minestom
+package dev.slne.surf.core.minestom.listener.redis
 
 import dev.slne.surf.core.api.minestom.util.minestomPlayer
 import dev.slne.surf.core.core.common.command.NetworkTeleportCommandHandler

@@ -7,5 +7,5 @@ import dev.slne.surf.core.core.CoreInstance
 
 @AutoService(CoreInstance::class)
 class MinestomCoreInstance : ClientCoreInstance {
-    override val clientLoader = ClientLoader(SurfCoreMinestomEntrypoint.dataPath)
+    override val clientLoader = ClientLoader(SurfCoreMinestomPlugin.dataDirectory)
 }

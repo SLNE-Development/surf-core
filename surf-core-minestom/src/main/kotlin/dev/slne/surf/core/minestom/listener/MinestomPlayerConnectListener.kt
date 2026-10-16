@@ -1,20 +1,21 @@
-package dev.slne.surf.core.minestom
+package dev.slne.surf.core.minestom.listener
 
-import dev.slne.minestom.lobby.api.coroutine.minestomScope
-import dev.slne.minestom.lobby.api.event.EventRegistrar
-import dev.slne.minestom.lobby.api.extension.addListener
-import dev.slne.minestom.lobby.api.player.event.PlayerLoginEvent
-import dev.slne.minestom.lobby.api.player.lobbyPlayer
 import dev.slne.surf.api.core.util.logger
-import dev.slne.surf.core.core.common.permission.CorePermissions
+import dev.slne.surf.api.minestom.coroutine.minestomScope
+import dev.slne.surf.api.minestom.event.EventRegistrar
+import dev.slne.surf.api.minestom.extension.addListener
+import dev.slne.surf.api.minestom.permission.hasPermission
+import dev.slne.surf.api.minestom.player.event.AsyncPlayerCountEvent
 import dev.slne.surf.core.api.common.server.connection.SurfProxyServerConnectionResult
 import dev.slne.surf.core.core.CoreInstance
 import dev.slne.surf.core.core.common.command.WhereAmICommandHandler
+import dev.slne.surf.core.core.common.permission.CorePermissions
 import dev.slne.surf.core.core.common.player.PlayerConnectionMessages
 import dev.slne.surf.core.core.common.player.SurfPlayerService
 import dev.slne.surf.core.core.common.player.error.SurfPlayerErrorService
 import dev.slne.surf.core.core.common.redis.request.SendPlayerToProxyRequest
 import dev.slne.surf.core.core.common.redis.watcher.PlayerProxyConnectionResultWatcher
+import dev.slne.surf.core.minestom.MinestomPlayerDisplayNameService
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -26,29 +27,27 @@ import net.minestom.server.event.player.PlayerSpawnEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-class MinestomPlayerConnectListener : EventRegistrar {
-
+object MinestomPlayerConnectListener : EventRegistrar {
     private val log = logger()
 
     override fun register(node: EventNode<Event>) {
-        node.addListener<PlayerLoginEvent>(::onPlayerLogin)
+        node.addListener<AsyncPlayerCountEvent>(::onPlayerCountCheck)
         node.addListener<AsyncPlayerConfigurationEvent>(::onPlayerConfiguration)
         node.addListener<PlayerSpawnEvent>(::onPlayerSpawn)
     }
 
-    /**
-     * Lets a player with [CorePermissions.BYPASS_MAX_PLAYERS] onto a full server. The limit itself
-     * belongs to the server, which refuses everyone else before they are configured.
-     */
-    private fun onPlayerLogin(event: PlayerLoginEvent) {
-        if (event.result != PlayerLoginEvent.Result.KICK_FULL) return
-        if (!event.lobbyPlayer.hasPermission(CorePermissions.BYPASS_MAX_PLAYERS)) return
+    private fun onPlayerCountCheck(event: AsyncPlayerCountEvent) {
+        if (!event.player.hasPermission(CorePermissions.BYPASS_MAX_PLAYERS)) {
+            return
+        }
 
         event.allow()
     }
 
     private fun onPlayerConfiguration(event: AsyncPlayerConfigurationEvent) {
-        if (!event.isFirstConfig) return
+        if (!event.isFirstConfig) {
+            return
+        }
 
         val player = event.player
 
@@ -105,7 +104,7 @@ class MinestomPlayerConnectListener : EventRegistrar {
     private fun onPlayerSpawn(event: PlayerSpawnEvent) {
         if (!event.isFirstSpawn) return
 
-        val player = event.lobbyPlayer
+        val player = event.player
         val surfPlayer = SurfPlayerService.findPlayerByUuid(player.uuid) ?: return
 
         MinestomPlayerDisplayNameService.update(player)
@@ -114,7 +113,9 @@ class MinestomPlayerConnectListener : EventRegistrar {
             WhereAmICommandHandler.send(player, player.uuid, player.username)
         }
 
-        if (!surfPlayer.transferred) return
+        if (!surfPlayer.transferred) {
+            return
+        }
 
         CoreInstance.redisApi.publishEvent(
             SendPlayerToProxyRequest.Response(

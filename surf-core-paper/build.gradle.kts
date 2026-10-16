@@ -22,6 +22,10 @@ surfPaperPluginApi {
         registerRequired("LuckPerms")
         registerRequired("surf-rabbitmq-paper")
     }
+
+    testing {
+        mockBukkit = false
+    }
 }
 
 dependencies {

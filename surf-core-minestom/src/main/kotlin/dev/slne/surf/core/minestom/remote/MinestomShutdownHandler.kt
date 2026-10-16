@@ -1,8 +1,8 @@
-package dev.slne.surf.core.minestom
+package dev.slne.surf.core.minestom.remote
 
 import com.google.auto.service.AutoService
-import dev.slne.minestom.lobby.api.extension.CommandManager
-import dev.slne.minestom.lobby.api.extension.ConnectionManager
+import dev.slne.surf.api.minestom.extension.CommandManager
+import dev.slne.surf.api.minestom.extension.ConnectionManager
 import dev.slne.surf.core.api.common.server.CommonSurfServer
 import dev.slne.surf.core.api.common.server.SurfServer
 import dev.slne.surf.core.core.common.redis.listener.ServerShutdownHandler

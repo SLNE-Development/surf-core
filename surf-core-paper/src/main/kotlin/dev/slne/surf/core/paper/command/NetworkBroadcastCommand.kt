@@ -11,7 +11,7 @@ import net.kyori.adventure.text.Component
 
 fun networkBroadcastCommand() = commandTree("nbroadcast") {
     withPermission(PermissionRegistry.COMMAND_NETWORK_BROADCAST)
-    argument(MiniMessageArgument("message")) {
+    argument(MiniMessageArgument("message", greedy = true)) {
         anyExecutor { executor, args ->
             val message: Component by args
 
